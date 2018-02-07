@@ -75,6 +75,7 @@ require(wesanderson)
 require(ggplot2)
 require(data.table)
 require(plyr)
+require(EBImage)
 
 
 #download example images and place in "example" subdirectory
@@ -82,8 +83,7 @@ f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
 download.file(f,"temp.zip")
 unzip("temp.zip")
 unlink("temp.zip")
-
-kin <- kin.img(image.dir="example",thr=0.7,frames=150:200,smooth=0.5)
+kin <- kin.img(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=50:100,smooth=0.5)
 ml <- kin$midline
 #normalize x (y is normalized to midline by "kin.img/kin.vid")
 ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -95,8 +95,7 @@ ml <- merge(ml,ml2,by="frame") #merge these
 
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-
+p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 }
 \seealso{
 \code{\link{kin.vid}}

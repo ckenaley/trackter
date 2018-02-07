@@ -50,13 +50,11 @@
 #'
 #' require(wesanderson)
 #' require(ggplot2)
-#' require(data.table)
 #' require(plyr)
 #'
 #' #download an example video (7.5 MB) and place in working directory
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/trout1_63_test.avi?raw=true"
 #' download.file(f, file.path(getwd(), "trout1_63_test.avi"), method = "libcurl")
-#' setwd("/Users/Chris/Google Drive/trout/red")
 #' kin <- kin.vid(vid.path ="trout1_63_test.avi",thr=0.7,frames=1:20,frame.rate=10)
 #'
 #' ml <- kin$midline
@@ -80,9 +78,10 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
   oldwd <- getwd()
   trial <- gsub(".avi","",vid.path)
 
-  for(i in 1:2) fishr::vid.to.images(vid.path=vid.path,qual = 20)
-
-kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth, image.type,flip,n.blob,rem.file,make.video,qual,frame.rate)
+  for(i in 1:2) vid.to.images(vid.path=vid.path,qual = 20)
+  image.dir <- paste0(getwd(),"/images")
+  print(image.dir)
+  kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth, image.type,flip,n.blob,rem.file,make.video,qual,frame.rate)
 }
 
 ######### kin.img
@@ -117,18 +116,18 @@ kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth
 #' @return A list with the following components:
 #'
 #'\code{kin.dat} a data frame consisting of position paramters for the ROI indicated by \code{n.blob}:\itemize{
-  #' \item the frame number
-  #' \item "head.x" and "head.y": the x and y position of the head (leftmost or anteriormost)
-  #' \item "x" and ""y": the position of the tail (rightmost or posteriormost)
-  #' \item "amp": the amplitude (\code{amp}) of the tail
-  #' \item "head.pval": p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
-  #'
-  #' \code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{
-  #' \item "x" and "y.m": x and y positions of the midline of the ROI
-  #' \item "mid.pred": the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-  #' \item "y.pred": midline points fit to a loess smoothing model with span equal to \code{smooth} (red curve in the outputted images/video)
-  #' \item "wave.y": midline points "y.pred" normalized to "mid.pred"}
-  #'
+#' \item the frame number
+#' \item "head.x" and "head.y": the x and y position of the head (leftmost or anteriormost)
+#' \item "x" and ""y": the position of the tail (rightmost or posteriormost)
+#' \item "amp": the amplitude (\code{amp}) of the tail
+#' \item "head.pval": p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
+#'
+#' \code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{
+#' \item "x" and "y.m": x and y positions of the midline of the ROI
+#' \item "mid.pred": the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
+#' \item "y.pred": midline points fit to a loess smoothing model with span equal to \code{smooth} (red curve in the outputted images/video)
+#' \item "wave.y": midline points "y.pred" normalized to "mid.pred"}
+#'
 #'  \code{head.lms}  "lm" objects, one for each frame desribed by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
 #' @seealso \code{\link{kin.vid}}
 #' @export
@@ -138,6 +137,7 @@ kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth
 #' require(ggplot2)
 #' require(data.table)
 #' require(plyr)
+#' require(EBImage)
 #'
 #'
 #' #download example images and place in "example" subdirectory
@@ -145,8 +145,7 @@ kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth
 #' download.file(f,"temp.zip")
 #' unzip("temp.zip")
 #' unlink("temp.zip")
-#'
-#' kin <- kin.img(image.dir="example",thr=0.7,frames=150:200,smooth=0.5)
+#' kin <- kin.img(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=50:100,smooth=0.5)
 #' ml <- kin$midline
 #' #normalize x (y is normalized to midline by "kin.img/kin.vid")
 #' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -158,8 +157,7 @@ kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth
 #'
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-#'
+#' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 
 
 kin.img <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,n.blob=NULL,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10){
@@ -171,6 +169,7 @@ kin.img <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg"))
 
+  if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")
   if(!is.null(frames)) images <- images[frames]
 
   pb = txtProgressBar(min = 0, max = length(images), initial = 0,style=3)
@@ -184,6 +183,7 @@ kin.img <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
   midline.dat <- list()
   lms <- list()
   for(im in images){
+
     frame <- which(im==images)-1 #could cause problems
     img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"
     ## computes binary mask

@@ -2,16 +2,18 @@ Package: trackter
 Title: Automated Kinematic Analysis of Video Data
 Version: 0.0.0.9000
 Authors@R: person(given="Christopher", family="Kenaley", email = "kenaley@bc.edu", role = c("aut", "cre"))
-Description: fish converts video files to binary images and simply analyzes the shape of a region of interest (ROI). It was developed to automate kinematic analysis of undulatory locomotion using highly contrasted video data produced from backlighting an animal. fish converts a video to binary images and then to matrices to determine a column-wise midpoint of ROI pixels is determined. tThis, in turn, determines the midline coordinates and from these data one can calculate important kinematic parameters including amplitude, frequency, wavelength, etc.
-Depends: R (>= 3.3.3)
+Description: trackter converts video files to binary images and simply analyzes the shape of a region of interest (ROI). It was developed to automate kinematic analysis of undulatory locomotion using highly contrasted video data produced from backlighting an animal. fish converts a video to binary images and then to matrices to determine a column-wise midpoint of ROI pixels is determined. tThis, in turn, determines the midline coordinates and from these data one can calculate important kinematic parameters including amplitude, frequency, wavelength, etc.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-Imports:
+Depends: R (>= 3.3.3),
     dplyr,
     data.table,
     pastecs,
     animation,
-    emojifont,
     EBImage
+Imports:
+    wesanderson,
+    ggplot2,
+    emojifont
 RoxygenNote: 6.0.1

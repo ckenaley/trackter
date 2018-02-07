@@ -10,13 +10,13 @@ images.to.video(image.dir = NULL, vid.name = NULL, qual = 50,
 \arguments{
 \item{image.dir}{Character; directory containing images to stich.}
 
+\item{vid.name}{character; file name to be give video.}
+
 \item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
 
 \item{vid.ext}{chacracter; video type to output. mp4 currently works best.}
 
 \item{frame.rate}{numeric; video frame rate in fps.}
-
-\item{vid.path}{character; file name to be give video.}
 }
 \value{
 Outputs a video of name "video.name+vid.ext".
@@ -34,6 +34,7 @@ require(emojifont)
 
 y <- sin(1:50)
 x <- 1:50
+dir.create("images") #make a directory to stor images
 for(i in 1:50) {
   jpeg(paste0(getwd(),"/images/image",sprintf("\%03d",i),".jpg"))
   plot(x[i],y[i],col="red",xlim=c(0,50),ylim=range(y),cex=0)
@@ -41,7 +42,7 @@ for(i in 1:50) {
   dev.off()
   }
 
-images.to.video(image.dir="images",vid.name="flyingcow",frame.rate=5)
+images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="flyingcow",frame.rate=5,qual=100)
 
 }
 \seealso{

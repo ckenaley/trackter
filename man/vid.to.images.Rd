@@ -35,5 +35,5 @@ vid.to.images(vid.path="wave.mp4",qual=100)
 list.files( paste0(getwd(),"/","images"))
 }
 \seealso{
-\code{\link{images.to.videos}}
+\code{\link{images.to.video}}
 }

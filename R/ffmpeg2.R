@@ -3,7 +3,7 @@
 #' @param vid.path Character; path of video file to be processed.
 #' @param qual numeric; the quality of the jpeg images to be rendered from 1-100\%. Defaults to 50\%.
 #' @return Extracts all the images of the video and saves them to an "images" directory with appended number sequence
-#' @seealso \code{\link{images.to.videos}}
+#' @seealso \code{\link{images.to.video}}
 #' @export
 #' @examples
 #' #make a video with animation package
@@ -27,7 +27,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 
   version <-  try(system("ffmpeg -version", intern = TRUE))
   if (inherits(version, "try-error")) {
-    warning("The command \"", ffmpeg, "\" is not available in your system. Please install FFmpeg or avconv first:",
+    warning("The command \"", ffmpeg, "\" is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
@@ -55,7 +55,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #' Stitches images into an AVI file
 #'
 #' @param image.dir Character; directory containing images to stich.
-#' @param vid.path character; file name to be give video.
+#' @param vid.name character; file name to be give video.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
 #' @param vid.ext chacracter; video type to output. mp4 currently works best.
 #' @param frame.rate numeric; video frame rate in fps.
@@ -70,6 +70,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #'
 #' y <- sin(1:50)
 #' x <- 1:50
+#' dir.create("images") #make a directory to stor images
 #' for(i in 1:50) {
 #'   jpeg(paste0(getwd(),"/images/image",sprintf("%03d",i),".jpg"))
 #'   plot(x[i],y[i],col="red",xlim=c(0,50),ylim=range(y),cex=0)
@@ -77,14 +78,14 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #'   dev.off()
 #'   }
 #'
-#' images.to.video(image.dir="images",vid.name="flyingcow",frame.rate=5)
+#' images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="flyingcow",frame.rate=5,qual=100)
 #'
 
 images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",frame.rate=10)  {
 
   version <-  try(system(paste("ffmpeg -version"), intern = TRUE))
   if (inherits(version, "try-error")) {
-    warning("The command \"", ffmpeg, "\" is not available in your system. Please install FFmpeg or avconv first:",
+    warning("The command \"", ffmpeg, "\" is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
@@ -100,8 +101,8 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
   #delete video if it exists
   unlink(vid.path,recursive = T)
 
-  images <- list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp")
-
+  images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp"))
+print(images)
   image.dir <- paste0(gsub("Google Drive","\"Google Drive\"",image.dir),"/") #degooglize path
 
   vid.path <- paste0(gsub("Google Drive","\"Google Drive\"",vid.path)) #degooglize path
@@ -109,10 +110,10 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
   und <- grepl("_\\d+\\.\\w+\\b",images[1])
 
 
-  image.name <- gsub("(\\w)\\d+\\.\\w+\\b","\\1", images[1])
-  if(und) image.name <- gsub("(.+)_\\d+\\.\\w+\\b","\\1",images[1])
+  image.name <- gsub("(\\w)\\d+\\.\\w+\\b","\\1", basename(images[1]))
+  if(und) image.name <- gsub("(.+)_\\d+\\.\\w+\\b","\\1",basename(images[1]))
 
-  num<- gsub(image.name,"",images[1])
+  num<- gsub(image.name,"",basename(images[1]))
   num <- gsub("_","",num);
   num <- unlist(strsplit(num,"[.]"))
 

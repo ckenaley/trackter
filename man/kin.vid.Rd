@@ -75,13 +75,11 @@ Assumes images are appended with a numeric sequence.
 
 require(wesanderson)
 require(ggplot2)
-require(data.table)
 require(plyr)
 
 #download an example video (7.5 MB) and place in working directory
 f <- "https://github.com/ckenaley/exampledata/blob/master/trout1_63_test.avi?raw=true"
 download.file(f, file.path(getwd(), "trout1_63_test.avi"), method = "libcurl")
-setwd("/Users/Chris/Google Drive/trout/red")
 kin <- kin.vid(vid.path ="trout1_63_test.avi",thr=0.7,frames=1:20,frame.rate=10)
 
 ml <- kin$midline
