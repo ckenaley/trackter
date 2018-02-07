@@ -2,35 +2,23 @@
 title: "trackter: Automated Kinematic Analysis in R"
 author: "Christopher Kenaley"
 date: "2/6/2018"
-output:
-  html_document:
-    highlight: tango
-    toc: yes
-    toc_float:
-      collapsed: no
-      smooth_scroll: no
-      theme: united
-  pdf_document:
-    toc: yes
 ---
 
 
-<<<<<<< HEAD
 # Introduction
-=======
-#Introduction
->>>>>>> dd649b6a7f64c51365ccedc2704206ef44d32c54
+
  ![](trackterlogo.png) 
 <br>
 
 _trackter_ extracts 2D kinemtics from video and image data. Although `trackter` was developed for analysis of swimming fishes, this package should prove useful for those interested in waveforms of any undulating or oscillating body in a pixel field. The intent is to find body midline positions and, from that, compute trailing-edge frequency and amplitude. The basic premise here is that a modestly contrasted image of the moving body can be transformed into a binary image rather easily and those negative (i.e., black pixels) can be used to infer the position of the midline. Specifically, the midline is calculated from the column-wise midpoint of negative pixels. The midline data are then plotted onto the original images from the video and those images are stiched together to produce an MPEG complete with undulating fish and midline data. So you go from . . .
 
 ![](trout1_64_2018-01-23-130029-0000001.jpg)
- $\rightarrow$ 
+to 
+
 ![](trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg)
-$\rightarrow$ 
+to
+
 ![](trout1_64_2018-01-23-130029-0000_001_data.jpg)
-<img src="trout1_64_2018-01-23-130029-0000_001_data.jpg" alt="trout swimming", width = "20%">
 
 Functions also return values for relevant kinematic paramters, including midline x and y positions and rightmost (i.e., trailing edge) amplitude, among others.
 
@@ -101,7 +89,8 @@ OK, let's choose a nice color palette and plot the waveforms for each of the 50 
 ```{r}
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+print(p)
 ```
 
 
