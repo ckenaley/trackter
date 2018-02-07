@@ -15,7 +15,11 @@ output:
 ---
 
 
+<<<<<<< HEAD
 # Introduction
+=======
+#Introduction
+>>>>>>> dd649b6a7f64c51365ccedc2704206ef44d32c54
  ![](trackterlogo.png) 
 <br>
 
