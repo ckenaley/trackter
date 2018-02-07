@@ -2,17 +2,7 @@
 title: "trackter: Automated Kinematic Analysis in R"
 author: "Christopher Kenaley"
 date: "1/24/2018"
-output:
-  html_document:
-    highlight: tango
-    toc: yes
-    toc_float:
-      collapsed: no
-      smooth_scroll: no
-      theme: united
-      keep_md: true
-  pdf_document:
-    toc: yes
+output:  md_document
 ---
 
 
