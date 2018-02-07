@@ -1,7 +1,7 @@
 ---
 title: "trackter: Automated Kinematic Analysis in R"
 author: "Christopher Kenaley"
-date: "1/24/2018"
+date: "2/6/2018"
 output:
   html_document:
     highlight: tango
@@ -15,12 +15,18 @@ output:
 ---
 
 
-#Introduction
-<img src="trackterlogo.png" alt="logo", width = "40%"><br>
+# Introduction
+ ![](trackterlogo.png) 
+<br>
 
 _trackter_ extracts 2D kinemtics from video and image data. Although `trackter` was developed for analysis of swimming fishes, this package should prove useful for those interested in waveforms of any undulating or oscillating body in a pixel field. The intent is to find body midline positions and, from that, compute trailing-edge frequency and amplitude. The basic premise here is that a modestly contrasted image of the moving body can be transformed into a binary image rather easily and those negative (i.e., black pixels) can be used to infer the position of the midline. Specifically, the midline is calculated from the column-wise midpoint of negative pixels. The midline data are then plotted onto the original images from the video and those images are stiched together to produce an MPEG complete with undulating fish and midline data. So you go from . . .
 
-<img src="trout1_64_2018-01-23-130029-0000001.jpg" alt="trout swimming", width = "20%"> $\rightarrow$ <img src="trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg" alt="trout swimming", width = "20%"> $\rightarrow$ <img src="trout1_64_2018-01-23-130029-0000_001_data.jpg" alt="trout swimming", width = "20%">
+![](trout1_64_2018-01-23-130029-0000001.jpg)
+ $\rightarrow$ 
+![](trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg)
+$\rightarrow$ 
+![](trout1_64_2018-01-23-130029-0000_001_data.jpg)
+<img src="trout1_64_2018-01-23-130029-0000_001_data.jpg" alt="trout swimming", width = "20%">
 
 Functions also return values for relevant kinematic paramters, including midline x and y positions and rightmost (i.e., trailing edge) amplitude, among others.
 

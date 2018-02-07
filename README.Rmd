@@ -15,7 +15,7 @@ output:
 ---
 
 
-#This is a development version of _trackter_, an R package that performs semiautomated tracking and analysis of 2D kinematics from video and image data.
+# This is a development version of _trackter_, an R package that performs semiautomated tracking and analysis of 2D kinematics from video and image data.
 
 Please report any bugs or performance issues---this page is currently under development.
 
@@ -30,4 +30,4 @@ require(trackter)
 <b>
 A tutorial can be found here: 
 
-<img src="trackterlogo.png" alt="logo", width = "40%"><br>
+ ![](trackterlogo.png) 
