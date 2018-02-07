@@ -1,7 +1,7 @@
 Introduction
 ============
 
-<img src="trackterlogo.png" alt="logo", width = "40%"><br>
+![](trackterlogo.png) <br>
 
 *trackter* extracts 2D kinemtics from video and image data. Although
 `trackter` was developed for analysis of swimming fishes, this package
