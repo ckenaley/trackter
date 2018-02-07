@@ -102,7 +102,6 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
   unlink(vid.path,recursive = T)
 
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp"))
-print(images)
   image.dir <- paste0(gsub("Google Drive","\"Google Drive\"",image.dir),"/") #degooglize path
 
   vid.path <- paste0(gsub("Google Drive","\"Google Drive\"",vid.path)) #degooglize path
