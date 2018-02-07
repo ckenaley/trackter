@@ -1,10 +1,11 @@
-Introduction
-============
-
-![](trackterlogo.png) <br>
+*trackter*: Semiautomated kinematic analysis of video and image data
+====================================================================
+<br>
+![](trackterlogo.png) 
+<br>
 
 *trackter* extracts 2D kinemtics from video and image data. Although
-`trackter` was developed for analysis of swimming fishes, this package
+*trackter* was developed for analysis of swimming fishes, this package
 should prove useful for those interested in waveforms of any undulating
 or oscillating body in a pixel field. The intent is to find body midline
 positions and, from that, compute trailing-edge frequency and amplitude.
@@ -17,11 +18,9 @@ original images from the video and those images are stiched together to
 produce an MPEG complete with undulating fish and midline data. So you
 go from . . .
 
-<img src="trout1_64_2018-01-23-130029-0000001.jpg" alt="trout swimming", width = "20%">
-→
-<img src="trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg" alt="trout swimming", width = "20%">
-→
-<img src="trout1_64_2018-01-23-130029-0000_001_data.jpg" alt="trout swimming", width = "20%">
+![](trout1_64_2018-01-23-130029-0000001.jpg) -&gt;
+![](trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg) -&gt;
+![](trout1_64_2018-01-23-130029-0000_001_data.jpg)
 
 Functions also return values for relevant kinematic paramters, including
 midline x and y positions and rightmost (i.e., trailing edge) amplitude,
@@ -58,7 +57,7 @@ amplitude, etc.).
 Install and load
 ================
 
-Use the `dev.tools` package to install `trackter`, then load it:
+Use the `dev.tools` package to install *trackter*, then load it:
 
       require(devtools)
       install_github("ckenaley/trackter")
@@ -70,7 +69,7 @@ Preliminaries
 Because the goal of many projects focused on locomotor kinematics is to
 determine waveform paramters, including wavelength, wave speed, and
 trailing edge amplitude, we need a point of reference. For this,
-\_trackter\_\_ computes a midline determined by a prediction from an
+*trackter* computes a midline determined by a prediction from an
 linear model of the some anterior part of the body. That is, it assumes
 the leading edge (the head in this example) is stiff and thus is will
 serve as the point of reference to determine waveform paramters. The
@@ -103,12 +102,12 @@ the largest group of negative pixels in the field. However, should it
 not be, you can indicated the ROI of interest as the nth largest in the
 field with "n.blob".
 
-    kin <- kin.vid(vid.path ="trout1_63_test.avi",thr=0.7,frames=1:5,frame.rate=10,flip = T)
+    kin <- kin.vid(vid.path ="trout1_63_test.avi",thr=0.7,frames=1:50,frame.rate=10,flip = T)
 
     ml <- kin$midline
 
-Check that the MP4 vide---complete with midlines plotted over the
-original video---exists.
+Check that the MP4 video (complete with midlines plotted over the
+original video)exists.
 
     file.exists("trout1_63_test.mp4")
 
