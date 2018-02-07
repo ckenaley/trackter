@@ -17,11 +17,7 @@ original images from the video and those images are stiched together to
 produce an MPEG complete with undulating fish and midline data. So you
 go from . . .
 
-<img src="trout1_64_2018-01-23-130029-0000001.jpg" alt="trout swimming", width = "20%">
-→
-<img src="trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg" alt="trout swimming", width = "20%">
-→
-<img src="trout1_64_2018-01-23-130029-0000_001_data.jpg" alt="trout swimming", width = "20%">
+![](trout1_64_2018-01-23-130029-0000001.jpg)→![](trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg)→![](trout1_64_2018-01-23-130029-0000_001_data.jpg)
 
 Functions also return values for relevant kinematic paramters, including
 midline x and y positions and rightmost (i.e., trailing edge) amplitude,
