@@ -80,7 +80,6 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 
   for(i in 1:2) vid.to.images(vid.path=vid.path,qual = 20)
   image.dir <- paste0(getwd(),"/images")
-  print(image.dir)
   kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth, image.type,flip,n.blob,rem.file,make.video,qual,frame.rate)
 }
 
