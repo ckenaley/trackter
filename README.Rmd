@@ -30,4 +30,4 @@ require(trackter)
 <b>
 A tutorial can be found here: 
 
-<img src="trackterlogo.png" alt="logo", width = "40%"><br>
+ ![](trackterlogo.png) 
