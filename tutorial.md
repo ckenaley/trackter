@@ -4,7 +4,7 @@
 ![](trackterlogo.png) 
 <br>
 
-*trackter* extracts 2D kinemtics from video and image data. Although
+*trackter* extracts 2D kinematics from video and image data. Although
 *trackter* was developed for analysis of swimming fishes, this package
 should prove useful for those interested in waveforms of any undulating
 or oscillating body in a pixel field. The intent is to find body midline
@@ -14,15 +14,14 @@ body can be transformed into a binary image rather easily and those
 negative (i.e., black pixels) can be used to infer the position of the
 midline. Specifically, the midline is calculated from the column-wise
 midpoint of negative pixels. The midline data are then plotted onto the
-original images from the video and those images are stiched together to
+original images from the video and those images are stitched together to
 produce an MPEG complete with undulating fish and midline data. So you
 go from . . .
 
 ![](trout1_64_2018-01-23-130029-0000001.jpg) -&gt;
-![](trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg) -&gt;
-![](trout1_64_2018-01-23-130029-0000_001_data.jpg)
+![](trout1_64_2018-01-23-130029-0000.avi_001_bin.jpg) -&gt; ![](trout1_64_2018-01-23-130029-0000_001_data.jpg)
 
-Functions also return values for relevant kinematic paramters, including
+Functions also return values for relevant kinematic parameters, including
 midline x and y positions and rightmost (i.e., trailing edge) amplitude,
 among others.
 
@@ -45,8 +44,8 @@ tested on a few dark fish swimming on light back grounds and the results
 are comparable.
 
 If you have an image sequence, you don't need ffmpeg installed. To
-extract images from a video or to stich outputted images (those with
-overlayed mideline track) you could perform some simple opertions in
+extract images from a video or to stitch outputted images (those with
+overlayed midline track) you could perform some simple operations in
 something like [imageJ](https://imagej.nih.gov/ij/)). By using
 *trackter's* `kin.img`, near total automation of the waveform estimation
 is possible. With ffmpeg installed, the user can invoke `kin.vid` to
@@ -67,13 +66,13 @@ Preliminaries
 =============
 
 Because the goal of many projects focused on locomotor kinematics is to
-determine waveform paramters, including wavelength, wave speed, and
+determine waveform parameters, including wavelength, wave speed, and
 trailing edge amplitude, we need a point of reference. For this,
 *trackter* computes a midline determined by a prediction from an
 linear model of the some anterior part of the body. That is, it assumes
 the leading edge (the head in this example) is stiff and thus is will
-serve as the point of reference to determine waveform paramters. The
-midline and waveform is projected along the length of deginated ROI and,
+serve as the point of reference to determine waveform parameters. The
+midline and waveform is projected along the length of designated ROI and,
 based on the trailing edge position, the amplitude is calculated as the
 distance between the trailing edge and the predicted midline.
 
@@ -94,9 +93,9 @@ the video.
 
 Next, with `kid.vid` we'll extract the images from the downloaded AVI
 and compute the midline positions and store them. The threshold ("thr")
-value of 0.7 works well for backlit images like the onces in this video.
+value of 0.7 works well for backlit images like the ones in this video.
 We'll only process the first 50 frames, and produce a video with midline
-postions plotted over the original frames with a playback frame rate of
+positions plotted over the original frames with a playback frame rate of
 10 fps. By default, `kid.vid` assumes the ROI (the body of interest) is
 the largest group of negative pixels in the field. However, should it
 not be, you can indicated the ROI of interest as the nth largest in the
@@ -115,7 +114,7 @@ original video)exists.
 
 Now, we'll compute corrected x positions of the leading edge normalized
 to the first (leftmost) pixel of the ROI, then compute the
-trainling-edge amplitude (assumed to be the last few pixels in the
+trailing-edge amplitude (assumed to be the last few pixels in the
 waveform) for each frame, and then merge the two.
 
     ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -125,7 +124,7 @@ waveform) for each frame, and then merge the two.
     ml <- merge(ml,ml2,by="frame") #merge these
 
 OK, let's choose a nice color palette and plot the waveforms for each of
-the 50 frames and colo them according to trainling edge amplitude.
+the 50 frames and color them according to trailing edge amplitude.
 
     pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
     p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
