@@ -213,7 +213,7 @@ names(c.roi) <- letters[order(rois[c.roi],decreasing = T)]
    rownames(kin.burn) <- NULL
    amp.var <- ddply(kin.burn,.(roi),summarize,amp.v=var(amp))
  }else{
-   amp.var=="a" #assum largest ROI on first frame
+   amp.var="a" #assum largest ROI on first frame
  }
 
  cand.kin <- list()
