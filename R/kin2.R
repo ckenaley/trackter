@@ -228,7 +228,7 @@ names(c.roi) <- letters[order(rois[c.roi],decreasing = T)]
     cent.x <- mean(unlist(apply(z.m,1,function(x) which(x==1))))
     cent.y <- mean(unlist(apply(z.m,2,function(x) which(x==1))))
 
-    points(centroid.x,centroid.y,col="white",pch=16)
+    #points(cent.x,cent.y,col="white",pch=16)
 
     y.max <- apply(z.m,1,function(x) ifelse(any(x==1),max(which(x==1)),NA))
     y.min <- apply(z.m,1,function(x) ifelse(any(x==1),min(which(x==1)),NA))
