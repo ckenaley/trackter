@@ -143,7 +143,7 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 #' download.file(f,"temp.zip")
 #' unzip("temp.zip")
 #' unlink("temp.zip")
-#' kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:50,smooth=0.5)
+#' kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:10,smooth=0.5)
 #' ml <- kin$midline
 #' #normalize x (y is normalized to midline by "kin.img/kin.vid")
 #' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -205,7 +205,7 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
 
  c.roi <-  which(per>=0.05) #candidate rois, filtered by 5 % of pixel field
 
-names(c.roi) <- letters[order(rois[c.roi],decreasing = T)]
+names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
 
  kin.burn <- NULL
  if(which(im==images)>2){
@@ -213,12 +213,14 @@ names(c.roi) <- letters[order(rois[c.roi],decreasing = T)]
    rownames(kin.burn) <- NULL
    amp.var <- ddply(kin.burn,.(roi),summarize,amp.v=var(amp))
  }else{
-   amp.var="a" #assum largest ROI on first frame
+   amp.var <- data.frame(roi=as.character("a"),amp.v=1) #assum largest ROI on first frame
+   print(amp.var)
  }
 
  cand.kin <- list()
  for(r in c.roi){
-   r.name <- names(c.roi)[c.roi==r]
+   r.name <- as.character(names(c.roi)[c.roi==r])
+   print(r.name)
        z.r <- z
     z.r[z!=r] <- 0
     z.r[z==r] <- 1
@@ -266,6 +268,7 @@ names(c.roi) <- letters[order(rois[c.roi],decreasing = T)]
 
 
     m.var.i <- amp.var$roi[which.max(amp.var$amp.v)]
+    print(m.var.i)
     if(r.name==m.var.i){
       midline.dat[[basename(im)]] <- data.frame(frame,midline,roi=r.name)
       lms[[basename(im)]] <- head.lm
@@ -281,7 +284,7 @@ names(c.roi) <- letters[order(rois[c.roi],decreasing = T)]
     }
  }
  #store raw and best kin and midline data
- max.var <- amp.var$roi[which.max(amp.var$amp.v)]
+ max.var <- as.character(amp.var$roi[which.max(amp.var$amp.v)])
  cand.kin.i <- do.call(rbind,cand.kin)
  rownames(cand.kin.i) <- NULL
  cand.kin[[basename(im)]] <- cand.kin.i
