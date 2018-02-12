@@ -3,6 +3,7 @@
 export(bearing.xy)
 export(deg)
 export(dist.2d)
+export(frames)
 export(images.to.video)
 export(kin.img)
 export(kin.vid)
