@@ -40,7 +40,7 @@
 #' \item "wave.y": midline points "y.pred" normalized to "mid.pred"}
 #'
 #'  \code{head.lms}  "lm" objects, one for each frame desrbied by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
-#' @details Assumes images are appended with a numeric sequence. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving)
+#' @details Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving)
 #' @seealso \code{\link{kin.img}}
 #' @export
 #' @import data.table
@@ -79,7 +79,7 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 
   for(i in 1:2) vid.to.images(vid.path=vid.path,qual = 20)
   image.dir <- paste0(getwd(),"/images")
-  kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth, image.type,flip,n.blob,rem.file,make.video,qual,frame.rate)
+  kin.img2(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth, image.type,flip,n.blob,rem.file,make.video,qual,frame.rate)
 }
 
 ######### kin.img
@@ -102,7 +102,7 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 #' @param rem.file logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted.
 #' @export
 #' @details
-#' By default, images are outputted to the \code{image.dir} subdirectory in the working directory.
+#' By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving).
 #'
 #'\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the orginal video frames, "bin" over binary images.
 #'\code{n.blob} May be useful if there are other highly contrasted ROIs in the frame.

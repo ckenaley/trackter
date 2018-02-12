@@ -129,7 +129,7 @@ By default, images are outputted to an "images" subdirectory in the working dire
 
 \code{rem.file} If "TRUE", \code{make.video} is also "TRUE" a video of processed images is still produced.
 
-Assumes images are appended with a numeric sequence. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving)
+Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving)
 }
 \examples{
 #produce a classic midline waveform plot of swimming fish

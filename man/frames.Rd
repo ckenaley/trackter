@@ -59,7 +59,7 @@ A list with the following components:
 Retrives the midline of an ROI from an image sequence.
 }
 \details{
-By default, images are outputted to the \code{image.dir} subdirectory in the working directory.
+By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving).
 
 \code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the orginal video frames, "bin" over binary images.
 \code{n.blob} May be useful if there are other highly contrasted ROIs in the frame.
