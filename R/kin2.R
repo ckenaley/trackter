@@ -214,13 +214,11 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
    amp.var <- ddply(kin.burn,.(roi),summarize,amp.v=var(amp))
  }else{
    amp.var <- data.frame(roi=as.character("a"),amp.v=1) #assum largest ROI on first frame
-   print(amp.var)
  }
 
  cand.kin <- list()
  for(r in c.roi){
    r.name <- as.character(names(c.roi)[c.roi==r])
-   print(r.name)
        z.r <- z
     z.r[z!=r] <- 0
     z.r[z==r] <- 1
@@ -268,7 +266,6 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
 
 
     m.var.i <- amp.var$roi[which.max(amp.var$amp.v)]
-    print(m.var.i)
     if(r.name==m.var.i){
       midline.dat[[basename(im)]] <- data.frame(frame,midline,roi=r.name)
       lms[[basename(im)]] <- head.lm
@@ -296,8 +293,6 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
 
   kin.dat <- do.call(rbind,kin.dat)
   midline.dat <- do.call(rbind,midline.dat)
-
-  print(list.files(proc.dir))
   if(make.video) images.to.video(image.dir =proc.dir, vid.name = trial, qual=qual,frame.rate = frame.rate)
 
   #clean up
