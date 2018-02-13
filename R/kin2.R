@@ -94,7 +94,7 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 #' @param image.type character; the type of image to be outputted.
 #' @param flip logical, indicating if binary should be flipped.
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.
-#' @param n.blob numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation.
+#' @param n.blob numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation. Perhaps best to let the function choose.
 #' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames.
 #' @param qual numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.
 #' @param ant.per numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
@@ -156,7 +156,9 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
 #' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,n.blob=NULL,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10){
+#'
+frames <- 1:10
+kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10,n.blob=NULL){
 
   unlink("processed_images",recursive = T)
   dir.create("processed_images")
@@ -174,6 +176,7 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
 
   trial <- gsub("(\\w)\\d+\\.\\w+\\b","\\1", basename(images[1]))
   if(und) trial<- gsub("(.+)_\\d+\\.\\w+\\b","\\1",basename(images[1]))
+
 
   kin.dat <- list()
   kin.dat.raw <- list()
@@ -193,10 +196,10 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
     }
     z = bwlabel(y)
 
+
     rois <- tabulate(z)
+
     roi <- which.max(rois)#find the largest roi, can tell it to find nth larger blob
-
-
 
     if(!is.null(n.blob)) roi <- which(rois==rois[order(rois,decreasing =T)[n.blob]])
 
@@ -213,7 +216,7 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
    rownames(kin.burn) <- NULL
    amp.var <- ddply(kin.burn,.(roi),summarize,amp.v=var(amp))
  }else{
-   amp.var <- data.frame(roi=as.character("a"),amp.v=1) #assum largest ROI on first frame
+   amp.var <- data.frame(roi=as.character("a"),amp.v=1) #assume largest ROI on first frame
  }
 
  cand.kin <- list()
