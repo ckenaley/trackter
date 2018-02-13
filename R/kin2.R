@@ -180,10 +180,10 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
 
   kin.dat <- list()
   kin.dat.raw <- list()
-  midline.dat.raw <- list()
   midline.dat <- list()
   lms <- list()
-  for(im in images){
+
+  for(im in images[-c(1:2)]){
 
     frame <- which(im==images)-1 #could cause problems
     img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"
@@ -210,6 +210,7 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
 
 names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
 
+
  kin.burn <- NULL
  if(which(im==images)>2){
    kin.burn <- do.call(rbind,kin.dat.raw)
@@ -219,7 +220,10 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
    amp.var <- data.frame(roi=as.character("a"),amp.v=1) #assume largest ROI on first frame
  }
 
+
+
  cand.kin <- list()
+
  for(r in c.roi){
    r.name <- as.character(names(c.roi)[c.roi==r])
        z.r <- z
