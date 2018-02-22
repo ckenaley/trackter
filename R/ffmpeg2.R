@@ -43,7 +43,8 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
     unlink(image.dir,recursive = T)
       dir.create(image.dir)
 
-  vid.path <- gsub("Google Drive","\"Google Drive\"",vid.path) ## remove spaces from dir if google drive
+  #vid.path <- gsub("Google Drive","\"Google Drive\"",vid.path) ## remove spaces from dir if google drive
+  vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path)
   image.dir <- paste0(gsub("Google Drive","\"Google Drive\"",image.dir),"/") #degooglize path
  video.name<- gsub(".avi","",basename(vid.path))
 
@@ -105,7 +106,9 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
 
   image.dir <- paste0(gsub("Google Drive","\"Google Drive\"",image.dir),"/") #degooglize path
 
-  vid.path <- paste0(gsub("Google Drive","\"Google Drive\"",vid.path)) #degooglize path
+  vid.path <- "/Documents/foo/My Drive/foo"
+  vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path)
+  #vid.path <- paste0(gsub("Google Drive","\"Google Drive\"",vid.path)) #degooglize path
 
   und <- grepl("_\\d+\\.\\w+\\b",images[1])
 

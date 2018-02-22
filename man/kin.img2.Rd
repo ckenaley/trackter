@@ -2,12 +2,12 @@
 % Please edit documentation in R/kin2.R
 \name{kin.img2}
 \alias{kin.img2}
-\title{Retrives the midline of an ROI from an image sequence.}
+\title{Automatically retrives the midline of a detected ROI in each image of a sequenced based on undulating ROI.}
 \usage{
 kin.img2(image.dir = NULL, frames = NULL, thr = 0.7,
   plot.midline = TRUE, show.prog = FALSE, ant.per = 0.15, smooth = 0.2,
-  image.type = "orig", flip = TRUE, n.blob = NULL, rem.file = TRUE,
-  make.video = TRUE, qual = 50, frame.rate = 10)
+  image.type = "orig", flip = TRUE, rem.file = TRUE, make.video = TRUE,
+  qual = 50, frame.rate = 10, n.blob = NULL)
 }
 \arguments{
 \item{image.dir}{Directory containing images to analyze.}
@@ -28,8 +28,6 @@ kin.img2(image.dir = NULL, frames = NULL, thr = 0.7,
 
 \item{flip}{logical, indicating if binary should be flipped.}
 
-\item{n.blob}{numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation.}
-
 \item{rem.file}{logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted.}
 
 \item{make.video}{logical value indicating if a video should be saved of midline position overlaying origina frames.}
@@ -37,27 +35,11 @@ kin.img2(image.dir = NULL, frames = NULL, thr = 0.7,
 \item{qual}{numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.}
 
 \item{frame.rate}{numeric; outputted video frame rate in fps.}
-}
-\value{
-A list with the following components:
 
-\code{kin.dat} a data frame consisting of position paramters for the ROI indicated by \code{n.blob}:\itemize{
-\item the frame number
-\item "head.x" and "head.y": the x and y position of the head (leftmost or anteriormost)
-\item "x" and ""y": the position of the tail (rightmost or posteriormost)
-\item "amp": the amplitude (\code{amp}) of the tail
-\item "head.pval": p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
-
-\code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{
-\item "x" and "y.m": x and y positions of the midline of the ROI
-\item "mid.pred": the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-\item "y.pred": midline points fit to a loess smoothing model with span equal to \code{smooth} (red curve in the outputted images/video)
-\item "wave.y": midline points "y.pred" normalized to "mid.pred"}
-
- \code{head.lms}  "lm" objects, one for each frame desribed by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
+\item{n.blob}{numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation. Perhaps best to let the function choose.}
 }
 \description{
-Retrives the midline of an ROI from an image sequence.
+Automatically retrives the midline of a detected ROI in each image of a sequenced based on undulating ROI.
 }
 \details{
 By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving).
@@ -77,13 +59,12 @@ require(data.table)
 require(dplyr)
 require(EBImage)
 
-
 #download example images and place in "example" subdirectory
 f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
 download.file(f,"temp.zip")
 unzip("temp.zip")
 unlink("temp.zip")
-kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:50,smooth=0.5)
+kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:10,smooth=0.5)
 ml <- kin$midline
 #normalize x (y is normalized to midline by "kin.img/kin.vid")
 ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -96,6 +77,7 @@ ml <- merge(ml,ml2,by="frame") #merge these
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
 p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+
 }
 \seealso{
 \code{\link{kin.vid}}
