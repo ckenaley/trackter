@@ -11,6 +11,7 @@ Depends: R (>= 3.3.3),
     data.table,
     pastecs,
     animation,
+    features,
     EBImage
 Imports:
     wesanderson,
