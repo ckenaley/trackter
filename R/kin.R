@@ -161,6 +161,7 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 
 kin.img <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,n.blob=NULL,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10){
 
+
   unlink("processed_images",recursive = T)
   dir.create("processed_images")
 
@@ -250,8 +251,8 @@ kin.img <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 
   if(make.video) images.to.video(image.dir =proc.dir, vid.name = trial, qual=qual,frame.rate = frame.rate)
   #clean up
-  if(rem.file){
-
+  if(rem.file ){
+    if(is.null(image.dir) stop("image.dir not specified and 'rem.file'=T. Won't delete working directory")
     unlink(proc.dir,recursive = T)
     unlink(image.dir,recursive = T)
 

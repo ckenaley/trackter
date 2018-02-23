@@ -39,6 +39,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
   image.dir <- gsub(basename(vid.path),"images",vid.path)
 
   #delete or create the image directory
+  if(is.null(image.dir)) stop("'image.dir' not specified and 'rem.file'=T. Won't delete working directory")
 
     unlink(image.dir,recursive = T)
       dir.create(image.dir)
