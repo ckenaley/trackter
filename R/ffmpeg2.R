@@ -193,14 +193,40 @@ print(image.dir)
 if(is.null(codec)) codec <- " "
   system(paste0("ffmpeg -i ", vid.path, codec, image.dir,"/",video.name,"_%5d.jpg -y")) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
 
-print("HERE")
-
-print(paste0("ffmpeg -i ", image.dir,"/",video.name,"_%5d.jpg", filt, image.dir,"/",video.name,"_%5d.jpg  -y"))
-
+  if(!is.null(filt)){
   system(paste0("ffmpeg -i ", image.dir,"/",video.name,"_%5d.jpg", filt, image.dir,"/",video.name,"_%5d.jpg  -y")) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
 
-
 }
+}
+
+#' Stitches images from video file passing filters to ffmpeg
+#'
+#' @param image.dir Character; directory containing images to stich.
+#' @param vid.name character; file name to be give video.
+#' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
+#' @param vid.ext chacracter; video type to output. mp4 currently works best.
+#' @param frame.rate numeric; video frame rate in fps.
+#' @return Outputs a video of name "video.name+vid.ext".
+#' @export
+#' @details Assumes images are appended with a numeric sequence.
+#' @seealso \code{\link{vid.to.images}}
+#' @examples
+#'
+#' #make some images
+#' require(emojifont)
+#'
+#' y <- sin(1:50)
+#' x <- 1:50
+#' dir.create("images") #make a directory to stor images
+#' for(i in 1:50) {
+#'   jpeg(paste0(getwd(),"/images/image",sprintf("%03d",i),".jpg"))
+#'   plot(x[i],y[i],col="red",xlim=c(0,50),ylim=range(y),cex=0)
+#'   text(x[i], y[i], labels=emoji('cow'), cex=6, col='steelblue', family='EmojiOne')
+#'   dev.off()
+#'   }
+#'
+#' images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="flyingcow",frame.rate=5,qual=100)
+#'
 
 images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",frame.rate=10,raw=T,filt=NULL)  {
   vid.name <- gsub(".avi","_red",vid.name)
