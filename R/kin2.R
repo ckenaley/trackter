@@ -308,6 +308,7 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
 
   #clean up
   if(rem.file){
+    if(is.null(image.dir)) stop("'image.dir' not specified and 'rem.file'=T. Won't delete working directory")
     unlink(proc.dir,recursive = T)
     unlink(image.dir,recursive = T)
   }

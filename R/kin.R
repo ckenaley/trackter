@@ -252,7 +252,7 @@ kin.img <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
   if(make.video) images.to.video(image.dir =proc.dir, vid.name = trial, qual=qual,frame.rate = frame.rate)
   #clean up
   if(rem.file ){
-    if(is.null(image.dir) stop("image.dir not specified and 'rem.file'=T. Won't delete working directory")
+    if(is.null(image.dir)) stop("image.dir not specified and 'rem.file'=T. Won't delete working directory")
     unlink(proc.dir,recursive = T)
     unlink(image.dir,recursive = T)
 
