@@ -36,6 +36,13 @@ OS](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/wiki/Installing-ffmpeg-o
 [Windows](https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg),
 or [Linux](https://www.ostechnix.com/install-ffmpeg-linux/).
 
+You'll also need `EBImage`. This can be installed by:
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite("EBImage")
+```
+
 The back lighting---as in the examples presenter here--was accomplished
 with an [LED light box](http://a.co/hIbIxNq) placed under a swim tunnel
 and video was captured at 100 fps from dorsal view. This creates some
@@ -105,7 +112,9 @@ field with "n.blob".
 
     ml <- kin$midline
 
-Check that the MP4 video (complete with midlines plotted over the
+Alternatively, on could use `kin.vid2` or `kin.img2` which both find an ROI with the largest variance of the trailing edge amplitude (i.e., assumes that ROI is the one moving). 
+
+In any case, check that the MP4 video (complete with midlines plotted over the
 original video)exists.
 
     file.exists("trout1_63_test.mp4")

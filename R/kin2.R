@@ -223,7 +223,7 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
  cand.kin <- list()
 
  m.var.i <- amp.var$roi[which.max(amp.var$amp.v)]
-
+print(m.var.i)
  c.roi <- c.roi[which(names(c.roi)==m.var.i)]
  for(r in c.roi){
    r.name <- as.character(names(c.roi)[c.roi==r])

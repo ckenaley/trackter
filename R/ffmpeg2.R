@@ -225,7 +225,7 @@ if(is.null(codec)) codec <- " "
 #'   dev.off()
 #'   }
 #'
-#' images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="flyingcow",frame.rate=5,qual=100)
+#' images.to.video2(image.dir=paste0(getwd(),"/images"),vid.name="flyingcow",frame.rate=5,qual=100)
 #'
 
 images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",frame.rate=10,raw=T,filt=NULL)  {
