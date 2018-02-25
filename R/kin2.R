@@ -93,12 +93,13 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' @param image.type character; the type of image to be outputted.
 #' @param flip logical, indicating if binary should be flipped.
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.
-#' @param n.blob numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation. Perhaps best to let the function choose.
+#' @param n.blob numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation. Perhaps best to let the function choose by using "searchl.for".
 #' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames.
 #' @param qual numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.
 #' @param ant.per numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
 #' @param frame.rate numeric; outputted video frame rate in fps.
 #' @param rem.file logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted.
+#' @param search.for character; the search paramer: "und" will attempt to fin the undulating ROI, "offset" the ROI closest to the horizontal center of the field
 #' @export
 #' @details
 #'By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving).
@@ -126,6 +127,9 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' \item "y.pred": midline points fit to a loess smoothing model with span equal to \code{smooth} (red curve in the outputted images/video)
 #' \item "wave.y": midline points "y.pred" normalized to "mid.pred"}
 #' \item "roi": a character indicating ROI size (a being the largest)
+#' \item "cent.x": x centroid of ROI
+#' \item "cent.y": y centroid of ROI
+#' \item "offset.x": ROI distance from horizontal center
 #' }
 
 #'  \code{head.lms}  "lm" objects, one for each frame desribed by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
@@ -159,7 +163,7 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 #'
 
-kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10,n.blob=NULL){
+kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10,n.blob=NULL,search.for="offset"){
 
   unlink("processed_images",recursive = T)
   dir.create("processed_images")
@@ -204,7 +208,8 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
     if(!is.null(n.blob)) roi <- which(rois==rois[order(rois,decreasing =T)[n.blob]])
 
     pix <- dim(z[,,1])[1]*dim(z[,,1])[2]
-  per <- rois/pix #how big are rois compared to pixel field
+    w <- dim(z[,,1])[1] #width of image
+   per <- rois/pix #how big are rois compared to pixel field
 
  c.roi <-  which(per>=0.05) #candidate rois, filtered by 5 % of pixel field
 
@@ -216,15 +221,23 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
    kin.burn <- do.call(rbind,kin.dat.raw)
    rownames(kin.burn) <- NULL
    amp.var <- ddply(kin.burn,.(roi),summarize,amp.v=var(amp))
+   off.min <- kin.burn[order(kin.burn$offset.x,decreasing = F)[1],"roi"]
+   if(search.for=="und") prob.roi <- amp.var$roi[which.max(amp.var$amp.v)]
+   if(search.for=="offset") prob.roi <- off.min
  }else{
    amp.var <- data.frame(roi=as.character("a"),amp.v=1) #assume largest ROI on first frame
+   off.min <- "a" #assume largest ROI on first frame
+   if(search.for=="und") prob.roi <- amp.var$roi[which.max(amp.var$amp.v)]
+   if(search.for=="offset") prob.roi <- off.min
  }
 
  cand.kin <- list()
 
- m.var.i <- amp.var$roi[which.max(amp.var$amp.v)]
-print(m.var.i)
- c.roi <- c.roi[which(names(c.roi)==m.var.i)]
+ if(!any(c("und","offset")==search.for)) stop("'search.for' must = 'und' or 'offset'")
+
+
+
+ #c.roi <- c.roi[which(names(c.roi)==prob.roi)]
  for(r in c.roi){
    r.name <- as.character(names(c.roi)[c.roi==r])
        z.r <- z
@@ -232,12 +245,13 @@ print(m.var.i)
     z.r[z==r] <- 1
     z.m <- z.r[,,1]
     z.m[1,1] <- 0 #dunno why, but this gets a 1
-    if(show.prog) EBImage::display(z.m, method="raster")
+
+
 
     #centroids
     cent.x <- mean(unlist(apply(z.m,2,function(x) which(x==1))))
     cent.y <- mean(unlist(apply(z.m,1,function(x) which(x==1))))
-
+    offset.x <- abs(cent.x-w/2)# distance
     #points(cent.x,cent.y,col="white",pch=16)
 
     y.max <- apply(z.m,1,function(x) ifelse(any(x==1),max(which(x==1)),NA))
@@ -273,20 +287,21 @@ print(m.var.i)
 
     n.roi <- paste0(basename(im),"-",r)
     cand.kin[[r]] <- data.frame(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last
-                                (midline$wave.y),head.pval=head.p,roi=r.name,cent.x,cent.y)
+                                (midline$wave.y),head.pval=head.p,roi=r.name,cent.x,cent.y,offset.x)
 
-    m.var.i <- amp.var$roi[which.max(amp.var$amp.v)]
+    #prob.roi <- amp.var$roi[which.max(amp.var$amp.v)]
 
-    if(r.name==m.var.i){
+    if(r.name==prob.roi){
+      if(show.prog) EBImage::display(z.m,method = "raster")
       midline.dat[[basename(im)]] <- data.frame(frame,midline,roi=r.name)
       lms[[basename(im)]] <- head.lm
-    jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
-    if(image.type=="bin")EBImage::display(z,method = "raster")
-    if(image.type=="orig")EBImage:: display(img,method = "raster")
-    if(plot.midline) {
-      lines(predict(lm(mid.pred~x,midline)),x=midline$x,col="blue",lwd=4)
-      lines(predict(loess(y.m~x,midline,span=smooth,degree=1)),x=midline$x,col="red",lwd=4)
-      with(head.dat,points(x,y.m,col="green",pch=16,cex=0.75))
+      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
+      if(image.type=="bin")EBImage::display(z,method = "raster")
+      if(image.type=="orig")EBImage:: display(img,method = "raster")
+      if(plot.midline) {
+        lines(predict(lm(mid.pred~x,midline)),x=midline$x,col="blue",lwd=4)
+        lines(predict(loess(y.m~x,midline,span=smooth,degree=1)),x=midline$x,col="red",lwd=4)
+        with(head.dat,points(x,y.m,col="green",pch=16,cex=0.75))
     }
     dev.off()
     }
@@ -298,7 +313,7 @@ print(m.var.i)
  cand.kin[[basename(im)]] <- cand.kin.i
  kin.dat.raw[[basename(im)]] <- do.call(rbind,cand.kin)
  kin.dat[[basename(im)]] <- cand.kin.i[cand.kin.i$roi==max.var,]
- setTxtProgressBar(pb,which(images==im))
+ #setTxtProgressBar(pb,which(images==im))
   }
 
 
@@ -313,4 +328,31 @@ print(m.var.i)
     unlink(image.dir,recursive = T)
   }
   return(list(kin.dat=kin.dat,midline=midline.dat,head.lms=lms))
+}
+
+
+#' AIC model fitting for loess regression
+#'
+#' @param x a loess object
+#' @export
+#' @import data.table
+#'
+loess.aic <- function (x) {
+  if (!(inherits(x,"loess"))) stop("x is not a loess model object")
+  span <- x$pars$span
+  n <- x$n
+  traceL <- x$trace.hat
+  sigma2 <- sum( x$residuals^2 ) / (n-1)
+  delta1 <- x$one.delta
+  delta2 <- x$two.delta
+  enp <- x$enp
+
+  aicc <- log(sigma2) + 1 + 2* (2*(traceL+1)) / (n-traceL-2)
+  aicc1<- n*log(sigma2) + n* (
+    (delta1/(delta2*(n+enp)))/(delta1^2/delta2)-2 )
+  aicc1<- n*log(sigma2) + n* ( (delta1/delta2)*(n+enp)/(delta1^2/delta2)-2 )
+  gcv <- n*sigma2 / (n-traceL)^2
+
+  result <- list(span=span, aicc=aicc, aicc1=aicc1, gcv=gcv)
+  return(result)
 }
