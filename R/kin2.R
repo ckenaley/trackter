@@ -289,8 +289,6 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
     cand.kin[[r]] <- data.frame(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last
                                 (midline$wave.y),head.pval=head.p,roi=r.name,cent.x,cent.y,offset.x)
 
-    #prob.roi <- amp.var$roi[which.max(amp.var$amp.v)]
-
     if(r.name==prob.roi){
       if(show.prog) EBImage::display(z.m,method = "raster")
       midline.dat[[basename(im)]] <- data.frame(frame,midline,roi=r.name)
@@ -313,7 +311,7 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
  cand.kin[[basename(im)]] <- cand.kin.i
  kin.dat.raw[[basename(im)]] <- do.call(rbind,cand.kin)
  kin.dat[[basename(im)]] <- cand.kin.i[cand.kin.i$roi==max.var,]
- #setTxtProgressBar(pb,which(images==im))
+ setTxtProgressBar(pb,which(images==im))
   }
 
 
