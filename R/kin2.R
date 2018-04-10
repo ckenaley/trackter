@@ -8,7 +8,7 @@
 #' @param smooth numeric; smoothing parameter value for plotted midline
 #' @param image.type character; the type of image to be outputted
 #' @param n.blob numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation
-#' #' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames
+#' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames
 #' @param qual numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.
 #' @param ant.per numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
 #' @param frame.rate numeric; outputted video frame rate in fps.
@@ -99,7 +99,8 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' @param ant.per numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
 #' @param frame.rate numeric; outputted video frame rate in fps.
 #' @param rem.file logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted.
-#' @param search.for character; the search paramer: "und" will attempt to fin the undulating ROI, "offset" the ROI closest to the horizontal center of the field
+#' @param search.for character; the search parameter: "offset" the ROI closest to the midpoint of the field, "shape" with search of a shape, "largest" the largest roi (equivalent to n.blob=1)
+#' @param shape character; another search paramer; if search.for is set to "shape", "long" will attempt to find an ROI that has an aspect ratio greater than 2
 #' @export
 #' @details
 #'By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving).
@@ -130,6 +131,10 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' \item "cent.x": x centroid of ROI
 #' \item "cent.y": y centroid of ROI
 #' \item "offset.x": ROI distance from horizontal center
+#' \item "offset.y": ROI distance from vertical center
+#' \item "offset.total": sum of ROI offset.x and offset.y
+#' \item "ar": aspect ration of the ROI
+#' \item "size": size of ROI in picxes
 #' }
 
 #'  \code{head.lms}  "lm" objects, one for each frame desribed by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
@@ -148,7 +153,7 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' download.file(f,"temp.zip")
 #' unzip("temp.zip")
 #' unlink("temp.zip")
-#' kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:10,smooth=0.5)
+#' kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:10,smooth=0.5,show.prog=T)
 #' ml <- kin$midline
 #' #normalize x (y is normalized to midline by "kin.img/kin.vid")
 #' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -161,9 +166,9 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
 #' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-#'
+#' print(p)
 
-kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10,n.blob=NULL,search.for="offset"){
+kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10,n.blob=NULL,search.for="offset",shape="long"){
 
   unlink("processed_images",recursive = T)
   dir.create("processed_images")
@@ -183,11 +188,14 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
   if(und) trial<- gsub("(.+)_\\d+\\.\\w+\\b","\\1",basename(images[1]))
 
   kin.dat <- list()
-  kin.dat.raw <- list()
   midline.dat <- list()
   lms <- list()
 
+  #assume largest ROI on first frame
+  prob.roi <- "a"
+
   for(im in images){
+
 
     frame <- which(im==images)-1 #could cause problems
     img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"
@@ -200,44 +208,32 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
     }
     z = bwlabel(y)
 
-
     rois <- tabulate(z)
 
     roi <- which.max(rois)#find the largest roi, can tell it to find nth larger blob
 
-    if(!is.null(n.blob)) roi <- which(rois==rois[order(rois,decreasing =T)[n.blob]])
+   if(search.for=="size") roi <- which(rois==rois[order(rois,decreasing =T)[n.blob]])
 
     pix <- dim(z[,,1])[1]*dim(z[,,1])[2]
     w <- dim(z[,,1])[1] #width of image
-   per <- rois/pix #how big are rois compared to pixel field
+    h <- dim(z[,,1])[2] #height of image
+    per <- rois/pix #how big are rois compared to pixel field
 
- c.roi <-  which(per>=0.05) #candidate rois, filtered by 5 % of pixel field
+   c.roi <-  which(per>=0.02) #candidate rois, filtered by 2 % of pixel field
 
-names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
+   names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
 
+ setTxtProgressBar(pb,which(images==im))
 
- kin.burn <- NULL
- if(which(im==images)>=2){
-   kin.burn <- do.call(rbind,kin.dat.raw)
-   rownames(kin.burn) <- NULL
-   amp.var <- ddply(kin.burn,.(roi),summarize,amp.v=var(amp))
-   off.min <- kin.burn[order(kin.burn$offset.x,decreasing = F)[1],"roi"]
-   if(search.for=="und") prob.roi <- amp.var$roi[which.max(amp.var$amp.v)]
-   if(search.for=="offset") prob.roi <- off.min
- }else{
-   amp.var <- data.frame(roi=as.character("a"),amp.v=1) #assume largest ROI on first frame
-   off.min <- "a" #assume largest ROI on first frame
-   if(search.for=="und") prob.roi <- amp.var$roi[which.max(amp.var$amp.v)]
-   if(search.for=="offset") prob.roi <- off.min
- }
-
- cand.kin <- list()
 
  if(!any(c("und","offset")==search.for)) stop("'search.for' must = 'und' or 'offset'")
 
 
-
  #c.roi <- c.roi[which(names(c.roi)==prob.roi)]
+ cand.kin <- list() #store each roi kin data
+  cand.mid <- list() #store each roi midline data
+  z.l <- list()
+
  for(r in c.roi){
    r.name <- as.character(names(c.roi)[c.roi==r])
        z.r <- z
@@ -246,19 +242,22 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
     z.m <- z.r[,,1]
     z.m[1,1] <- 0 #dunno why, but this gets a 1
 
-
-
+    z.l[[r.name]] <- z.m
+    length <- diff(range(unlist(apply(z.m,2,function(x) which(x==1)))))
+    width <- diff(range(unlist(apply(z.m,1,function(x) which(x==1)))))
+    ar <- length/width
     #centroids
     cent.x <- mean(unlist(apply(z.m,2,function(x) which(x==1))))
     cent.y <- mean(unlist(apply(z.m,1,function(x) which(x==1))))
     offset.x <- abs(cent.x-w/2)# distance
+    offset.y <- abs(cent.y-h/2)
+    offset.tot <- offset.x+offset.y
     #points(cent.x,cent.y,col="white",pch=16)
 
     y.max <- apply(z.m,1,function(x) ifelse(any(x==1),max(which(x==1)),NA))
     y.min <- apply(z.m,1,function(x) ifelse(any(x==1),min(which(x==1)),NA))
 
-    y.df <- data.frame(x=1:nrow(z.m),y.max,y.min)
-    y.df <- as.data.table(y.df) #data.table operations speed this up
+    y.df <- data.table(x=1:nrow(z.m),y.max,y.min)
     y.df <- y.df[,y.m :=(y.max-y.min)/2+y.min, by=.(x,y.min,y.max)]
 
     tip.y <- mean(tail(y.df$y.m[!is.na(y.df$y.m)],30))#tip is mean y.m of last 30 pixels
@@ -269,50 +268,55 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
 
 
     #n midline points
-    midline <- y.df[seq(1,nrow(y.df),length.out = 100),] #hundred points on midline
-    midline <- midline[complete.cases(midline),]
+    midline <- y.df[seq(1,nrow(y.df),length.out = 200),] #two hundred points on midline
+
+    midline <- midline[complete.cases(midline)]
 
     #head section
-    head.dat <- midline[1:(ant.per*100),]
+    head.dat <- midline[1:(ant.per*200),]
     head.lm <- lm(y.m~x,head.dat)
     head.p <- summary(head.lm)$r.squared #how well does head lm fit
     midline$mid.pred <- predict(head.lm,newdata=midline)#add lm prediction to midline df
     midline <- midline[complete.cases(midline),]
 
-    if(which(im==images)>=2){
-    midline$y.pred <- predict(loess(y.m~x,midline,span=smooth,degree=1))#add smoothed predictions
-    }else{midline$y.pred <- midline$y.m}
-    midline$wave.y <- with(midline,dist.2d(x,x,y.pred,mid.pred)) #wave y based on  pred points
-    midline$wave.y[midline$y.pred<midline$mid.pred] <- midline$wave.y[midline$y.pred<midline$mid.pred]*-1 #neg or pos amp
 
+    midline[,y.pred:=fitted(loess(y.m~x,span=smooth,degree=1))]#add smoothed predictions
+
+    midline[,wave.y:=dist.2d(x,x,y.pred,mid.pred)] #wave y based on  pred points
+    midline[y.pred<mid.pred,wave.y:=wave.y*-1] #neg or pos amp
+    midline[,roi:=r.name]
     n.roi <- paste0(basename(im),"-",r)
-    cand.kin[[r]] <- data.frame(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last
-                                (midline$wave.y),head.pval=head.p,roi=r.name,cent.x,cent.y,offset.x)
+    cand.kin[[r]] <- data.frame(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last(midline$wave.y),head.pval=head.p,roi=r.name,cent.x,cent.y,offset.x,offset.y,offset.tot,ar,size=rois[c.roi[r.name]])
+    cand.mid[[r]] <- midline
 
-    if(r.name==prob.roi){
-      if(show.prog) EBImage::display(z.m,method = "raster")
-      midline.dat[[basename(im)]] <- data.frame(frame,midline,roi=r.name)
-      lms[[basename(im)]] <- head.lm
-      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
-      if(image.type=="bin")EBImage::display(z,method = "raster")
-      if(image.type=="orig")EBImage:: display(img,method = "raster")
-      if(plot.midline) {
-        lines(predict(lm(mid.pred~x,midline)),x=midline$x,col="blue",lwd=4)
-        lines(predict(loess(y.m~x,midline,span=smooth,degree=1)),x=midline$x,col="red",lwd=4)
-        with(head.dat,points(x,y.m,col="green",pch=16,cex=0.75))
-    }
-    dev.off()
-    }
- }
- #store raw and best kin and midline data
- max.var <- as.character(amp.var$roi[which.max(amp.var$amp.v)])
- cand.kin.i <- do.call(rbind,cand.kin)
- rownames(cand.kin.i) <- NULL
- cand.kin[[basename(im)]] <- cand.kin.i
- kin.dat.raw[[basename(im)]] <- do.call(rbind,cand.kin)
- kin.dat[[basename(im)]] <- cand.kin.i[cand.kin.i$roi==max.var,]
- setTxtProgressBar(pb,which(images==im))
-  }
+}
+ cand.kin.i <- data.table(do.call(rbind,cand.kin)) #store all candidate roi kin data
+ cand.mid.i <- data.table(do.call(rbind,cand.mid))
+
+ #store raw and best kin data
+
+   if(search.for=="largest") prob.roi <- "a"
+  off.min <- cand.kin.i[which.min(cand.kin.i$offset.tot),"roi"]$roi
+  if(search.for=="offset") prob.roi <- off.min
+   if(search.for=="shape" & shape=="long") prob.roi <- cand.kin.i[cand.kin.i$ar>2,"roi"]$roi
+
+   kin.i <- cand.kin.i[roi==prob.roi]
+   mid.i <- cand.mid.i[roi==prob.roi]
+     if(show.prog) {
+       EBImage::display(z.l[[prob.roi]],method = "raster")
+       }
+     midline.dat[[basename(im)]] <- data.frame(frame,mid.i)
+     kin.dat[[basename(im)]] <- kin.i
+     jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
+     if(image.type=="bin")EBImage::display(z,method = "raster")
+     if(image.type=="orig")EBImage:: display(img,method = "raster")
+     if(plot.midline) {
+       lines(predict(lm(mid.pred~x,mid.i)),x=mid.i$x,col="blue",lwd=4)
+       lines(predict(loess(y.m~x,mid.i,span=smooth,degree=1)),x=mid.i$x,col="red",lwd=4)
+       with(mid.i[1:(ant.per*200),],points(x,y.m,col="green",pch=16,cex=0.75))
+     }
+     dev.off()
+   }
 
 
   kin.dat <- do.call(rbind,kin.dat)
@@ -325,7 +329,7 @@ names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
     unlink(proc.dir,recursive = T)
     unlink(image.dir,recursive = T)
   }
-  return(list(kin.dat=kin.dat,midline=midline.dat,head.lms=lms))
+  return(list(kin.dat=kin.dat,midline=midline.dat))
 }
 
 

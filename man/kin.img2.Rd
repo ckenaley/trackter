@@ -7,7 +7,8 @@
 kin.img2(image.dir = NULL, frames = NULL, thr = 0.7,
   plot.midline = TRUE, show.prog = FALSE, ant.per = 0.15, smooth = 0.2,
   image.type = "orig", flip = TRUE, rem.file = TRUE, make.video = TRUE,
-  qual = 50, frame.rate = 10, n.blob = NULL)
+  qual = 50, frame.rate = 10, n.blob = NULL, search.for = "offset",
+  shape = "long")
 }
 \arguments{
 \item{image.dir}{Directory containing images to analyze.}
@@ -36,7 +37,11 @@ kin.img2(image.dir = NULL, frames = NULL, thr = 0.7,
 
 \item{frame.rate}{numeric; outputted video frame rate in fps.}
 
-\item{n.blob}{numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation. Perhaps best to let the function choose.}
+\item{n.blob}{numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation. Perhaps best to let the function choose by using "searchl.for".}
+
+\item{search.for}{character; the search parameter: "offset" the ROI closest to the midpoint of the field, "shape" with search of a shape, "largest" the largest roi (equivalent to n.blob=1)}
+
+\item{shape}{character; another search paramer; if search.for is set to "shape", "long" will attempt to find an ROI that has an aspect ratio greater than 2}
 }
 \description{
 Automatically retrives the midline of a detected ROI in each image of a sequenced based on undulating ROI.
@@ -64,7 +69,7 @@ f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
 download.file(f,"temp.zip")
 unzip("temp.zip")
 unlink("temp.zip")
-kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:10,smooth=0.5)
+kin <- kin.img2(image.dir=paste0(getwd(),"/example"),thr=0.7,frames=1:10,smooth=0.5,show.prog=T)
 ml <- kin$midline
 #normalize x (y is normalized to midline by "kin.img/kin.vid")
 ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -77,7 +82,7 @@ ml <- merge(ml,ml2,by="frame") #merge these
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
 p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-
+print(p)
 }
 \seealso{
 \code{\link{kin.vid}}

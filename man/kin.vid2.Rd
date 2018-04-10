@@ -26,10 +26,11 @@ kin.vid2(vid.path = NULL, frames = NULL, thr = 0.7, plot.midline = TRUE,
 
 \item{image.type}{character; the type of image to be outputted}
 
-\item{n.blob}{numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation
-#' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames}
+\item{n.blob}{numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation}
 
 \item{rem.file}{logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted. Default is "TRUE".}
+
+\item{make.video}{logical value indicating if a video should be saved of midline position overlaying origina frames}
 
 \item{qual}{numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.}
 

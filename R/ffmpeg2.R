@@ -273,7 +273,7 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4"
 
 
   if(!raw) system(paste0("ffmpeg -i ", image.dir, image.name,num.for," -q:v ",qual," -r ", frame.rate," -f mp4", filt," -vcodec libx264 -pix_fmt yuv420p ", vid.path,vid.ext, " -y")) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
-  if(raw)
+
     if(raw) system(paste0("ffmpeg -i ", image.dir, image.name,num.for," -q:v ",qual," -r ", frame.rate," -f avi -vcodec rawvideo ", vid.path,vid.ext, " -y")) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
 
 

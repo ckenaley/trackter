@@ -70,10 +70,11 @@ wave <- function(x,y,p=F){
 
 #' Compute amplitude(s) and wavelength(s) of a wave form, amongst other things
 #'
-#' @param x Numeric; x position
+#' @param x Numeric; x position (or sample number)
 #' @param y numeric; y position
+#' @param sf numeric; sample frequency (i.e., how often was x and y sampled)
 #' @param p logical; should a plot of the last half wavelength
-#' @return a list with amplitude "a", frequence "f", amplitude returned from a smoothed sign function "a.f", signal to noise ratio "snr", half wavelength "wave.l".
+#' @return a list with amplitude "a", frequence "f", amplitude returned from a smoothed sign function "a.f", signal to noise ratio "snr".
 #' @export
 #' @import features
 #' @examples
@@ -91,12 +92,11 @@ amp.freq <- function(x=NULL,y,sf=100){
   amp.n <- features(x=x,y=y)
   x.n <- unlist(sapply(amp.n$cpts,function(z) which.min(abs(z-x))))
   amp<- abs(diff(y[x.n])/2)
-  amp.f <- abs(diff(attributes(amp.n)$fits$fn[amp.n$cpts])/2)
+  amp.f <- abs(diff(attributes(amp.n)$fits$fn[x.n])/2)
   snr <- fget(amp.n)$f["snr"]
   names(snr) <-NULL
-  freq<- 1/(s*diff(amp.n$cpts))
-  wave.l <- diff(tail(amp.n$cpts,2))
-  tail.dat <-  list(a=amp,f=freq,a.f=amp.f,snr=snr,wave.l=wave.l)#a.f is amp accourding to function
+  freq<- 1/(s*diff(amp.n$cpts[seq(1,length(amp.n$cpts),2)])) #peak to peak or trough to trough freq
+  tail.dat <-  list(a=amp,f=freq,a.f=amp.f,snr=snr)#a.f is amp according to function
 
   return(tail.dat)
 }
