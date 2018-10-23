@@ -99,14 +99,15 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' @param ant.per numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
 #' @param frame.rate numeric; outputted video frame rate in fps.
 #' @param rem.file logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted.
-#' @param search.for character; the search parameter: "offset" the ROI closest to the midpoint of the field, "shape" with search of a shape, "largest" the largest roi (equivalent to n.blob=1)
+#' @param search.for character; the search parameter: "midline" an ROI that has positive pixels along its midline (see details), "roi offset" the ROI closest to the midpoint of the field, "shape" with search of a shape, "largest" the largest roi (equivalent to n.blob=1)
 #' @param shape character; another search paramer; if search.for is set to "shape", "long" will attempt to find an ROI that has an aspect ratio greater than 2
 #' @export
 #' @details
 #'By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs that are big (>5\% of the pixel field) and identifies the one with the largest variance to the trailing edge amplitude (i.e., assumes that ROI is the one moving).
 #'
 #'\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the orginal video frames, "bin" over binary images.
-#'\code{n.blob} May be useful if there are other highly contrasted ROIs in the frame.
+#'\code{n.blob} May be useful if there are other highly contrasted ROIs in the frame and the user expects and knows their relative size
+#'\code{search.for} If set to "midline", the algorithm attempts to resolve an ROI as that which has positive (i.e., dark) pixels along the ROI's midline. This should be useful if the ROI of interest is surrount by irregular dark object (e.g., walls).
 #'
 #'\code{make.video} If "TRUE" a vidoe of the same names as \code{video.name} is outputted in a \code{image.dir} subdirectory.
 #'
@@ -167,8 +168,15 @@ kin.vid2 <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
 #' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 #' print(p)
+#'
+#'
 
-kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.15,smooth=.2, image.type="orig",flip=TRUE,rem.file=TRUE,make.video=TRUE,qual=50,frame.rate=10,n.blob=NULL,search.for="offset",shape="long"){
+setwd("~/Google Drive/eel/eel2")
+image.dir=paste0(getwd(),"/example")
+
+frames=1:50
+
+kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.10,smooth=.2, image.type="orig",flip=TRUE,rem.file=FALSE,make.video=TRUE,qual=50,frame.rate=10,n.blob=NULL,search.for="midline",shape="long"){
 
   unlink("processed_images",recursive = T)
   dir.create("processed_images")
@@ -210,14 +218,14 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
 
     rois <- tabulate(z)
 
-    roi <- which.max(rois)#find the largest roi, can tell it to find nth larger blob
+    roi <- which.max(rois)#find the largest roi, can tell it to find nth largest blob
 
    if(search.for=="size") roi <- which(rois==rois[order(rois,decreasing =T)[n.blob]])
 
     pix <- dim(z[,,1])[1]*dim(z[,,1])[2]
     w <- dim(z[,,1])[1] #width of image
     h <- dim(z[,,1])[2] #height of image
-    per <- rois/pix #how big are rois compared to pixel field
+    per <- rois/(w*h) #how big are rois compared to pixel field
 
    c.roi <-  which(per>=0.02) #candidate rois, filtered by 2 % of pixel field
 
@@ -226,13 +234,14 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
  setTxtProgressBar(pb,which(images==im))
 
 
- if(!any(c("und","offset")==search.for)) stop("'search.for' must = 'und' or 'offset'")
+ if(!any(c("und","offset","midline")==search.for)) stop("'search.for' must = 'midline','und', or 'offset'")
 
 
  #c.roi <- c.roi[which(names(c.roi)==prob.roi)]
  cand.kin <- list() #store each roi kin data
   cand.mid <- list() #store each roi midline data
   z.l <- list()
+  void.l <- list() #store eval of centroids, empty or not
 
  for(r in c.roi){
    r.name <- as.character(names(c.roi)[c.roi==r])
@@ -255,9 +264,15 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
     #points(cent.x,cent.y,col="white",pch=16)
 
     y.max <- apply(z.m,1,function(x) ifelse(any(x==1),max(which(x==1)),NA))
+
     y.min <- apply(z.m,1,function(x) ifelse(any(x==1),min(which(x==1)),NA))
 
+
+
     y.df <- data.table(x=1:nrow(z.m),y.max,y.min)
+
+
+    #hollow <- y.df[complete.cases(y.df),.(any(z.m[x,y.min:y.max]==0)),by=.(x)]
     y.df <- y.df[,y.m :=(y.max-y.min)/2+y.min, by=.(x,y.min,y.max)]
 
     tip.y <- mean(tail(y.df$y.m[!is.na(y.df$y.m)],30))#tip is mean y.m of last 30 pixels
@@ -280,31 +295,41 @@ kin.img2 <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.p
     midline <- midline[complete.cases(midline),]
 
 
+    #midline pixels
+
+    z.dat <- imageData(z.m)#extract image data
+    m.pix <- apply(midline[,c("x","y.m")],1,function(x) z.dat[x[1],x[2]])
+
     midline[,y.pred:=fitted(loess(y.m~x,span=smooth,degree=1))]#add smoothed predictions
 
     midline[,wave.y:=dist.2d(x,x,y.pred,mid.pred)] #wave y based on  pred points
     midline[y.pred<mid.pred,wave.y:=wave.y*-1] #neg or pos amp
     midline[,roi:=r.name]
     n.roi <- paste0(basename(im),"-",r)
-    cand.kin[[r]] <- data.frame(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last(midline$wave.y),head.pval=head.p,roi=r.name,cent.x,cent.y,offset.x,offset.y,offset.tot,ar,size=rois[c.roi[r.name]])
-    cand.mid[[r]] <- midline
+    cand.kin[[r.name]] <- data.frame(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last(midline$wave.y),head.pval=head.p,roi=r.name,cent.x,cent.y,offset.x,offset.y,offset.tot,ar,size=rois[c.roi[r.name]])
+    cand.mid[[r.name]] <- midline
+
+
+    void.l[[r.name]] <- sum(m.pix)/length(m.pix)>0.95
 
 }
  cand.kin.i <- data.table(do.call(rbind,cand.kin)) #store all candidate roi kin data
  cand.mid.i <- data.table(do.call(rbind,cand.mid))
+
 
  #store raw and best kin data
 
    if(search.for=="largest") prob.roi <- "a"
   off.min <- cand.kin.i[which.min(cand.kin.i$offset.tot),"roi"]$roi
   if(search.for=="offset") prob.roi <- off.min
-   if(search.for=="shape" & shape=="long") prob.roi <- cand.kin.i[cand.kin.i$ar>2,"roi"]$roi
+  if(search.for=="midline") prob.roi <- names(void.l)[which(void.l==T)]
+   #if(search.for=="shape" & shape=="long") prob.roi <- cand.kin.i[cand.kin.i$ar>2,"roi"]$roi
 
    kin.i <- cand.kin.i[roi==prob.roi]
    mid.i <- cand.mid.i[roi==prob.roi]
      if(show.prog) {
        EBImage::display(z.l[[prob.roi]],method = "raster")
-       }
+          }
      midline.dat[[basename(im)]] <- data.frame(frame,mid.i)
      kin.dat[[basename(im)]] <- kin.i
      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
