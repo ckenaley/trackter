@@ -1,19 +1,9 @@
-#' Retrives the midline of an ROI in each frame of a video.
+#' @title  Naive midline detection from video data
+#'
+#' @description  A wrapper, decomposing videos with \code{vid.to.images} to frames for naive retrieval of midlines from the larges ROI using \code{kin.img}.
 #'
 #' @param vid.path Character; path of video to be analyze.
-#' @param frames numeric vectors indicating which video frames to process
-#' @param thr numeric, threshhold to determine binary image. May require some tweeking through iteration
-#' @param plot.midline logical value indicating if outputted images should inclued plotted midline and reference line.
-#' @param show.prog logical value indicating if outputted image should be display during analysis.
-#' @param smooth numeric; smoothing parameter value for plotted midline
-#' @param image.type character; the type of image to be outputted
-#' @param flip logical, indicating if binary should be flipped
-#' @param n.blob numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation
-#' #' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames
-#' @param qual numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.
-#' @param ant.per numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
-#' @param frame.rate numeric; outputted video frame rate in fps.
-#' @param rem.file logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted. Default is "TRUE".
+#' @param ... other arguments to be passed to \code{kin.img} and \code{vid.to.images}
 #'
 #' @details
 #' By default, images are outputted to an "images" subdirectory in the working directory.
@@ -25,24 +15,9 @@
 #'
 #'\code{rem.file} If "TRUE", \code{make.video} is also "TRUE" a video of processed images is still produced.
 #
-#' @return A list with the following components:
-#'
-#' \code{kin.dat} a data frame consisting of position paramters for the ROI indicated by \code{n.blob}:\itemize{
-#' \item the frame number
-#' \item "head.x" and "head.y": the x and y position of the head (leftmost or anteriormost)
-#' \item "x" and ""y": the position of the tail (rightmost or posteriormost)
-#' \item "amp": the amplitude (\code{amp}) of the tail
-#' \item "head.pval": p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
-#'
-#' \code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{
-#' \item "x" and "y.m": x and y positions of the midline of the ROI
-#' \item "mid.pred": the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-#' \item "y.pred": midline points fit to a loess smoothing model with span equal to \code{smooth} (red curve in the outputted images/video)
-#' \item "wave.y": midline points "y.pred" normalized to "mid.pred"}
-#'
-#'  \code{head.lms}  "lm" objects, one for each frame desrbied by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
+#' @return Returns the components of \code{kin.img}
 #' @details Assumes images are appended with a numeric sequence.
-#' @seealso \code{\link{kin.img}}
+#' @seealso \code{\link{kin.img}} \code{\link{kin.vid2}}
 #' @export
 #' @import data.table
 #' @examples
@@ -71,21 +46,21 @@
 #' p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 #'
 
-kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE, ant.per=0.15,smooth=.2, image.type="orig",flip=T,n.blob=NULL,rem.file=TRUE,make.video=T,qual=50,frame.rate=10){
+kin.vid <-function(vid.path=NULL,...){
 
   if(!file.exists(vid.path)) stop(paste0(vid.path," does not exist in ", "getwd()"))
 
   oldwd <- getwd()
   trial <- gsub(".avi","",vid.path)
 
-  for(i in 1:2) vid.to.images(vid.path=vid.path,qual = 20)
+  for(i in 1:2) vid.to.images(vid.path=vid.path,...)
   image.dir <- paste0(getwd(),"/images")
-  kin.img(image.dir = image.dir,frames,thr,plot.midline, show.prog, ant.per,smooth, image.type,flip,n.blob,rem.file,make.video,qual,frame.rate)
+  kin.img(image.dir = image.dir,...)
 }
 
 ######### kin.img
 
-#' Retrives the midline of an ROI from an image sequence.
+#' Retrives the midline of an ROI from an image sequence. This algorithm is naive and assumes a single ROI.
 #'
 #' @param image.dir Directory containing images to analyze.
 #' @param frames numeric vectors indicating which images to process.
@@ -108,7 +83,7 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 #'\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the orginal video frames, "bin" over binary images.
 #'\code{n.blob} May be useful if there are other highly contrasted ROIs in the frame.
 #'
-#'\code{make.video} If "TRUE" a vidoe of the same names as \code{video.name} is outputted in a \code{image.dir} subdirectory.
+#'\code{make.video} If "TRUE", a vidoe of the same names as \code{video.name} is outputted in a \code{image.dir} subdirectory.
 #'
 #'\code{rem.file} If "TRUE", \code{make.video} is also "TRUE" a video of processed images is still produced.
 #
@@ -128,7 +103,7 @@ kin.vid <-function(vid.path=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pro
 #' \item "wave.y": midline points "y.pred" normalized to "mid.pred"}
 #'
 #'  \code{head.lms}  "lm" objects, one for each frame desribed by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
-#' @seealso \code{\link{kin.vid}}
+#' @seealso \code{\link{kin.vid}} \code{\link{kin.img2}}
 #' @export
 #' @examples
 #' #produce a classic midline waveform plot of swimming fish
@@ -195,7 +170,7 @@ kin.img <-function(image.dir=NULL,frames=NULL,thr=0.7,plot.midline=TRUE, show.pr
     }
     z = bwlabel(y)
 
-    roi <- which.max(tabulate(z))#find the largest roi, can tell it to find nth larger blob
+    roi <- which.max(tabulate(z))#find the largest roi, can tell it to find nth largest blob
     if(!is.null(n.blob)) roi <- which(tabulate(z)==tabulate(z)[order(tabulate(z),decreasing = T)[n.blob]])
     z[z!=roi] <- 0
     z[z==roi] <- 1
