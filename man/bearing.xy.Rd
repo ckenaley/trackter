@@ -2,7 +2,7 @@
 % Please edit documentation in R/trig.funs.R
 \name{bearing.xy}
 \alias{bearing.xy}
-\title{compute the heading between to cratesian points (radians counter clockwise from north or vertical)}
+\title{Compute the heading between to cratesian points}
 \usage{
 bearing.xy(x1, x2, y1, y2)
 }
@@ -17,7 +17,17 @@ bearing.xy(x1, x2, y1, y2)
 }
 \value{
 A single value in radians
+
+a single value in radians
 }
 \description{
-compute the heading between to cratesian points (radians counter clockwise from north or vertical)
+Computes the heading (radians counter clockwise from north or vertical)
+}
+\examples{
+#example
+A <- c(0,0)
+B <- c(-5,5)
+thet <- bearing.xy(A[1],B[1],A[2],B[2])
+deg(thet)
+
 }

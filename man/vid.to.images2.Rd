@@ -2,22 +2,25 @@
 % Please edit documentation in R/ffmpeg2.R
 \name{vid.to.images2}
 \alias{vid.to.images2}
-\title{Extracts images from a video file with ffmep using flexib video filters and codecs}
+\title{Extracts images from a video file with ffmep}
 \usage{
-vid.to.images2(vid.path = NULL, filt = NULL, codec = NULL)
+vid.to.images2(vid.path = NULL, filt = NULL, codec = NULL,
+  silent = TRUE)
 }
 \arguments{
 \item{vid.path}{Character; path of video file to be processed.}
 
+\item{filt}{character; video filter that should be applied to ffmpeg operation. See https://ffmpeg.org/ffmpeg-filters.html}
+
 \item{codec}{character; video codec to apply in ffmpeg operation}
 
-\item{filter}{character; video filter that should be applied to ffmpeg operation. See https://ffmpeg.org/ffmpeg-filters.html}
+\item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
 }
 \value{
 Extracts all the images of the video and saves them to an "images" directory with appended number sequence
 }
 \description{
-Extracts images from a video file with ffmep using flexib video filters and codecs
+Extract images from video file using ffmpegs flexible video filters and codecs
 }
 \details{
 Particularly useful for resizing images
@@ -34,7 +37,9 @@ for(i in 1:50) {
 }
 saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
 
-filt.red <- " -vf scale=200:-1 " #reduce the image images to 200 px wide maintaining aspect ratio
+#reduce the image images to 200 px wide maintaining aspect ratio
+#notice the spaces at the beginning/end of string
+filt.red <- " -vf scale=200:-1 "
 c <- " -c:v libx264 "
 vid.to.images2(vid.path="wave.mp4",filt=filt.red,codec=NULL)
 

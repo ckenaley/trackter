@@ -2,7 +2,7 @@
 % Please edit documentation in R/trig.funs.R
 \name{deg}
 \alias{deg}
-\title{convert radians to degrees}
+\title{Converts radians to degrees}
 \usage{
 deg(x)
 }
@@ -13,7 +13,7 @@ deg(x)
 A single value
 }
 \description{
-convert radians to degrees
+Converts radians to degrees
 }
 \seealso{
 \code{\link{rad}}

@@ -5,7 +5,7 @@
 #' @param y numeric; y position
 #' @param p logical; should the data be plotted with indicated waves
 #' @param method character; how should wavelength be calculated, where it crosses zero ("zeros") or peak to peak ("peaks"). "peaks" method calculates full wavelength, "zeros" the half wavelength.
-#' @param zero.begin logical; does wave begin at zero? Default is 'TRUE' and will help find wave beginning at first x,y values if y=0
+#' @param zero.begin logical; does wave begin at zero? Default is 'TRUE' and will help find waves beginning at first x,y values if y=0
 #' @return a list with half wavelength "l" and position of the crest, "p"
 #' @export
 #' @import features

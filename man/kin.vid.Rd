@@ -2,61 +2,20 @@
 % Please edit documentation in R/kin.R
 \name{kin.vid}
 \alias{kin.vid}
-\title{Retrives the midline of an ROI in each frame of a video.}
+\title{Naive midline detection from video data}
 \usage{
-kin.vid(vid.path = NULL, frames = NULL, thr = 0.7, plot.midline = TRUE,
-  show.prog = FALSE, ant.per = 0.15, smooth = 0.2, image.type = "orig",
-  flip = T, n.blob = NULL, rem.file = TRUE, make.video = T, qual = 50,
-  frame.rate = 10)
+kin.vid(vid.path = NULL, ...)
 }
 \arguments{
 \item{vid.path}{Character; path of video to be analyze.}
 
-\item{frames}{numeric vectors indicating which video frames to process}
-
-\item{thr}{numeric, threshhold to determine binary image. May require some tweeking through iteration}
-
-\item{plot.midline}{logical value indicating if outputted images should inclued plotted midline and reference line.}
-
-\item{show.prog}{logical value indicating if outputted image should be display during analysis.}
-
-\item{ant.per}{numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.}
-
-\item{smooth}{numeric; smoothing parameter value for plotted midline}
-
-\item{image.type}{character; the type of image to be outputted}
-
-\item{flip}{logical, indicating if binary should be flipped}
-
-\item{n.blob}{numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweeking through interation
-#' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames}
-
-\item{rem.file}{logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted. Default is "TRUE".}
-
-\item{qual}{numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.}
-
-\item{frame.rate}{numeric; outputted video frame rate in fps.}
+\item{...}{other arguments to be passed to \code{kin.img} and \code{vid.to.images}}
 }
 \value{
-A list with the following components:
-
-\code{kin.dat} a data frame consisting of position paramters for the ROI indicated by \code{n.blob}:\itemize{
-\item the frame number
-\item "head.x" and "head.y": the x and y position of the head (leftmost or anteriormost)
-\item "x" and ""y": the position of the tail (rightmost or posteriormost)
-\item "amp": the amplitude (\code{amp}) of the tail
-\item "head.pval": p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
-
-\code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{
-\item "x" and "y.m": x and y positions of the midline of the ROI
-\item "mid.pred": the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-\item "y.pred": midline points fit to a loess smoothing model with span equal to \code{smooth} (red curve in the outputted images/video)
-\item "wave.y": midline points "y.pred" normalized to "mid.pred"}
-
- \code{head.lms}  "lm" objects, one for each frame desrbied by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
+Returns the components of \code{kin.img}
 }
 \description{
-Retrives the midline of an ROI in each frame of a video.
+A wrapper, decomposing videos with \code{vid.to.images} to frames for naive retrieval of midlines from the larges ROI using \code{kin.img}.
 }
 \details{
 By default, images are outputted to an "images" subdirectory in the working directory.
@@ -97,5 +56,5 @@ p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 
 
 }
 \seealso{
-\code{\link{kin.img}}
+\code{\link{kin.img}} \code{\link{kin.vid2}}
 }

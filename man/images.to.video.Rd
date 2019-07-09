@@ -2,10 +2,10 @@
 % Please edit documentation in R/ffmpeg2.R
 \name{images.to.video}
 \alias{images.to.video}
-\title{Stitches images into an AVI file}
+\title{Stitches images into a video file}
 \usage{
 images.to.video(image.dir = NULL, vid.name = NULL, qual = 50,
-  vid.ext = ".mp4", frame.rate = 10)
+  vid.ext = ".mp4", frame.rate = 10, silent = TRUE)
 }
 \arguments{
 \item{image.dir}{Character; directory containing images to stich.}
@@ -17,12 +17,14 @@ images.to.video(image.dir = NULL, vid.name = NULL, qual = 50,
 \item{vid.ext}{chacracter; video type to output. mp4 currently works best.}
 
 \item{frame.rate}{numeric; video frame rate in fps.}
+
+\item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
 }
 \value{
 Outputs a video of name "video.name+vid.ext".
 }
 \description{
-Stitches images into an AVI file
+Stitches images into a video file of type indicated by "vid.ext"
 }
 \details{
 Assumes images are appended with a numeric sequence.
@@ -30,20 +32,21 @@ Assumes images are appended with a numeric sequence.
 \examples{
 
 #make some images
-require(emojifont)
+dir.create("images") #make a directory to store images
 
-y <- sin(1:50)
-x <- 1:50
-dir.create("images") #make a directory to stor images
-for(i in 1:50) {
-  jpeg(paste0(getwd(),"/images/image",sprintf("\%03d",i),".jpg"))
-  plot(x[i],y[i],col="red",xlim=c(0,50),ylim=range(y),cex=0)
-  text(x[i], y[i], labels=emoji('cow'), cex=6, col='steelblue', family='EmojiOne')
+a <- 2
+b <- 3
+theta <- seq(0,10*pi,0.01)
+r <- a + b*theta
+df <- data.frame(x=r*cos(theta), y=r*sin(theta)) # Cartesian coords
+every.i <- 30
+for(i in seq(1,length(theta),30)) {
+  jpeg(paste0(getwd(),"/images/image_",sprintf("\%03d",which(i==seq(1,length(theta),30))),".jpg"))
+  with(df[1:i,],plot(x,y,xlim=range(df$x),ylim=range(df$y),col="red"))
   dev.off()
   }
 
-images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="flyingcow",frame.rate=5,qual=100)
-
+images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="spiral",frame.rate=5,qual=100,silent=FALSE)
 }
 \seealso{
 \code{\link{vid.to.images}}

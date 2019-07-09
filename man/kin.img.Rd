@@ -2,12 +2,12 @@
 % Please edit documentation in R/kin.R
 \name{kin.img}
 \alias{kin.img}
-\title{Retrives the midline of an ROI from an image sequence.}
+\title{Retrives the midline of an ROI from an image sequence. This algorithm is naive and assumes a single ROI.}
 \usage{
-kin.img(image.dir = NULL, frames = NULL, thr = 0.7, plot.midline = TRUE,
-  show.prog = FALSE, ant.per = 0.15, smooth = 0.2, image.type = "orig",
-  flip = TRUE, n.blob = NULL, rem.file = TRUE, make.video = TRUE,
-  qual = 50, frame.rate = 10)
+kin.img(image.dir = NULL, frames = NULL, thr = 0.7,
+  plot.midline = TRUE, show.prog = FALSE, ant.per = 0.15,
+  smooth = 0.2, image.type = "orig", flip = TRUE, n.blob = NULL,
+  rem.file = TRUE, make.video = TRUE, qual = 50, frame.rate = 10)
 }
 \arguments{
 \item{image.dir}{Directory containing images to analyze.}
@@ -57,7 +57,7 @@ A list with the following components:
  \code{head.lms}  "lm" objects, one for each frame desribed by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
 }
 \description{
-Retrives the midline of an ROI from an image sequence.
+Retrives the midline of an ROI from an image sequence. This algorithm is naive and assumes a single ROI.
 }
 \details{
 By default, images are outputted to the \code{image.dir} subdirectory in the working directory.
@@ -65,7 +65,7 @@ By default, images are outputted to the \code{image.dir} subdirectory in the wor
 \code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the orginal video frames, "bin" over binary images.
 \code{n.blob} May be useful if there are other highly contrasted ROIs in the frame.
 
-\code{make.video} If "TRUE" a vidoe of the same names as \code{video.name} is outputted in a \code{image.dir} subdirectory.
+\code{make.video} If "TRUE", a vidoe of the same names as \code{video.name} is outputted in a \code{image.dir} subdirectory.
 
 \code{rem.file} If "TRUE", \code{make.video} is also "TRUE" a video of processed images is still produced.
 }
@@ -98,5 +98,5 @@ p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(c
 p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 }
 \seealso{
-\code{\link{kin.vid}}
+\code{\link{kin.vid}} \code{\link{kin.img2}}
 }

@@ -129,6 +129,7 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
   num.for <- paste0("_%",num.l,"d",ext)
 
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir) #if image.dir has spaces
+  print(paste0(image.dir,"/", image.name,num.for))
 
   system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -vcodec mpeg4 ", vid.path,"/",vid.ext),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
 
@@ -192,7 +193,7 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 
   #image.dir <- paste0(gsub("Google Drive","\"Google Drive\"",image.dir),"/") #degooglize path
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir)
-  print(image.dir)
+
   video.name<- gsub(".avi","",basename(vid.path))
   video.name <- gsub(".avi","_red",video.name)
 
@@ -267,7 +268,7 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4"
   unlink(vid.path,recursive = T)
 
 
-  vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path) #if vid.patt has spaces
+  vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path) #if vid.path has spaces
 
 
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp",ignore.case = T))
@@ -283,7 +284,10 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4"
   num.l <- nchar(num)
   num.for <- paste0("_%",num.l,"d",ext)
 
+  image.dir <- normalizePath(dirname(images[1]))
+
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir) #if image.dir has spaces
+
 
   if(!raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f mp4", filt," -vcodec libx264 -pix_fmt yuv420p ", vid.path,vid.ext, " -y"),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
 

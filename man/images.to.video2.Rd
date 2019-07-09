@@ -5,10 +5,11 @@
 \title{Stitches images from video file passing filters to ffmpeg}
 \usage{
 images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
-  vid.ext = ".mp4", frame.rate = 10, raw = T, filt = NULL)
+  vid.ext = ".mp4", frame.rate = 10, raw = TRUE, filt = NULL,
+  silent = TRUE)
 }
 \arguments{
-\item{image.dir}{Character; directory containing images to stich.}
+\item{image.dir}{character; directory containing images to stich.}
 
 \item{vid.name}{character; file name to be give video.}
 
@@ -17,34 +18,43 @@ images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
 \item{vid.ext}{chacracter; video type to output. mp4 currently works best.}
 
 \item{frame.rate}{numeric; video frame rate in fps.}
+
+\item{raw}{logical; encodes a raw AVI video with the "rawvideo" codec.}
+
+\item{filt}{character; video filter that should be applied to ffmpeg operation. See https://ffmpeg.org/ffmpeg-filters.html.}
+
+\item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
 }
 \value{
 Outputs a video of name "video.name+vid.ext".
 }
 \description{
-Stitches images from video file passing filters to ffmpeg
+Wrapper for ffmpeg video operaations. Permits flexible filtering.
 }
 \details{
-Assumes images are appended with a numeric sequence.
+Assumes images are appended with a numeric sequence beginning with "_".
 }
 \examples{
 
-#make some images
-require(emojifont)
+#make some spiralled images and video
 
-y <- sin(1:50)
-x <- 1:50
-dir.create("images") #make a directory to stor images
-for(i in 1:50) {
-  jpeg(paste0(getwd(),"/images/image",sprintf("\%03d",i),".jpg"))
-  plot(x[i],y[i],col="red",xlim=c(0,50),ylim=range(y),cex=0)
-  text(x[i], y[i], labels=emoji('cow'), cex=6, col='steelblue', family='EmojiOne')
+dir.create("images") #make a directory to store images
+
+a <- 2
+b <- 3
+theta <- seq(0,10*pi,0.01)
+r <- a + b*theta
+df <- data.frame(x=r*cos(theta), y=r*sin(theta)) # Cartesian coords
+every.i <- 30
+for(i in seq(1,length(theta),30)) {
+  jpeg(paste0(getwd(),"/images/image_",sprintf("\%03d",which(i==seq(1,length(theta),30))),".jpg"))
+  with(df[1:i,],plot(x,y,xlim=range(df$x),ylim=range(df$y),col="red"))
   dev.off()
   }
 
-images.to.video2(image.dir=paste0(getwd(),"/images"),vid.name="flyingcow",frame.rate=5,qual=100)
+images.to.video2(image.dir=paste0(getwd(),"/images"),vid.name="spiral",frame.rate=5,qual=100,raw=FALSE)
 
 }
 \seealso{
-\code{\link{vid.to.images}}
+\code{\link{vid.to.images2}}
 }

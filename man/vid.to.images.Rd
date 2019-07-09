@@ -2,7 +2,7 @@
 % Please edit documentation in R/ffmpeg2.R
 \name{vid.to.images}
 \alias{vid.to.images}
-\title{Extracts images from a video file with ffmep}
+\title{Extracts images from a video file with ffmpeg}
 \usage{
 vid.to.images(vid.path = NULL, qual = 50)
 }
@@ -15,10 +15,12 @@ vid.to.images(vid.path = NULL, qual = 50)
 Extracts all the images of the video and saves them to an "images" directory with appended number sequence
 }
 \description{
-Extracts images from a video file with ffmep
+Uses ffmpeg systems calls to extract images from a video.
 }
 \examples{
+
 #make a video with animation package
+require(animation)
 fun <- function(){
 y <- sin(1:50)
 x <- 1:50

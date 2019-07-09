@@ -2,22 +2,26 @@
 % Please edit documentation in R/kin.2d.R
 \name{wave}
 \alias{wave}
-\title{Compute wavelength from the last half wave of sine-like waveform}
+\title{Compute wavelength from a sine-like waveform}
 \usage{
-wave(x, y, p = F)
+wave(x, y, p = F, method = "zeros", zero.begin = T)
 }
 \arguments{
 \item{x}{Numeric; x position}
 
 \item{y}{numeric; y position}
 
-\item{p}{logical; should a plot of the last half wavelength}
+\item{p}{logical; should the data be plotted with indicated waves}
+
+\item{method}{character; how should wavelength be calculated, where it crosses zero ("zeros") or peak to peak ("peaks"). "peaks" method calculates full wavelength, "zeros" the half wavelength.}
+
+\item{zero.begin}{logical; does wave begin at zero? Default is 'TRUE' and will help find waves beginning at first x,y values if y=0}
 }
 \value{
 a list with half wavelength "l" and position of the crest, "p"
 }
 \description{
-Compute wavelength from the last half wave of sine-like waveform
+computes wavelength from a sine-like waveform based on either peak-to-peak or internodal distance
 }
 \examples{
 
@@ -26,4 +30,6 @@ x <- seq(0,pi,0.1)
 y <- sin(x*pi)
 
 wave(x,y,p=T)
+
+
 }
