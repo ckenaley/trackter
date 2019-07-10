@@ -7,7 +7,7 @@
 kin.img2(image.dir = NULL, sequenced = TRUE, frames = NULL,
   thr = 0.7, plot.pml = TRUE, show.prog = FALSE, ant.per = 0.1,
   smoothing = "loess", smooth = 0.2, smooth.points = 200,
-  image.type = "orig", save = T, flip = TRUE, rem.file = FALSE,
+  image.type = "orig", save = TRUE, flip = TRUE, rem.file = FALSE,
   frame.rate = 10, size.min = 0.05, n.blob = NULL,
   search.for = "largest", burn = 10)
 }
@@ -120,8 +120,8 @@ p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", si
 print(p)
 
 ### Make a video of processed frames
-#video operations
-trackter::images.to.video2(image.dir = "processed_images", vid.name = "trou_test", qual=50,frame.rate =10,silent=F)
+
+trackter::images.to.video2(image.dir = "processed_images", vid.name = "trout_test", qual=50,frame.rate =10,silent=T)
 }
 
 }

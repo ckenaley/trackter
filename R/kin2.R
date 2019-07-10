@@ -823,11 +823,10 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,train.dat=NULL,rescale=F,h
 
 kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.2,smooth.points=200,save=TRUE,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
   
-  unlink("processed_images",recursive = T)
+  if(save){unlink("processed_images",recursive = T)
   dir.create("processed_images")
-  
   proc.dir <- "processed_images"
-  
+}
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
   
   if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")
@@ -835,7 +834,6 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
   
   
   trial <- gsub("\\.[^.]*$", "", basename(images[1]))
- 
   
   kin.l <- list()
   midline.l<- list()
