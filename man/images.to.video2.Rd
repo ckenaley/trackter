@@ -11,7 +11,7 @@ images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
 \arguments{
 \item{image.dir}{character; directory containing images to stich.}
 
-\item{vid.name}{character; file name to be give video.}
+\item{vid.name}{character; file name to be given video.}
 
 \item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
 
@@ -21,7 +21,7 @@ images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
 
 \item{raw}{logical; encodes a raw AVI video with the "rawvideo" codec.}
 
-\item{filt}{character; video filter that should be applied to ffmpeg operation. See https://ffmpeg.org/ffmpeg-filters.html.}
+\item{filt}{character; video filter that should be applied to ffmpeg operation. See \link{https://ffmpeg.org/ffmpeg-filters.html}.}
 
 \item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
 }
