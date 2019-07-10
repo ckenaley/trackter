@@ -1,54 +1,3 @@
-#' @title  Midline detection from video data
-#'
-#' @description A wrapper, decomposing videos with \code{vid.to.images2} to frames for automatical retrieval of ROI midlines using \code{kin.img2}.
-#'
-#' @param vid.args list; arguments to be passed to \code{vid.to.images2}
-#' @param kin.args list; arguments to be passed to \code{kin.img2}
-#'
-#'
-#' @details By default, images are outputted to an 'images' subdirectory in the working directory and processed images to a 'processed_images' subdirectory.
-#
-#' @return Returns the components of \code{kin.img2}
-#'
-#' @seealso \code{\link{kin.img2}}, \code{\link{vid.to.images2}}
-#' @export
-#' @import data.table
-#' @examples produce a classic midline waveform plot of swimming fish
-#'\dontrun{
-#' require(wesanderson)
-#' require(ggplot2)
-#' require(dplyr)
-#'
-#' #download an example video (7.5 MB) and place in working directory
-#' f <- "https://github.com/ckenaley/exampledata/blob/master/trout1_63_test.avi?raw=true"
-#' download.file(f, file.path(getwd(), "trout1_63_test.avi"), method = "libcurl")
-#' kin <- kin.vid2(vid.args=list(vid.path ="trout1_63_test.avi",silent=TRUE),kin.args=list(thr=0.7,frames=1:10,frame.rate=10,sequenced=TRUE,rem.file=F))
-#'
-#' ml <- kin$midline
-#' #normalize x (y is normalized to midline by "kin.img/kin.vid")
-#' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
-#'
-#' #compute instantaneous amplitude of tail (last/rightmost point) and wave crest x position  by frame
-#' ml2 <- ddply(ml,.(frame),summarize,amp.i=last(wave.y))
-#'
-#' ml <- merge(ml,ml2,by="frame") #merge these
-#'
-#' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
-#' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-#'}
-
-
-kin.vid2 <-function(kin.args,vid.args){
-
-  if(!file.exists(vid.args$vid.path)) stop(paste0(vid.args$vid.path," does not exist in ", "getwd()"))
-
-  oldwd <- getwd()
-  do.call(vid.to.images2,vid.args)
-  kin.args$image.dir <- paste0(getwd(),"/images")
-  do.call(kin.img2,kin.args)
-}
-
 ######### kin.img2
 
 #' @title  Midline tracking over image seqences
@@ -59,25 +8,20 @@ kin.vid2 <-function(kin.args,vid.args){
 #' @param frames numeric, vector indicating which images to process.
 #' @param sequenced logical, do the names of the image sequence end in a number sequence. If set to 'TRUE', output video will be named the file base name of the first image minus the image number ('gsub("(.+)\\_\\d*$", "\\1", image[1])')
 #' @param thr numeric, threshold to determine binary image. May require some tweaking through iteration.
-#' @param plot.midline logical, value indicating if outputted images should include plotted midline and reference line based on anterior section of the ROI.
+#' @param plot.ml logical, value indicating if outputted images should include an overlay of the theoretical amidline based on \code{ant.per}.
 #' @param smoothing character, the midline smoothing method, either 'loess' or "spline".
 #' @param smooth numeric; if \code{smoothing} is set to 'loess', smoothing parameter value for plotted midline.
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
-#' @param image.type character; the type of image to be outputted.
 #' @param flip logical, indicating if binary should be flipped.
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.
 #' @param n.blob numeric, indicating which nth largest ROI is the ROI to be analyzed. May require tweaking through iteration. Perhaps best to let the function choose by using "search.for".
-#' @param make.video logical value indicating if a video should be saved of midline position overlaying origina frames.
-#' @param video.name character, the name given to the outputted video.
-#' @param qual numeric; quality of the outputted video from 1-100\%. Defaults to 50\%.
-#' @param ant.per numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
-#' @param frame.rate numeric; outputted video frame rate in fps.
+#' #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. Automatically set to 'TRUE' if 'make.video=TRUE'.
+#' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
 #' @param rem.file logical value indicating if the outputted images, both from the original video and images with midline overlay, should be deleted.
 #' @param search.for character; the search parameter: "offset" the ROI closest to the midpoint of the field or "largest" the largest roi (equivalent to n.blob=1). Will produce a warning if the ROI indicated by either of these settings is one that has no positive pixels along 90\% of its midline (see details).
 #' @param burn numeric, how many frames (a burn-in) should be used to determine the ROI. If all ROIs in the the burn-in frames are the same, the algorithm will choose that ROI in all subsequent frames. This should increase the speed of midline detection in post burn-in frames.
-#'  @param silent logical, should output of ffmpeg system calls be hidden.
-#'
+#' 
 #' @export
 #'
 #' @details
@@ -119,7 +63,7 @@ kin.vid2 <-function(kin.args,vid.args){
 #' }
 
 #'  \code{head.lms}  'lm' objects, one for each frame described by \code{frames} of the linear model fit to the \code{ant.per} section of the ROI
-#' @seealso \code{\link{kin.vid}}
+#' @seealso \code{\link{kin.LDA},\link{kin.simple}}
 #' @export
 #' @examples
 #' #produce a classic midline waveform plot of swimming fish
@@ -136,7 +80,7 @@ kin.vid2 <-function(kin.args,vid.args){
 #' unzip("temp.zip")
 #' unlink("temp.zip")
 #'
-#'kin <- kin.img2(image.dir ="example",search.for = "largest",smoothing = "spline",frames=1:15,show.prog = T,thr = 0.6,make.video = TRUE,silent=FALSE)
+#'kin <- kin.img2(image.dir ="example",search.for = "largest",smoothing = "spline",frames=1:10,show.prog = T,thr = 0.6)
 
 #' ml <- kin$midline
 #' #normalize x (y is normalized to midline by "kin.img/kin.vid")
@@ -151,14 +95,18 @@ kin.vid2 <-function(kin.args,vid.args){
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
 #' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 #' print(p)
+#' 
+#' ### Make a video of processed frames
+#'
+#' trackter::images.to.video2(image.dir = "processed_images", vid.name = "trout_test", qual=50,frame.rate =10,silent=T)
 #'}
 #'
-kin.img2 <-function(image.dir=NULL,sequenced=TRUE,frames=NULL,thr=0.7,plot.midline=TRUE, show.prog=FALSE,ant.per=0.10,smoothing="loess",smooth=.2, smooth.points=200, image.type="orig",flip=TRUE,rem.file=FALSE,make.video=TRUE,video.name=NULL,qual=50,frame.rate=10,size.min=0.05,n.blob=NULL,search.for="largest",burn=10,silent=TRUE){
+kin.img2 <-function(image.dir=NULL,sequenced=TRUE,frames=NULL,thr=0.7,plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,smoothing="loess",smooth=.2, smooth.points=200, image.type="orig",save=TRUE,flip=TRUE,rem.file=FALSE,frame.rate=10,size.min=0.05,n.blob=NULL,search.for="largest",burn=10){
 
-  unlink("processed_images",recursive = T)
+  if(save){unlink("processed_images",recursive = T)
   dir.create("processed_images")
 
-  proc.dir <- "processed_images"
+  proc.dir <- "processed_images"}
 
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
 print(images)
@@ -193,28 +141,6 @@ print(images)
     z = bwlabel(y)
 
     rois <- tabulate(z)
-
-    ###idealized fish
-   #  fish <- EBImage::readImage("/Users/Chris/Documents/R.scripts/trackter/fish.jpg",all=F) #if don't add package, others use "display"
-   #  ## computes binary mask
-   #  fish.y = fish >thr #contrast threshold
-   #  if(flip){#flip binary
-   #    fish.y[fish.y==1] <- 5
-   #    fish.y[fish.y==0] <- 1
-   #    fish.y[fish.y==5] <- 0
-   #  }
-   #  fish.z = bwlabel(fish.y)
-   #
-   #  fish.m <- fish.z[,,1]
-   # fish.m[1,1] <- 0
-
-   #fish.c <- ocontour(fish.m)
-    #fish.c.df <- data.frame(fish.c)
-
-   # fish.co <- efourier(ocontour(fish.m),nb.h = 40)
-   # efourier_norm(ef=fish.co)
-
-#plot(fish.c.df[,1],fish.c.df[,2])
 
     roi <- which.max(rois)#find the largest roi, can tell it to find nth largest blob
 
@@ -278,15 +204,6 @@ print(images)
 
       y.df <- y.df[,y.m :=(y.max-y.min)/2+y.min, by=.(x,y.min,y.max)]
 
-      # zc <- data.frame(ocontour(z.m))
-      # colnames(zc) <- c("x","y")
-      # with(zc,plot(x,y))
-
-
-
-      # ef.co <- efourier(ocontour(z.m),nb.h = 40)
-      # efourier_norm(ef=ef.co)
-
       tip.y <- mean(tail(y.df$y.m[!is.na(y.df$y.m)],30))#tip is mean y.m of last 30 pixels
       tip.x <- mean(tail(y.df$x[!is.na(y.df$y.m)],30))#tip is mean y.m of last 30 pixels
 
@@ -344,7 +261,7 @@ print(images)
     if(!prob.roi%in%names(void.l)[which(void.l==T)]) (warning(paste0("entire midline of probable ROI for image ", im, " does not have positive pixels. Try other 'seach.for' options")))
 
 
-    if(!is.null(burn) & which(im==images)<=burn &length(prob.roi)>1) prob.rois <- combine(prob.roi)
+    if(!is.null(burn) & which(im==images)<=burn &length(prob.roi)>1) prob.rois <- Momocs::combine(prob.roi)
 
     kin.i <- cand.kin.i[roi==prob.roi]
     mid.i <- cand.mid.i[roi==prob.roi]
@@ -356,12 +273,12 @@ print(images)
     jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
     if(image.type=="bin") EBImage::display(z,method = "raster")
     if(image.type=="orig") EBImage:: display(img,method = "raster")
-    if(plot.midline) {
+   
 
-      lines(predict(lm(mid.pred~x,mid.i)),x=mid.i$x,col="blue",lwd=4)
+    if(plot.midline) lines(predict(lm(mid.pred~x,mid.i)),x=mid.i$x,col="blue",lwd=4)
       lines(y.pred~x,mid.i,col="red",lwd=4)
-      with(mid.i[1:(ant.per*smooth.points),],points(x,y.m,col="green",pch=16,cex=0.75))
-    }
+      if(plot.midline) with(mid.i[1:(ant.per*smooth.points),],points(x,y.m,col="green",pch=16,cex=0.75))
+    
     dev.off()
   }
 
@@ -370,10 +287,7 @@ print(images)
   midline.dat <- data.table(do.call(rbind,midline.dat))
   rownames(midline.dat) <- NULL
   
-  if(make.video){vid.name <- paste0(trial,"_kin")}
-  if(make.video) {images.to.video2(image.dir = proc.dir, vid.name = vid.name, qual=qual,frame.rate = frame.rate,silent=silent)
-message(paste0(vid.name," outputted to ",getwd()))
-  }
+ 
   #clean up
   if(rem.file){
     if(is.null(image.dir)) stop("'image.dir' not specified and 'rem.file=TRUE'. Won't delete working directory!")
@@ -516,7 +430,6 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,train.dat=NULL,rescale=F,h
   if(!is.null(frames)) images <- images[frames]
   
   trial <- gsub("\\.[^.]*$", "", basename(images[1]))
-  if(sequenced==TRUE) trial <- gsub("(.+)\\_\\d*$", "\\1", trial)
   
   kin.l <- list()
   midline.l<- list()
@@ -559,7 +472,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,train.dat=NULL,rescale=F,h
       kin.train <- do.call(rbind,kin.l)
       out.train <- roi.outs
       size.train <- do.call(rbind,size.l)
-      roi.train <-combine(roi.outs)
+      roi.train <-Momocs::combine(roi.outs)
       
     }
     
@@ -593,7 +506,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,train.dat=NULL,rescale=F,h
         rois[c.roi[r.name]]
       }
       
-      roi.out2 <- combine(out.l)
+      roi.out2 <- Momocs::combine(out.l)
       
       classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),type=NA,shape=NA,post=NA,type2=NA,shape2=NA,post2= NA,retrained=frame>retrain,edge=roi.out2$fac$edge,size.diff=size.diff)
       
@@ -630,13 +543,13 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,train.dat=NULL,rescale=F,h
       
       ##### efourier and LDA analysis ####
       #train.data from training
-      roi.out2 <- combine(out.l)
+      roi.out2 <- Momocs::combine(out.l)
   
-      if(frame>retrain){all.outs <- combine(roi.train,roi.out2)}else{all.outs <- combine(train.dat,roi.out2)}
+      if(frame>retrain){all.outs <- Momocs::combine(roi.train,roi.out2)}else{all.outs <- Momocs::combine(train.dat,roi.out2)}
       #rescale?
       if(rescale) all.outs <- coo_scale(coo_center(all.outs))
       # panel(all.outs)
-      if(length(roi.out2)==1) all.outs <- combine(all.outs,roi.out2) #must have two roi rows for rePCA to work
+      if(length(roi.out2)==1) all.outs <- Momocs::combine(all.outs,roi.out2) #must have two roi rows for rePCA to work
       
       shapes.out <- all.outs %>% filter(type!="roi")
 
@@ -790,6 +703,8 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,train.dat=NULL,rescale=F,h
       
       dev.off()
     }
+    
+    
     setTxtProgressBar(pb,which(images==im))
   }
   
@@ -882,9 +797,9 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,train.dat=NULL,rescale=F,h
 #' vid.to.images2(vid.path="trout1_63_test.avi",filt = filt.red) #extract
 #' 
 #' #number of frames
-#' fr <- length(list.files("images"))
+#' fr <-1:50
 #' #extract midline and other data
-#' kin <- kin.simple(image.dir = "images",frames=c(1:fr),thr=0.6,ant.per = 0.2,show.prog=T)
+#' kin <- kin.simple(image.dir = "images",frames=fr,thr=0.6,ant.per = 0.2,show.prog=T)
 #' ml <- kin$midline
 #' #normalize x (y is normalized to midline by \code{kin.simple})
 #' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -920,7 +835,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
   
   
   trial <- gsub("\\.[^.]*$", "", basename(images[1]))
-  if(sequenced==TRUE) trial <- gsub("(.+)\\_\\d*$", "\\1", trial)
+ 
   
   kin.l <- list()
   midline.l<- list()
@@ -941,8 +856,6 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
     
     ## computes binary mask
     y = img >thr #contrast threshold
-    
-    
     
     if(flip){#flip binary
       y[y==1] <- 5
@@ -992,7 +905,9 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 
     }
     #don't combine if only one ROI
-    if(length(out.l)==1){roi.out2 <- out.l[[1]]}else{roi.out2 <- combine(out.l)}
+    if(length(out.l)==1){roi.out2 <- out.l[[1]]}else{roi.out2 <- Momocs::combine(out.l)}
+    
+   
     
     classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),edge=roi.out2$fac$edge,size=rois[c.roi])
     

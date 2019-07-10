@@ -211,12 +211,12 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #' @description Wrapper for ffmpeg video operaations. Permits flexible filtering.
 #'
 #' @param image.dir character; directory containing images to stich.
-#' @param vid.name character; file name to be give video.
+#' @param vid.name character; file name to be given video.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
 #' @param vid.ext chacracter; video type to output. mp4 currently works best.
 #' @param frame.rate numeric; video frame rate in fps.
 #' @param raw logical; encodes a raw AVI video with the "rawvideo" codec.
-#' @param filt character; video filter that should be applied to ffmpeg operation. See https://ffmpeg.org/ffmpeg-filters.html.
+#' @param filt character; video filter that should be applied to ffmpeg operation. See \link{https://ffmpeg.org/ffmpeg-filters.html}.
 #' @param silent logical; should output of \code{system} call for ffmpeg operation be suppressed.
 #'
 #' @return Outputs a video of name "video.name+vid.ext".
@@ -292,6 +292,6 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4"
   if(!raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f mp4", filt," -vcodec libx264 -pix_fmt yuv420p ", vid.path,vid.ext, " -y"),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
 
   if(raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f avi -vcodec rawvideo ", vid.path,vid.ext, " -y"),ignore.stderr = silent)
-
-
+ 
+message(paste0("video saved to ", vid.path,vid.ext))
 }
