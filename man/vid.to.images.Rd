@@ -29,7 +29,7 @@ for(i in 1:50) {
   animation::ani.pause()
   }
 }
-saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
 
 vid.to.images(vid.path="wave.mp4",qual=100)
 

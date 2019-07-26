@@ -18,7 +18,7 @@ kin.simple(image.dir = NULL, frames = NULL, thr = 0.7,
 
 \item{size.min}{numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.05.}
 
-\item{ant.per}{numeric; left-most proportion of ROI that establishes the vertical reference for the midline displacement.}
+\item{ant.per}{numeric; left-most proportion of ROI that establishes the horizontal reference for the midline displacement.}
 
 \item{tips, }{numeric, the proportion the the midline data to use in calculation of the head and tail position.}
 
@@ -28,7 +28,7 @@ kin.simple(image.dir = NULL, frames = NULL, thr = 0.7,
 
 \item{smooth.points}{numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.}
 
-\item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
+\item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.}
 
 \item{plot.pml}{logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).}
 
@@ -55,8 +55,8 @@ A list with the following components:
 #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
 \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{ant.per} (green points in the outputted images/video if 'plot.pml=TRUE')
 \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-\item 'wave.y': midline points 'y.pred' normalized to 'mid.pred'
-\item 'roi': a character indicating ROI size (a being the largest)
+\item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
+\item 'roi': a character indicating ROI size ('a' being the largest)
 }
 
 \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
@@ -65,12 +65,14 @@ A list with the following components:
 \item 'x' and 'y': the x and y positions of the countours
 }
 
-\code{all.classes} A data table containing the following: 
+\code{all.classes} A data table containing the following for all ROIs detected:  
 \itemize{
 \item 'frame': the frame
 \item 'roi': the name of each ROI found in a frame.
 \item 'size': the size of each ROI
 }
+
+\code{dim} the x and y dimensions of the images analyzed
 }
 \description{
 Automatically retrieves the midline of an ROI detected based on size. Assumes the ROI of interest is the largest detected and not interesecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
@@ -82,10 +84,6 @@ The algorithm assumes a left-right orientation, i.e., the head of the ROI is pos
 #produce a classic midline waveform plot of swimming fish searching a image field with a two fish-like ROIs
 \dontrun{
 require(wesanderson)
-require(ggplot2)
-require(data.table)
-require(dplyr)
-require(EBImage)
 
 #download example avi video
 f <- "https://github.com/ckenaley/exampledata/blob/master/trout1_63_test.avi?raw=true"
@@ -113,9 +111,13 @@ p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(c
 p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 print(p)
 
-#delete 'images' and 'processed_images' folders
+#make a video of extracted midlines over original images
+images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
+
+#delete 'images' and 'processed_images' folders and avi file
 unlink("processed_images",recursive = T)
-unlink("images",,recursive = T)
+unlink("images",recursive = T)
+unlink("trout1_63_test.avi",recursive = T)
 }
 
 }

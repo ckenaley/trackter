@@ -2,25 +2,28 @@ Package: trackter
 Title: Automated Kinematic Analysis of Image Data
 Version: 1.0.0.9000
 Authors@R: person(given="Christopher", family="Kenaley", email = "kenaley@bc.edu", role = c("aut", "cre"))
-Description: trackter analyzes the shape of a region of interest (ROI) in image sequences and extracts midline and other kinematic data. 
+Description: This package is intended for analysis of the shape of a region of interest (ROI) in image sequences and extracing midline and other kinematic data. 
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.3.0),
-    EBImage
-Imports:
-    Momocs,
-    stats,
-    raster,
-    zoo,
-    plyr,
-    dplyr,
-    data.table,
-    pastecs,
-    animation,
-    features,
-    jpeg,
-    wesanderson,
-    ggplot2
+Depends: R (>= 3.5.0),
+Imports: 
+  EBImage,
+  data.table,
+  dplyr,
+  Momocs,
+  raster,
+  zoo,
+  plyr,
+  pastecs,
+  animation,
+  features,
+  jpeg,
+  wesanderson,
+  ggplot2,
+  graphics,
+  stats,
+  utils
 RoxygenNote: 6.1.1
-
+Suggests: 
+    testthat (>= 2.1.0)

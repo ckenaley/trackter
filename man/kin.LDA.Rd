@@ -4,10 +4,10 @@
 \alias{kin.LDA}
 \title{Midline tracking over image sequences with ROI search using LDA}
 \usage{
-kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7,
-  train.dat = NULL, rescale = F, harms = 15, enorm = T,
-  retrain = 5, after.train = "LDA", ties = "fish", edges = F,
-  size.min = 0.05, show.prog = FALSE, ant.per = 0.2, tips = 0.2,
+kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
+  tips = 0.2, edges = FALSE, train.dat = NULL, rescale = FALSE,
+  harms = 15, enorm = T, retrain = 5, after.train = "LDA",
+  ties = "fish", size.min = 0.05, show.prog = FALSE,
   smoothing = "loess", smooth = 0.3, smooth.points = 200, save = T,
   image.type = "orig", plot.pml = TRUE, flip = TRUE)
 }
@@ -16,26 +16,31 @@ kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7,
 
 \item{frames}{numeric, vector indicating which images to process.}
 
-\item{thr}{numeric, threshold to determine binary image. May require some tweaking through iteration.}
+\item{thr}{numeric or character ('otsu') threshold to determine binary image. See Details.}
 
-\item{train.dat}{Classified \code{Out} and \code{Coo} outlines that are produced from \code{Momocs}. See details.}
+\item{ant.per}{numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.}
+
+\item{tips, }{numeric, the proportion the the midline data to use in calculation of the head and tail position.}
+
+\item{edges}{logical, shoudd ROIs on image edges by evaluated. See Details.}
+
+\item{train.dat}{Classified \code{Out} and \code{Coo} outlines that are produced from \code{Momocs}. See Details.}
 
 \item{rescale}{logical, should all shapes in PCA be rescaled. Performs best as 'FALSE'.}
 
 \item{harms}{numeric, the number of harmonics to use. If missing, \code{Momocs} sets 'nh.b' to 12. Will produce messages.}
 
-\item{enorm}{logical, should the EFA coeffecients from \code{efourier} operations be normalized or not. See \code{details} and \code{?Momocs::efourier}}
+\item{enorm}{logical, should the EFA coeffecients from \code{efourier} operations be normalized or not. See \code{details} and \code{\link{efourier}}}
 
-\item{after.train}{character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This peeds calculations considerably. If 'LDA', the default, 'LDA' will continue usining the retraining classifications from frames $<=$ 'train'.}
+\item{retrain}{numeric, the number of frames on which to retrain the LDA data set. See details.}
+
+\item{after.train}{character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This peeds calculations considerably. If 'LDA', the default, LDA will continue usining the retraining classifications from frames $<=$ 'train'.}
 
 \item{ties}{character, how to chose ROI's in any one frame that appear fish-like. See details.}
 
 \item{size.min}{numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.05.}
 
 \item{show.prog}{logical value indicating if outputted image should be displayed during analysis.}
-
-\item{ant.per}{numeric; left-most percentage of ROI that establishes the vertical reference for the midline displacement.
-#' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position.}
 
 \item{smoothing}{character, the midline smoothing method, either 'loess' or 'spline'.}
 
@@ -45,12 +50,11 @@ kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7,
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
 
-\item{image.type}{character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save==FALSE'.
-#' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).}
+\item{image.type}{character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save==FALSE'.}
+
+\item{plot.pml}{logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).}
 
 \item{flip}{logical, indicating if binary should be flipped.}
-
-\item{train}{numeric, the number of frames on which to retrain the LDA data set. See details.}
 }
 \value{
 A list with the following components:
@@ -70,8 +74,8 @@ A list with the following components:
 #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
 \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
 \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-\item 'wave.y': midline points 'y.pred' normalized to 'mid.pred'
-\item 'roi': a character indicating ROI size (a being the largest)
+\item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
+\item 'roi': a character indicating ROI size ('a' being the largest)
 }
 
 \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
@@ -80,24 +84,28 @@ A list with the following components:
 #' \item 'x' and 'y': the x and y positions of the countours
 }
 
-#' \code{all.classes} A data table containing the following: 
+\code{all.classes} A data table containing the following for all ROIs detected: 
 \itemize{
 \item 'frame': the frame
 \item 'roi': the name of each ROI found in a frame.
 \item 'size': the size of each ROI
 }
+
+\code{dim} the x and y dimensions of the images analyzed
 }
 \description{
-Experimental. Automatically retrieves the midline of a fish-like ROI class detected through linear discrimate analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROI is user defined or with the 'train.dat' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+Experimental. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentatio. Chose a fish-like ROI class detected through linear discrimate analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 }
 \details{
 The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body mideline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+
+Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 
 Before \code{train}, ROIs are chosen according to LDA of a PCA object constructed from \code{efourier} analysis. LDA is trained by a user define 'train.dat' when the frame $<=$ \code{retrain}. LDA will procede after \code{retrain} if \code{after.train}='LDA', but the LDA will be trained by the contours classified as 'fish' and 'not.fish' found during the chosen training period. 
 
 \code{enorm} Normalization of EFA coefficents is often perilous, especially for symetrical shapes, a conditional met for undulating, bilaterally sysmetical organisms at least some of the time and perhaps for many of the frames included in any analysis. Thus, 'enorm' by default is set to 'FALSE'. 'enorm=TRUE' may produce odd ROI choices and should be used cautiously.
 
-\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes from \code{Momocs::efourier}. A user defined dataset or the 'shapes' dataset in \code{trackter} must be used for training. 'shapes' includes several arbitrary shapes (circrles, squares, U-shapes, etc.) as well as several fish shapes (sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle). A user-defined dataset must have shapes classified with factors identical to the 'fisshapes' contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. See also \link{fishshapes} and \link{Momocs}.
+\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes. A user defined dataset or the \code{fishshapes} dataset in \code{trackter} must be used for training. \code{fishshapes} includes several arbitrary shapes (circrles, squares, U-shapes, etc.) as well as several fish shapes: sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle. A user-defined dataset must have shapes classified with factors identical to the \code{fishshapes} contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. 
 
 \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therfore incomplete.
 \code{retrain} After this value, the LDA analysis will use the ROIs determined as 'fish' and 'not.fish' in the frames $>=$ \code{retrain} to discrimate fish from non-fish shapes. This speeds up analysis considerably.
@@ -117,9 +125,12 @@ f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
 download.file(f,"temp.zip")
 unzip("temp.zip")
 unlink("temp.zip")
-kin <- kin.simple(image.dir = "example",frames=1:20,thr=0.7,ant.per=.25,enorm=F,show.prog = F,retrain=2,train.dat = train,after.train="LDA",edges=F)
+
+#load fishshapes data
+data(fishshapes)
+kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,ant.per=.25,enorm=F,show.prog = F,retrain=2,train.dat = fishshapes,after.train="LDA",edges=F)
 ml <- kin$midline
-#normalize x (y is normalized to midline by "kin.img/kin.vid")
+ #x start at 0
 ml <- ddply(ml,.(frame),transform,x2=x-x[1])
 
 #compute instantaneous amplitude of tail (last/rightmost point) and wave crest x position  by frame
@@ -131,9 +142,17 @@ pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
 p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 print(p)
-}
 
+
+#make a video of extracted midlines over original images
+images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
+
+#delete 'example', images','processed_images' folders
+unlink("processed_images",recursive = T)
+unlink("images",recursive = T)
+unlink("example",recursive = T)
+}
 }
 \seealso{
-\code{\link{kin.simple}}, \code{\link{efourier}} \code{\link{LDA}}
+\code{\link{kin.simple}}, \code{\link{kin.search}}, \code{\link{efourier}} \code{\link{LDA}}, \code{\link{fishshapes}}.
 }

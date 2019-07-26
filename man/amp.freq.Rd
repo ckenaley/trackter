@@ -2,7 +2,7 @@
 % Please edit documentation in R/kin.2d.R
 \name{amp.freq}
 \alias{amp.freq}
-\title{Computes amplitude and wavelength of wave-like data}
+\title{Computes amplitude and frequency of wave-like data}
 \usage{
 amp.freq(x = NULL, y, sf = 100)
 }
@@ -20,14 +20,15 @@ a list with amplitude "a", frequence "f", amplitude returned from a smoothed sig
 Computes amplitude(s) and wavelength(s) of a wave form, amongst other things, based on a sampling frequency
 }
 \examples{
-
+\dontrun{
 #Compute waveform patterns
 x <- seq(0,pi,0.1)
 y <- sin(x^1.3*pi)
 plot(x,y)
 
-amp.freq(x=x,y=y)
+}amp.freq(x=x,y=y)
+
 }
 \seealso{
-\code{features}
+\code{\link{features}}
 }

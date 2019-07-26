@@ -19,7 +19,7 @@
 #'   animation::ani.pause()
 #'   }
 #' }
-#' saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+#' animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
 #'
 #' vid.to.images(vid.path="wave.mp4",qual=100)
 #'
@@ -31,7 +31,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 
   version <-  try(system("ffmpeg -version", intern = TRUE))
   if (inherits(version, "try-error")) {
-    warning("The command \"", ffmpeg, "\" is not available in your system. Please install FFmpeg first:",
+    warning("The command 'ffmpeg' is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
@@ -94,7 +94,7 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
 
   version <-  try(system(paste("ffmpeg -version"), intern = TRUE))
   if (inherits(version, "try-error")) {
-    warning("The command \"", ffmpeg, "\" is not available in your system. Please install FFmpeg first:",
+    warning("The command 'ffmpeg' is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
@@ -142,7 +142,7 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
 #' @description Extract images from video file using ffmpegs flexible video filters and codecs
 #'
 #' @param vid.path Character; path of video file to be processed.
-#' @param filt character; video filter that should be applied to ffmpeg operation. See https://ffmpeg.org/ffmpeg-filters.html
+#' @param filt character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}
 #' @param codec character; video codec to apply in ffmpeg operation
 #' @param silent logical; should output of \code{system} call for ffmpeg operation be suppressed.
 #' @details Particularly useful for resizing images
@@ -159,7 +159,7 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
 #'   animation::ani.pause()
 #'   }
 #' }
-#' saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+#' animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
 #'
 #'#reduce the image images to 200 px wide maintaining aspect ratio
 #'#notice the spaces at the beginning/end of string
@@ -174,7 +174,7 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 
   version <-  try(system("ffmpeg -version", intern = TRUE))
   if (inherits(version, "try-error")) {
-    warning("The command \"", ffmpeg, "\" is not available in your system. Please install FFmpeg first:",
+    warning("The command 'ffmpeg' is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
@@ -216,7 +216,7 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #' @param vid.ext chacracter; video type to output. mp4 currently works best.
 #' @param frame.rate numeric; video frame rate in fps.
 #' @param raw logical; encodes a raw AVI video with the "rawvideo" codec.
-#' @param filt character; video filter that should be applied to ffmpeg operation. See \link{https://ffmpeg.org/ffmpeg-filters.html}.
+#' @param filt character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}.
 #' @param silent logical; should output of \code{system} call for ffmpeg operation be suppressed.
 #'
 #' @return Outputs a video of name "video.name+vid.ext".
@@ -250,7 +250,7 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4"
 
   version <-  try(system(paste("ffmpeg -version"), intern = TRUE))
   if (inherits(version, "try-error")) {
-    warning("The command \"", ffmpeg, "\" is not available on your system. Please install FFmpeg first:",
+    warning("The command 'ffmpeg' is not available on your system. Please install ffmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
@@ -287,7 +287,6 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4"
   image.dir <- normalizePath(dirname(images[1]))
 
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir) #if image.dir has spaces
-
 
   if(!raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f mp4", filt," -vcodec libx264 -pix_fmt yuv420p ", vid.path,vid.ext, " -y"),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
 

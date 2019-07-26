@@ -33,6 +33,7 @@ Shapes of type 'not.fish' include 'Ellipse', 'Lshape', 'Ushape', Ushape2', 'Usha
 The 'edge' factor is included so as to have the classification factors match those of the \code{efourier} and \code{LDA} analysis in \code{kin.LDA}.
 }
 \examples{
+library(Momocs)
 data(fishshapes)
 panel(fishshapes)
 }

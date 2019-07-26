@@ -10,7 +10,7 @@ vid.to.images2(vid.path = NULL, filt = NULL, codec = NULL,
 \arguments{
 \item{vid.path}{Character; path of video file to be processed.}
 
-\item{filt}{character; video filter that should be applied to ffmpeg operation. See https://ffmpeg.org/ffmpeg-filters.html}
+\item{filt}{character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}}
 
 \item{codec}{character; video codec to apply in ffmpeg operation}
 
@@ -35,7 +35,7 @@ for(i in 1:50) {
   animation::ani.pause()
   }
 }
-saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
 
 #reduce the image images to 200 px wide maintaining aspect ratio
 #notice the spaces at the beginning/end of string

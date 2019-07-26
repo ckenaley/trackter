@@ -27,6 +27,8 @@
 #' @rdname fish-shapes
 #' @name fishshapes
 #' @usage data(fishshapes)
+#' @import data.table
+#' @import Momocs
 #'
 #' @format An object of class \code{"Out"} and \code{"Coo"}; see \code{\link[Momocs]{Out}}.
 #' 
@@ -34,6 +36,7 @@
 #' @keywords datasets
 #'
 #' @examples
+#' library(Momocs)
 #' data(fishshapes)
 #' panel(fishshapes)
 NULL

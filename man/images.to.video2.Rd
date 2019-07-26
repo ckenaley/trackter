@@ -21,7 +21,7 @@ images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
 
 \item{raw}{logical; encodes a raw AVI video with the "rawvideo" codec.}
 
-\item{filt}{character; video filter that should be applied to ffmpeg operation. See \link{https://ffmpeg.org/ffmpeg-filters.html}.}
+\item{filt}{character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}.}
 
 \item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
 }
