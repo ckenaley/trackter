@@ -28,43 +28,42 @@
 
 
 vid.to.images <- function(vid.path=NULL,qual=50)  {
-
+  
   version <-  try(system("ffmpeg -version", intern = TRUE))
   if (inherits(version, "try-error")) {
     warning("The command 'ffmpeg' is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
-
+   
   qual <- round(30-30*(qual/100)+1,0)
 
-
-
+  
   image.dir <- gsub(basename(vid.path),"images",vid.path)
-
+  
   #delete or create the image directory
-  if(is.null(image.dir)) stop("'image.dir' not specified")
+ 
+  if(!file.exists(vid.path)) stop("'vid.path' invalid")
 
   unlink(image.dir,recursive = T)
   dir.create(image.dir)
-
+  
   vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path)
-
+  
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir)
-
+  
   video.name<- gsub(".avi","",basename(vid.path))
-
+  
   system(paste0("ffmpeg -i ", vid.path, " -q:v ",qual," ", image.dir,"/",video.name,"_%5d.jpg")) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
-
+  
 }
 
 #' @title Stitches images into a video file
 #' @description Stitches images into a video file of type indicated by "vid.ext"
 #'
 #' @param image.dir Character; directory containing images to stich.
-#' @param vid.name character; file name to be give video.
+#' @param vid.name character; file name to be give video including extension.  mp4 currently works best.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
-#' @param vid.ext chacracter; video type to output. mp4 currently works best.
 #' @param frame.rate numeric; video frame rate in fps.
 #' @param silent logical; should output of \code{system} call for ffmpeg operation be suppressed.
 #' @return Outputs a video of name "video.name+vid.ext".
@@ -90,51 +89,48 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #'
 #'images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="spiral",frame.rate=5,qual=100,silent=FALSE)
 
-images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",frame.rate=10,silent=TRUE)  {
-
+images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,silent=TRUE)  {
+  
   version <-  try(system(paste("ffmpeg -version"), intern = TRUE))
   if (inherits(version, "try-error")) {
     warning("The command 'ffmpeg' is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
-
+  
   qual <- round(30-30*(qual/100)+1,0)
-
+  
   if(!dir.exists(image.dir)) {
     stop("The directory \"", image.dir, "\" does not exist.")}
-
-
-
+  
+  
+  
   vid.path <- paste0(getwd(),"/",vid.name)
   #delete video if it exists
-  unlink(vid.path,recursive = T)
-
+  if(file.exists(vid.path)) unlink(vid.path,recursive = T)
+  
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp"))
-
-
-  vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path) #if vid.patt has spaces
-
+  
+  
+  vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path) #if vid.path has spaces
+  
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp",ignore.case = T))
-
-  #[here]
-
-
+  
   image.name <- gsub("(.+)\\_\\d*\\.\\w+$", "\\1", basename(images[1]))
-
+  
   ext <-    gsub(".*(\\.\\w+$)", "\\1", basename(images[1]))
-
+  
   num <- gsub(".*_(\\d+)\\.\\w+$","\\1",basename(images[1]))
   num.l <- nchar(num)
   num.for <- paste0("_%",num.l,"d",ext)
-
+  
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir) #if image.dir has spaces
   print(paste0(image.dir,"/", image.name,num.for))
-
-  system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -vcodec mpeg4 ", vid.path,"/",vid.ext),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
-
-  if(!file.exists(paste0(vid.name,vid.ext))) warning("ffmpeg failed to create video. Retry and inspect output of system call with 'silent=F'")
-
+  
+  system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -vcodec mpeg4 ", vid.path),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
+  
+  if(!file.exists(vid.name)) warning("ffmpeg failed to create video. Retry and inspect output of system call with 'silent=F'")
+  
 }
 
 
@@ -171,44 +167,44 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",
 #' list.files( paste0(getwd(),"/","images"))
 
 vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
-
+  
   version <-  try(system("ffmpeg -version", intern = TRUE))
   if (inherits(version, "try-error")) {
     warning("The command 'ffmpeg' is not available in your system. Please install FFmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
-
-
-
+  
+  if(!file.exists(vid.path)) stop("'vid.path' invalid")
+  
   image.dir <- gsub(basename(vid.path),"images",vid.path)
-
+  
   #delete or create the image directory
-
+  
   unlink(image.dir,recursive = T)
   dir.create(image.dir)
-
+  
   #vid.path <- gsub("Google Drive","\"Google Drive\"",vid.path) ## remove spaces from dir if google drive
   vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path)
-
+  
   #image.dir <- paste0(gsub("Google Drive","\"Google Drive\"",image.dir),"/") #degooglize path
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir)
-
+  
   video.name<- gsub(".avi","",basename(vid.path))
   video.name <- gsub(".avi","_red",video.name)
-
+  
   if(is.null(codec)) codec <- " "
   system(paste0("ffmpeg -i ", vid.path, codec, image.dir,"/",video.name,"_%5d.jpg -y"),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
-
+  
   if(!is.null(filt)){
     system(paste0("ffmpeg -i ", image.dir,"/",video.name,"_%5d.jpg", filt, image.dir,"/",video.name,"_%5d.jpg  -y"),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
-
+    
   }
 }
 
 #' @title  Stitches images from video file passing filters to ffmpeg
 #'
-#' @description Wrapper for ffmpeg video operaations. Permits flexible filtering.
+#' @description Wrapper for ffmpeg video operations. Permits flexible filtering.
 #'
 #' @param image.dir character; directory containing images to stich.
 #' @param vid.name character; file name to be given video.
@@ -245,52 +241,52 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #'
 
 images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",frame.rate=10,raw=TRUE,filt=NULL,silent=TRUE)  {
-
+  
   if(!raw)   vid.name <- paste0(vid.name,"_red")
-
+  
   version <-  try(system(paste("ffmpeg -version"), intern = TRUE))
   if (inherits(version, "try-error")) {
     warning("The command 'ffmpeg' is not available on your system. Please install ffmpeg first:",
             ifelse(.Platform$OS.type == "windows", "http://ffmpeg.arrozcru.org/autobuilds/",
                    "http://ffmpeg.org/download.html"))
     return()}
-
+  
   qual <- round(30-30*(qual/100)+1,0)
-
+  
   if(!dir.exists(image.dir)) {
     stop("The directory \"", image.dir, "\" does not exist.")}
-
+  
   vid.ext <- ".mp4"
   if(raw) vid.ext <-".avi"
-
+  
   vid.path <- paste0(getwd(),"/",vid.name)
   #delete video if it exists
   unlink(vid.path,recursive = T)
-
-
+  
+  
   vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path) #if vid.path has spaces
-
-
+  
+  
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp",ignore.case = T))
-
+  
   #[here]
-
-
+  
+  
   image.name <- gsub("(.+)\\_\\d*\\.\\w+$", "\\1", basename(images[1]))
-
+  
   ext <-    gsub(".*(\\.\\w+$)", "\\1", basename(images[1]))
-
+  
   num <- gsub(".*_(\\d+)\\.\\w+$","\\1",basename(images[1]))
   num.l <- nchar(num)
   num.for <- paste0("_%",num.l,"d",ext)
-
+  
   image.dir <- normalizePath(dirname(images[1]))
-
+  
   image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir) #if image.dir has spaces
-
+  
   if(!raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f mp4", filt," -vcodec libx264 -pix_fmt yuv420p ", vid.path,vid.ext, " -y"),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
-
+  
   if(raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f avi -vcodec rawvideo ", vid.path,vid.ext, " -y"),ignore.stderr = silent)
- 
-message(paste0("video saved to ", vid.path,vid.ext))
+  
+  message(paste0("video saved to ", vid.path,vid.ext))
 }

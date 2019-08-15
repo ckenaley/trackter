@@ -2,6 +2,7 @@
 #' @title Compute half wavelengths from a sine-like waveform
 #' @description Computes half wavelengths and their positions and amplitude from a sine-like waveform based on either peak-to-trough or internodal distance.
 #'
+
 #' @param x Numeric; x position
 #' @param y numeric; y position
 #' @param method character; how half waves should be found and classified, where it crosses zero/the internodal length ("zeros") or peak to trough/trough to peak ("p2t"). See Details. 
@@ -69,127 +70,127 @@
 halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.1,smoothing="loess") {
   
   wave.begin <- zeros <- l <- begin.index <- end.index <- NULL #to avoid NSE notes in R CMD check
-
-     if (!method %in% c("p2t", "zeros"))  stop("method must be set to 'p2t' or 'zeros' (the default)")
-    x = c(unlist(x))
-    y = c(unlist(y))
-
-    added <- FALSE
-    #is first value y=0?
-    if(y[1]==0){x.0 <- x[1]-diff(x[1:2])
-    y.0 <- y[1]-diff(y[1:2])
-    x <- c(x.0,x)
-    y <- c(y.0,y)
-    added <- T
+  
+  if (!method %in% c("p2t", "zeros"))  stop("method must be set to 'p2t' or 'zeros' (the default)")
+  x = c(unlist(x))
+  y = c(unlist(y))
+  
+  added <- FALSE
+  #is first value y=0?
+  if(y[1]==0){x.0 <- x[1]-diff(x[1:2])
+  y.0 <- y[1]-diff(y[1:2])
+  x <- c(x.0,x)
+  y <- c(y.0,y)
+  added <- T
+  }
+  
+  dt <- data.table(x, y)
+  
+  
+  #find peaks and then lengths
+  
+  
+  if (method == "p2t") {
+    
+    ft <- features(x, y)
+    x.pos <- sapply(ft$cpts, function(z) which.min(abs(x - z)))
+    y.pk <- y[x.pos]
+    x.pk <- x[x.pos]
+    
+    wave.dat <- data.table(zeros = NA, wave.begin = x.pk)
+    
+    if(length(x.pk)<=1) stop("method='p2t' and data may have a peak or trough but not both. Try changing method to 'zeros'")
+    
+    wave.dat[, c("wave.end", "begin.index", "end.index", "wave", "l") := 
+               list(dplyr::lead(wave.begin),
+                    x.pos,
+                    dplyr::lead(x.pos),
+                    as.character(1:.N),
+                    dplyr::lead(wave.begin) - wave.begin )  ]
+  }
+  if (method == "zeros") {
+    if(fit==T){
+      x.pred <- seq(first(x),last(x),length.out = dens*length(x))
+      
+      if(!smoothing %in% c("spline","loess")) stop("'smoothing' should be set to 'spline' or 'loess'")
+      if(smoothing=="loess") y.fit <- predict(loess(y~x,span = smooth),newdata=data.frame(x=x.pred))
+      
+      if(smoothing=="spline"){ y.sp <- smooth.spline(x,y,spar = smooth)
+      y.fit <- predict(y.sp,x=x.pred)$y
+      }
+      x <- x.pred
+      y <- y.fit
+      dt <- data.table(x=x.pred,y=y.fit)
+    }
+    y.signs <- sign(y)
+    if(zero.begin) y.signs[y.signs==0] <- -1
+    
+    z <- which(abs(diff(y.signs))>1)
+    
+    if(length(z)<=1) stop("method='zeros' and 1 or fewer zero crossings found. Try changing method to 'p2p' or 't2t'")
+    names(x) <- NULL
+    
+    wave.dat <- data.table(zeros = z+1, wave.begin = x[z+1])
+    
+    
+    if (length(z) > 1) {
+      wave.dat[, c("wave.end", "begin.index", "end.index", "wave", "l") := list(dplyr::lead(wave.begin)-1,zeros,dplyr::lead(zeros)-1,as.character(1:.N),dplyr::lead(wave.begin) - wave.begin )  ]
+    }
+  }
+  wave.dat <-  wave.dat[!is.na(l)]
+  
+  if (nrow(wave.dat) != 0) {
+    if (all(is.na(wave.dat$l))) {
+      wave.dat2 <- dt[, wave := NA]
+    } else{
+      wave.dat2 <- wave.dat[!is.na(l), list(x = x[begin.index:end.index]), by = list(wave)]
+      wave.dat2 <- merge(dt, wave.dat2, all.x = T,by="x")
     }
     
-    dt <- data.table(x, y)
-
-
-#find peaks and then lengths
-
-
-    if (method == "p2t") {
-      
-      ft <- features(x, y)
-      x.pos <- sapply(ft$cpts, function(z) which.min(abs(x - z)))
-      y.pk <- y[x.pos]
-      x.pk <- x[x.pos]
-      
-      wave.dat <- data.table(zeros = NA, wave.begin = x.pk)
-      
-      if(length(x.pk)<=1) stop("method='p2t' and data may have a peak or trough but not both. Try changing method to 'zeros'")
-      
-      wave.dat[, c("wave.end", "begin.index", "end.index", "wave", "l") := 
-                 list(dplyr::lead(wave.begin),
-                  x.pos,
-                  dplyr::lead(x.pos),
-                  as.character(1:.N),
-                  dplyr::lead(wave.begin) - wave.begin )  ]
-}
-    if (method == "zeros") {
-      if(fit==T){
-        x.pred <- seq(first(x),last(x),length.out = dens*length(x))
-        
-        if(!smoothing %in% c("spline","loess")) stop("'smoothing' should be set to 'spline' or 'loess'")
-        if(smoothing=="loess") y.fit <- predict(loess(y~x,span = smooth),newdata=data.frame(x=x.pred))
-        
-        if(smoothing=="spline"){ y.sp <- smooth.spline(x,y,spar = smooth)
-        y.fit <- predict(y.sp,x=x.pred)$y
-        }
-        x <- x.pred
-        y <- y.fit
-        dt <- data.table(x=x.pred,y=y.fit)
-      }
-      y.signs <- sign(y)
-      if(zero.begin) y.signs[y.signs==0] <- -1
-      
-      z <- which(abs(diff(y.signs))>1)
-      
-      if(length(z)<=1) stop("method='zeros' and 1 or fewer zero crossings found. Try changing method to 'p2p' or 't2t'")
-      names(x) <- NULL
-      
-      wave.dat <- data.table(zeros = z+1, wave.begin = x[z+1])
-      
-      
-      if (length(z) > 1) {
-        wave.dat[, c("wave.end", "begin.index", "end.index", "wave", "l") := list(dplyr::lead(wave.begin)-1,zeros,dplyr::lead(zeros)-1,as.character(1:.N),dplyr::lead(wave.begin) - wave.begin )  ]
-      }
+    pks <-wave.dat2[!is.na(wave), list(amp = y[which.max(abs(y))], pos = as.numeric(x[which.max(abs(y))])), by = wave]
+    
+    if(method=="p2t") pks <-wave.dat2[!is.na(wave), list(amp1 = first(y), amp2=last(y),pos1=first(x),pos2=last(x)), by = wave]
+    
+    if(method=="zeros") pks <-wave.dat2[!is.na(wave), list(amp1 = max(abs(y)), amp2=NA,pos1=x[which.max(abs(y))],pos2=NA), by = wave]
+    
+    
+    
+    if ( nrow(pks)>0){
+      wave.dat <- merge(wave.dat, pks, by = "wave")
     }
-    wave.dat <-  wave.dat[!is.na(l)]
-
-    if (nrow(wave.dat) != 0) {
-      if (all(is.na(wave.dat$l))) {
-        wave.dat2 <- dt[, wave := NA]
-      } else{
-        wave.dat2 <- wave.dat[!is.na(l), list(x = x[begin.index:end.index]), by = list(wave)]
-        wave.dat2 <- merge(dt, wave.dat2, all.x = T,by="x")
-      }
-
-      pks <-wave.dat2[!is.na(wave), list(amp = y[which.max(abs(y))], pos = as.numeric(x[which.max(abs(y))])), by = wave]
-      
-      if(method=="p2t") pks <-wave.dat2[!is.na(wave), list(amp1 = first(y), amp2=last(y),pos1=first(x),pos2=last(x)), by = wave]
-      
-      if(method=="zeros") pks <-wave.dat2[!is.na(wave), list(amp1 = max(abs(y)), amp2=NA,pos1=x[which.max(abs(y))],pos2=NA), by = wave]
-      
-      
-
-      if ( nrow(pks)>0){
-        wave.dat <- merge(wave.dat, pks, by = "wave")
-      }
-    } else{
-      wave.dat <- data.table(
-        zeros = 0,
-        wave.begin = 0,
-        wave.end = 0,
-        begin.index = 0,
-        end.index = 0,
-        wave = 0,
-        l = as.numeric(0),
-        pos = 0,
-        amp = 0,
-        l2 = 0,
-        pos2 = 0
-      )
-      wave.dat2 <- dt[, wave := NA]
-    }
-
-    #zap dummy data to find wave begining at y=0
-
-    if(added){
-      wave.dat2 <- wave.dat2[-1,]
-      wave.dat2$y <- wave.dat2$y-1e-17
-      wave.dat[,zeros:=zeros-1]
-      wave.dat[,begin.index:=begin.index-1]
-      wave.dat[,end.index:=end.index-1]
-    }
-
-    return(list(
-      method=method,
-      names = wave.dat2[!is.na(wave)],
-      dat = wave.dat
-    ))
+  } else{
+    wave.dat <- data.table(
+      zeros = 0,
+      wave.begin = 0,
+      wave.end = 0,
+      begin.index = 0,
+      end.index = 0,
+      wave = 0,
+      l = as.numeric(0),
+      pos = 0,
+      amp = 0,
+      l2 = 0,
+      pos2 = 0
+    )
+    wave.dat2 <- dt[, wave := NA]
   }
+  
+  #zap dummy data to find wave begining at y=0
+  
+  if(added){
+    wave.dat2 <- wave.dat2[-1,]
+    wave.dat2$y <- wave.dat2$y-1e-17
+    wave.dat[,zeros:=zeros-1]
+    wave.dat[,begin.index:=begin.index-1]
+    wave.dat[,end.index:=end.index-1]
+  }
+  
+  return(list(
+    method=method,
+    names = wave.dat2[!is.na(wave)],
+    dat = wave.dat
+  ))
+}
 
 # wave
 #' @title Compute wavelengths from a sine-like waveform
@@ -265,7 +266,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
   
   wave.begin <- zeros <- l <- begin.index <- end.index <- NULL# to avoid NSE erros on R CMD check
   
-  if (!method %in% c("p2p", "zeros","t2t"))  stop("method must be set to 'p2p' , 't2't, or 'zeros' (the default)")
+  if (!method %in% c("p2p", "zeros","t2t"))  stop("method must be set to 'p2p' , 't2t', or 'zeros' (the default)")
   x = c(unlist(x))
   y = c(unlist(y))
   
@@ -279,7 +280,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
   }
   
   dt <- data.table(x, y)
-
+  
   #find peaks and then lengths
   
   
@@ -320,19 +321,19 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
       x <- x.pred
       y <- y.fit
       dt <- data.table(x=x.pred,y=y.fit)
-      }
+    }
     y.signs <- sign(y)
     if(zero.begin) y.signs[y.signs==0] <- -1
     
     z <- which(abs(diff(y.signs))>1)
-   z <- z[seq(1,length(z),2)] #every other node
-   
+    z <- z[seq(1,length(z),2)] #every other node
+    
     if(length(z)<=1) stop("method='zeros' and 1 or fewer zero crossings found. Try changing method to 'p2p' or 't2t'")
     names(x) <- NULL
     
     wave.dat <- data.table(zeros = z+1, wave.begin = x[z+1])
     
-  
+    
     if (length(z) > 1) {
       wave.dat[, c("wave.end", "begin.index", "end.index", "wave", "l") := list(dplyr::lead(wave.begin)-1,zeros,dplyr::lead(zeros)-1,as.character(1:.N),dplyr::lead(wave.begin) - wave.begin )  ]
     }
@@ -349,12 +350,12 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
       
     }
     
-
-   if(method=="p2p" | method=="t2t") pks <-wave.dat2[!is.na(wave), list(amp1 = first(y), amp2=last(y),pos1=first(x),pos2=last(x)), by = wave]
+    
+    if(method=="p2p" | method=="t2t") pks <-wave.dat2[!is.na(wave), list(amp1 = first(y), amp2=last(y),pos1=first(x),pos2=last(x)), by = wave]
     
     if(method=="zeros") pks <-wave.dat2[!is.na(wave), list(amp1 = max(y), amp2=min(y),pos1=x[which.max(y)],pos2=x[which.min(y)]), by = wave]
-  
-                             
+    
+    
     
     if ( nrow(pks)>0){
       wave.dat <- merge(wave.dat, pks, by = "wave")
@@ -411,7 +412,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
 #' y <- sin(x^1.3*pi)
 #' plot(x,y)
 #'
-#' }amp.freq(x=x,y=y)
+#' amp.freq(x=x,y=y)
 #' 
 
 amp.freq <- function(x = NULL, y, sf = 100) {
@@ -432,7 +433,7 @@ amp.freq <- function(x = NULL, y, sf = 100) {
          f = freq,
          a.f = amp.f,
          snr = snr)#a.f is amp according to function
-
+  
   return(tail.dat)
 }
 
