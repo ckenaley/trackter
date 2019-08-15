@@ -2,7 +2,7 @@
 
 language: R
 cache: packages
-bioc_packages: EBImages
+bioc_packages: EBImage
 os:
   - osx
 before_install:
