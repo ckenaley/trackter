@@ -26,8 +26,8 @@ x <- seq(0,pi,0.1)
 y <- sin(x^1.3*pi)
 plot(x,y)
 
-}amp.freq(x=x,y=y)
-
+amp.freq(x=x,y=y)
+}
 }
 \seealso{
 \code{\link{features}}

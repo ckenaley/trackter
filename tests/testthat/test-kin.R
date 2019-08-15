@@ -1,3 +1,4 @@
+
 context("kin. fin.kin functions")
 
 test_that("kin.simple works fine", {

@@ -124,7 +124,7 @@
 #' @export
 #' 
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #'
 #' 
@@ -215,7 +215,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
       y[y==0] <- 1
       y[y==5] <- 0
     }
-    z = bwlabel(y)
+    z = EBImage::bwlabel(y)
     
     rois <- tabulate(z)
     
@@ -240,11 +240,11 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
       z.m[1,1] <- 0 #this gets a 1 when
       z.l[[r.name]] <- z.m
       
-      z.c <- ocontour(z.m)
+      z.c <- EBImage::ocontour(z.m)
       
       wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)
       
-      r.out <- Out(ocontour(z.m))
+      r.out <- Out(EBImage::ocontour(z.m))
       if(wall ) edge <- T
       if(!wall) edge <- F
       r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
@@ -300,7 +300,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
       suppressMessages( EBImage::display(z.best,method = "raster"))
     }
     
-    best.cont <- data.table(ocontour(z.best)[[1]])
+    best.cont <- data.table(EBImage::ocontour(z.best)[[1]])
     colnames(best.cont) <- c("x","y")
     
     conts[[paste0(frame)]] <- data.table(frame=frame,best.cont)
@@ -461,7 +461,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' @seealso \code{\link{kin.simple}}, \code{\link{kin.search}}, \code{\link{efourier}} \code{\link{LDA}}, \code{\link{fishshapes}}.
 #' 
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #' @importFrom EBImage ocontour otsu bwlabel
 #'
@@ -554,7 +554,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
       y[y==0] <- 1
       y[y==5] <- 0
     }
-    z = bwlabel(y)
+    z = EBImage::bwlabel(y)
     rois <- tabulate(z)
     pix <- dim(z[,,1])[1]*dim(z[,,1])[2]
     w <- dim(z[,,1])[1] #width of image
@@ -884,7 +884,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' @export
 #' 
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #' @importFrom grDevices dev.off jpeg
 #' @importFrom EBImage bwlabel otsu
@@ -975,7 +975,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
       y[y==0] <- 1
       y[y==5] <- 0
     }
-    z = bwlabel(y)
+    z = EBImage::bwlabel(y)
     
     rois <- tabulate(z)
     
@@ -1000,13 +1000,13 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
       z.m[1,1] <- 0 #this gets a 1 when
       z.l[[r.name]] <- z.m
       
-      z.c <- ocontour(z.m)
+      z.c <- EBImage::ocontour(z.m)
   
       
       wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)
       
       
-      r.out <- Out(ocontour(z.m))
+      r.out <- Out(EBImage::ocontour(z.m))
       if(wall ) edge <- T
       if(!wall) edge <- F
       r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
@@ -1031,7 +1031,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
       EBImage::display(z.best,method = "raster")
     }
     
-    best.cont <- data.table(ocontour(z.best)[[1]])
+    best.cont <- data.table(EBImage::ocontour(z.best)[[1]])
     colnames(best.cont) <- c("x","y")
     
     conts[[paste0(frame)]] <- data.table(frame=frame,best.cont)
@@ -1122,7 +1122,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' 
 #' @export
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #'
 #' @details
@@ -1174,7 +1174,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' @export
 #' 
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #'
 #' @examples

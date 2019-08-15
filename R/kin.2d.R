@@ -413,7 +413,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
 #' plot(x,y)
 #'
 #' amp.freq(x=x,y=y)
-#' 
+#' }
 
 amp.freq <- function(x = NULL, y, sf = 100) {
   s <- 1 / sf

@@ -29,7 +29,7 @@ images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
 Outputs a video of name "video.name+vid.ext".
 }
 \description{
-Wrapper for ffmpeg video operaations. Permits flexible filtering.
+Wrapper for ffmpeg video operations. Permits flexible filtering.
 }
 \details{
 Assumes images are appended with a numeric sequence beginning with "_".
