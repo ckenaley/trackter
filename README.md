@@ -7,14 +7,6 @@ output:
 [![Build Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
 
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "figure/",
-  fig.height = 1
-)
-```
 # *trackter*
 
 ## Description
@@ -47,7 +39,7 @@ Installation is platform-dependent. I found the [`FFmpeg` wiki installation and 
 
 ## Workflow 
 
-![](workflow.pdf)
+![](figure\workflow.pdf)
 
 The following generalized workflow is summarized above. Users can begin analyses with an image sequence or a video. Supported image formats include .jpg, .tif, and .png. If the starting point of analysis is a video file, `video.to.images` or `video.to.images2` to extract images to a ``processed_images" subdirectory. Supported video formats for `video.to.images` and `video.to.images2` include .avi and .mp4 files. `video.to.images2` supports added `FFmpeg` functionality, allowing users to specify filters. 
 
