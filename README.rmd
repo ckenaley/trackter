@@ -108,7 +108,6 @@ kin.y <- kin.simple(image.dir = t)
 
 The `kin` functions in *trackter* return a list of data tables/data frames:
 ```{r}
-print(names(kin.y))
 print(sapply(kin.y,class))
 ```
 
