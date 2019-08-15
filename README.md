@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
+
 This is a development version of *trackter*, an R package that performs semiautomated tracking and analysis of 2D kinematics from video and image data.
 =======================================================================================================================================================
 
