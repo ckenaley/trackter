@@ -28,7 +28,7 @@ under development.
     require(trackter)
 ```
 
-. \#\# External dependencies
+## External dependencies
 
 The core functions of *trackter* that extract shape and contour data
 from images ( `kin.simple` and `kin.search`) depend upon *EBImage* It
