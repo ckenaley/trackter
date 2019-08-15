@@ -6,6 +6,7 @@ output:
 
 [![Build Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
 
+
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -13,7 +14,7 @@ knitr::opts_chunk$set(
   fig.path = "figure/",
   fig.height = 1
 )
-
+```
 # *trackter*
 
 ## Description
