@@ -26,7 +26,6 @@ environment:
 before_test:
   - cinst ffmpeg
   - ps: $env:Path += ";C:\Program Files (x86)\FFmpeg\"
-  - ffmpeg -v
   
 build_script:
   - travis-tool.sh install_bioc EBImage #order matters, build depends on this
