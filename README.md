@@ -2,6 +2,9 @@
 [![Build
 Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
 
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&svg=true)](https://ci.appveyor.com/project/ckenaley/trackter)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # *trackter*
@@ -105,8 +108,6 @@ The `kin` functions in *trackter* return a list of data tables/data
 frames:
 
 ``` r
-print(names(kin.y))
-#> [1] "kin.dat"     "midline"     "cont"        "all.classes" "dim"
 print(sapply(kin.y,class))
 #> $kin.dat
 #> [1] "data.table" "data.frame"
@@ -243,7 +244,7 @@ qplot(data=kin.y2$midline,x=x2,y=wave.y,col=frame)
 ### Downstream analyses of kinematic data
 
 *trackter* supplies several functions for downstream analysis of
-kinematic data extracted for image frames. For instance, `half.wave`
+kinematic data extracted from image frames. For instance, `half.wave`
 computes the midline half wavelength (i.e., propulsive wavelength in
 pixels) from a data table of x and y position data. These and other
 functions are intended for use with output from the `kin` functions.
