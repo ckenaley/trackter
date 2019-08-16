@@ -182,7 +182,7 @@ qplot(data=kin.y2$midline,x=x2,y=wave.y,col=frame)
 
 ### Downstream analyses of kinematic data
 
-*trackter* supplies several functions for downstream analysis of kinematic data extracted for image frames. For instance, `half.wave` computes the midline half wavelength (i.e., propulsive wavelength in pixels) from a data table of x and y position data. These and other functions are intended for use with output from the `kin` functions.
+*trackter* supplies several functions for downstream analysis of kinematic data extracted from image frames. For instance, `half.wave` computes the midline half wavelength (i.e., propulsive wavelength in pixels) from a data table of x and y position data. These and other functions are intended for use with output from the `kin` functions.
 
 ```{r}
 w <- halfwave(x=kin.y$midline$x,y=kin.y$midline$wave.y,method="zeros")
