@@ -9,9 +9,6 @@ init:
 
 install:
   ps: Bootstrap
-  ps: Start-FileDownload $env:ffmpeg_download$env:ffmpeg_platform/static/ffmpeg-$env:ffmpeg_version-$env:ffmpeg_platform-static.zip
-  - 7z x ffmpeg-%ffmpeg_version%-%ffmpeg_platform%-static.zip
-  - PATH=%PATH%;%cd%\ffmpeg-%ffmpeg_version%-%ffmpeg_platform%-static\bin
 
 cache:
   - C:\RLibrary
@@ -22,11 +19,15 @@ environment:
   # see https://github.com/krlmlr/r-appveyor#readme for details
   # USE_RTOOLS: true
   # R_REMOTES_STANDALONE: true
-  ffmpeg_download: https://ffmpeg.zeranoe.com/builds/
-  
+
 # Adapt as necessary starting from here
 #https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc
 
+before_test:
+  - cinst ffmpeg
+  - ps: $env:Path += ";C:\Program Files (x86)\FFmpeg\"
+  - ffmpeg -v
+  
 build_script:
   - travis-tool.sh install_bioc EBImage #order matters, build depends on this
   - travis-tool.sh install_deps
