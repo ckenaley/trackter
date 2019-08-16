@@ -9,38 +9,6 @@ init:
 
 install:
   ps: Bootstrap
-  
-  # Prepend desired Python to the PATH of this build (this cannot be
-  # done from inside the powershell script as it would require to restart
-  # the parent CMD process).
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-
-  - pip install --upgrade pip --user
-  - pip install pipenv
-
-  # Find latest image magick version by parsing website
-
-  - python find_latest_imagemagick_version.py > temp.txt
-  - set /p IMAGE_MAGICK_VERSION=<temp.txt
-
-  - echo %IMAGE_MAGICK_VERSION%
-  # Download ImageMagick installer (which also installs ffmpeg.)
-  # From http://ftp.fifi.org/ImageMagick/binaries/
-  # Might need to be updated from time to time
-  # Versions >=7.0 have problems - executables changed names.
-  # Assume 64-bit. Need to change to x86 for 32-bit.
-  - curl https://imagemagick.org/download/binaries/ImageMagick-%IMAGE_MAGICK_VERSION%-%ARCH%-static.exe -o ImageMagick.exe
-
-  # Install ImageMagick, telling InnoSetup to not open a window and change default install dir
-  - ImageMagick.exe /SILENT /SP /DIR="%IMAGE_MAGICK_INSTALL_DIR%"
-
-  # Inspect contents and set env vars
-  - dir "%IMAGE_MAGICK_INSTALL_DIR%"
-  - set IMAGEMAGICK_BINARY=%IMAGE_MAGICK_INSTALL_DIR%//convert.exe
-  - echo %IMAGEMAGICK_BINARY%
-  - set FMPEG_BINARY="%IMAGE_MAGICK_INSTALL_DIR%//ffmpeg.exe"
-  - echo %FMPEG_BINARY%
-
 
 cache:
   - C:\RLibrary
@@ -51,14 +19,13 @@ environment:
   # see https://github.com/krlmlr/r-appveyor#readme for details
   # USE_RTOOLS: true
   # R_REMOTES_STANDALONE: true
-  global:
-    IMAGE_MAGICK_INSTALL_DIR: c://ImageMagick
-
+  ffmpeg_download: https://ffmpeg.zeranoe.com/builds/
+  
 # Adapt as necessary starting from here
 #https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc
-#https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc #For ffmpeg
+
 build_script:
-  - travis-tool.sh install_bioc EBImage #order matters, build depends on this first
+  - travis-tool.sh install_bioc EBImage #order matters, build depends on this
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_deps
