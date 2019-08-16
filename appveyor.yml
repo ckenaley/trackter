@@ -1,8 +1,6 @@
 # DO NOT CHANGE the "init" and "install" sections below
 
 # Download script file from GitHub
-image: Visual Studio 2017
-
 init:
   ps: |
         $ErrorActionPreference = "Stop"
@@ -11,51 +9,54 @@ init:
 
 install:
   ps: Bootstrap
-  - ps: Install-Product node $env:nodejs_version $env:platform
-  - npm install
-  - ps: Start-FileDownload $env:ffmpeg_download$env:ffmpeg_platform/static/ffmpeg-$env:ffmpeg_version-$env:ffmpeg_platform-static.zip
-  - 7z x ffmpeg-%ffmpeg_version%-%ffmpeg_platform%-static.zip
-  - PATH=%PATH%;%cd%\ffmpeg-%ffmpeg_version%-%ffmpeg_platform%-static\bin
-  - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
-  - ps: Update-AppveyorBuild -Version "$env:package_version-$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER"
+  
+  # Prepend desired Python to the PATH of this build (this cannot be
+  # done from inside the powershell script as it would require to restart
+  # the parent CMD process).
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+
+  - pip install --upgrade pip --user
+  - pip install pipenv
+
+  # Find latest image magick version by parsing website
+
+  - python find_latest_imagemagick_version.py > temp.txt
+  - set /p IMAGE_MAGICK_VERSION=<temp.txt
+
+  - echo %IMAGE_MAGICK_VERSION%
+  # Download ImageMagick installer (which also installs ffmpeg.)
+  # From http://ftp.fifi.org/ImageMagick/binaries/
+  # Might need to be updated from time to time
+  # Versions >=7.0 have problems - executables changed names.
+  # Assume 64-bit. Need to change to x86 for 32-bit.
+  - curl https://imagemagick.org/download/binaries/ImageMagick-%IMAGE_MAGICK_VERSION%-%ARCH%-static.exe -o ImageMagick.exe
+
+  # Install ImageMagick, telling InnoSetup to not open a window and change default install dir
+  - ImageMagick.exe /SILENT /SP /DIR="%IMAGE_MAGICK_INSTALL_DIR%"
+
+  # Inspect contents and set env vars
+  - dir "%IMAGE_MAGICK_INSTALL_DIR%"
+  - set IMAGEMAGICK_BINARY=%IMAGE_MAGICK_INSTALL_DIR%//convert.exe
+  - echo %IMAGEMAGICK_BINARY%
+  - set FMPEG_BINARY="%IMAGE_MAGICK_INSTALL_DIR%//ffmpeg.exe"
+  - echo %FMPEG_BINARY%
+
 
 cache:
   - C:\RLibrary
 
 environment:
   NOT_CRAN: true
-    ffmpeg_download: https://ffmpeg.zeranoe.com/builds/
-  
-  matrix:
-    - platform: x64
-      nodejs_version: LTS
-      ffmpeg_version: 3.4.1
-      ffmpeg_platform: win64
-
-    - platform: x64
-      nodejs_version: Current
-      ffmpeg_version: latest
-      ffmpeg_platform: win64
-
-    - platform: x86
-      nodejs_version: LTS
-      ffmpeg_version: 3.4.1
-      ffmpeg_platform: win32
-
-    - platform: x86
-      nodejs_version: Current
-      ffmpeg_version: latest
-      ffmpeg_platform: win32
-      
   # env vars that may need to be set, at least temporarily, from time to time
   # see https://github.com/krlmlr/r-appveyor#readme for details
   # USE_RTOOLS: true
   # R_REMOTES_STANDALONE: true
+  global:
+    IMAGE_MAGICK_INSTALL_DIR: c://ImageMagick
 
 # Adapt as necessary starting from here
 #https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc
 #https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc #For ffmpeg
-
 build_script:
   - travis-tool.sh install_bioc EBImage #order matters, build depends on this first
   - travis-tool.sh install_deps
