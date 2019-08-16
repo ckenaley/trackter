@@ -1,8 +1,7 @@
 
 [![Build
 Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
-
-[![AppVeyor build
+| [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&svg=true)](https://ci.appveyor.com/project/ckenaley/trackter)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -57,9 +56,9 @@ useful](https://trac.ffmpeg.org/wiki/CompilationGuide).
   - ROI detection with search parameters including position and size.
   - Relevant functions: `kin.search` and `kin.simple`.
 
-**Tools for kinematic anaylis of swimming animals**
+**Tools for kinematic analysis of swimming animals**
 
-  - Caluculate midline (propulsive) wavelength, trailing-edge freqency,
+  - Calculate midline (propulsive) wavelength, trailing-edge frequency,
     paired-fin position.
   - Relevant functions: `amp.freq`, `halfwave`, `wave`, and `fin.kin`
 
@@ -278,8 +277,8 @@ print(w)
 #> 2: 24.9167308   NA 551.21011   NA
 ```
 
-Using a “zeros” method, `half.wave` determines two halfwaves from the
-roi in the single image above, described in the “dat” table from the
+Using a “zeros” method, `half.wave` determines two half waves from the
+ROI in the single image above, described in the “dat” table from the
 output. The “names” table can be used to visualize the half wavelengths.
 
 ``` r
@@ -288,8 +287,8 @@ qplot(data=w$names,x=x,y=y,col=wave)
 
 ![](figure/unnamed-chunk-14-1.png)<!-- -->
 
-We could extend this framework using `data.table` to calculate halfwaves
-in each of the 11 frames from the example
+We could extend this framework using `data.table` to calculate half
+waves in each of the 11 frames from the example
 video.
 
 ``` r

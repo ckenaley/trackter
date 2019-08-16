@@ -1,6 +1,8 @@
 # DO NOT CHANGE the "init" and "install" sections below
 
 # Download script file from GitHub
+image: Visual Studio 2017
+
 init:
   ps: |
         $ErrorActionPreference = "Stop"
@@ -9,12 +11,42 @@ init:
 
 install:
   ps: Bootstrap
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - npm install
+  - ps: Start-FileDownload $env:ffmpeg_download$env:ffmpeg_platform/static/ffmpeg-$env:ffmpeg_version-$env:ffmpeg_platform-static.zip
+  - 7z x ffmpeg-%ffmpeg_version%-%ffmpeg_platform%-static.zip
+  - PATH=%PATH%;%cd%\ffmpeg-%ffmpeg_version%-%ffmpeg_platform%-static\bin
+  - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
+  - ps: Update-AppveyorBuild -Version "$env:package_version-$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER"
 
 cache:
   - C:\RLibrary
 
 environment:
   NOT_CRAN: true
+    ffmpeg_download: https://ffmpeg.zeranoe.com/builds/
+  
+  matrix:
+    - platform: x64
+      nodejs_version: LTS
+      ffmpeg_version: 3.4.1
+      ffmpeg_platform: win64
+
+    - platform: x64
+      nodejs_version: Current
+      ffmpeg_version: latest
+      ffmpeg_platform: win64
+
+    - platform: x86
+      nodejs_version: LTS
+      ffmpeg_version: 3.4.1
+      ffmpeg_platform: win32
+
+    - platform: x86
+      nodejs_version: Current
+      ffmpeg_version: latest
+      ffmpeg_platform: win32
+      
   # env vars that may need to be set, at least temporarily, from time to time
   # see https://github.com/krlmlr/r-appveyor#readme for details
   # USE_RTOOLS: true
@@ -22,9 +54,10 @@ environment:
 
 # Adapt as necessary starting from here
 #https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc
+#https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc #For ffmpeg
 
 build_script:
-  - travis-tool.sh install_bioc EBImage
+  - travis-tool.sh install_bioc EBImage #order matters, build depends on this first
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_deps
