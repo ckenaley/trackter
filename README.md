@@ -1,7 +1,7 @@
 
 [![Build
 Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
-| [![AppVeyor build
+[![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&svg=true)](https://ci.appveyor.com/project/ckenaley/trackter)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
