@@ -24,12 +24,13 @@ environment:
 #https://gist.github.com/kevinGodell/fa3e33c5fcade59ab57c5a7232fb28dc
 
 build_script:
+ - git config --global user.name "travis"
+  - git config --global user.email "travis@example.org"
+  - travis-tool.sh install_bioc EBImage
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_deps
-  - git config --global user.name "travis"
-  - git config --global user.email "travis@example.org"
-  - travis-tool.sh install_bioc EBImage
+ 
 test_script:
   - travis-tool.sh run_tests
 
