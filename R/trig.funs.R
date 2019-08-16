@@ -27,7 +27,7 @@ dist.2d <- function(x1, x2, y1, y2) {
   sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 }
 
-#' @title Computes angle between two segments of a triangle.
+#' @title Computes angle between two segments sharing a point.
 #' @description Computes angle between two segments of a triangle using law of cosines.
 #' @param l Numeric; length of segment to the left
 #' @param r Numeric; length of segment to the right
@@ -81,6 +81,7 @@ rad <- function(x){pi/180*x}
 #' B <- c(-5,5)
 #' thet <- bearing.xy(A[1],B[1],A[2],B[2])
 #' deg(thet)
+#'
 #'
 bearing.xy <- function(x1,x2,y1,y2){
   theta <- atan((x2-x1)/(y1-y2))

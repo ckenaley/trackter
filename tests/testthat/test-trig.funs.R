@@ -26,8 +26,8 @@ A <- acos((O^2-L^2-R^2)/(-2*L*R))
 expect_is(cosine.ang(L,R,O),"numeric")
 expect_identical(cosine.ang(L,R,O),A)
 
-expect_identical(cosine.ang(3,3,3),pi*1/3)
-expect_identical(cosine.ang(3,3,6),pi)
+expect_equal(cosine.ang(3,3,3),pi*1/3)
+expect_equal(cosine.ang(3,3,6),pi)
 
 
 })
