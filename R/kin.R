@@ -1,6 +1,6 @@
 ######### kin.search
 
-#' @title  Midline tracking over image seqences
+#' @title  Midline tracking over image sequences
 
 #' @description  Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 #'
@@ -9,7 +9,7 @@
 #' @param thr numeric or character ('otsu') threshold to determine binary image. See Details.
 #' @param ant.per numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.
 #' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position. 
-#' @param plot.pml logical, value indicating if outputted images should include an overlay of the theoretical amidline based on \code{ant.per}.
+#' @param plot.pml logical, value indicating if outputted images should include an overlay of the theoretical midline based on \code{ant.per}.
 #' @param smoothing character, the midline smoothing method, either 'loess' or "spline".
 #' @param smooth numeric; if \code{smoothing} is set to 'loess', smoothing parameter value for plotted midline.
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
@@ -27,7 +27,7 @@
 #' @details
 #'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.
 #'
-#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 #'
 #' \code{search.for} determines how ROIs are chosen: 
 #' \itemize{
@@ -39,7 +39,7 @@
 #' 
 #' These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.
 #' 
-#' \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therfore incomplete.
+#' \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.
 #' 
 #'\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.
 #'
@@ -64,7 +64,7 @@
 #' \code{midline} A data table containing, for each frame described by \code{frames}, the following: 
 #' \itemize{
 #' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
+#' #' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
 #' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
 #' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 #' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
@@ -74,7 +74,7 @@
 #' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 #' \itemize{
 #' \item 'frame': the frame
-#' \item 'x' and 'y': the x and y positions of the countours
+#' \item 'x' and 'y': the x and y positions of the contours
 #' }
 #' 
 #' \code{all.classes} A data table containing the following for all ROIs detected:
@@ -381,22 +381,22 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 
 #' @title  Midline tracking over image sequences with ROI search using LDA
 
-#' @description  Experimental. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentatio. Chose a fish-like ROI class detected through linear discrimate analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+#' @description  Experimental and untested. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 #'
 #' @param image.dir character, directory containing images to analyze.
 #' @param frames numeric, vector indicating which images to process.
 #' @param thr numeric or character ('otsu') threshold to determine binary image. See Details.
 #' @param ant.per numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.
 #' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position. 
-#' @param edges logical, shoudd ROIs on image edges by evaluated. See Details.
+#' @param edges logical, should ROIs on image edges by evaluated. See Details.
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.05.
-#' @param enorm logical, should the EFA coeffecients from \code{efourier} operations be normalized or not. See \code{details} and \code{\link{efourier}}
+#' @param enorm logical, should the EFA coefficients from \code{efourier} operations be normalized or not. See \code{details} and \code{\link{efourier}}
 #' @param harms numeric, the number of harmonics to use. If missing, \code{Momocs} sets 'nh.b' to 12. Will produce messages.
 #'
 #'@param rescale logical, should all shapes in PCA be rescaled. Performs best as 'FALSE'.
 #'@param train.dat Classified \code{Out} and \code{Coo} outlines that are produced from \code{Momocs}. See Details. 
 #'@param retrain numeric, the number of frames on which to retrain the LDA data set. See details.
-#'@param after.train character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This peeds calculations considerably. If 'LDA', the default, LDA will continue usining the retraining classifications from frames $<=$ 'train'.
+#'@param after.train character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This speeds calculations considerably. If 'LDA', the default, LDA will continue using the retraining classifications from frames $<=$ 'train'.
 #'
 #'@param ties character, how to chose ROI's in any one frame that appear fish-like. See details.
 #' @param smoothing character, the midline smoothing method, either 'loess' or 'spline'.
@@ -411,19 +411,19 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' @export
 #'
 #' @details
-#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body mideline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body midline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 #'
-#' Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#' Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 #'
-#'Before \code{train}, ROIs are chosen according to LDA of a PCA object constructed from \code{efourier} analysis. LDA is trained by a user define 'train.dat' when the frame $<=$ \code{retrain}. LDA will procede after \code{retrain} if \code{after.train}='LDA', but the LDA will be trained by the contours classified as 'fish' and 'not.fish' found during the chosen training period. 
+#'Before \code{train}, ROIs are chosen according to LDA of a PCA object constructed from \code{efourier} analysis. LDA is trained by a user define 'train.dat' when the frame $<=$ \code{retrain}. LDA will proceed after \code{retrain} if \code{after.train}='LDA', but the LDA will be trained by the contours classified as 'fish' and 'not.fish' found during the chosen training period. 
 #'
-#'\code{enorm} Normalization of EFA coefficents is often perilous, especially for symetrical shapes, a conditional met for undulating, bilaterally sysmetical organisms at least some of the time and perhaps for many of the frames included in any analysis. Thus, 'enorm' by default is set to 'FALSE'. 'enorm=TRUE' may produce odd ROI choices and should be used cautiously.
+#'\code{enorm} Normalization of EFA coefficients is often perilous, especially for symmetrical shapes, a conditional met for undulating, bilaterally symmetrical organisms at least some of the time and perhaps for many of the frames included in any analysis. Thus, 'enorm' by default is set to 'FALSE'. 'enorm=TRUE' may produce odd ROI choices and should be used cautiously.
 #'
-#'\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes. A user defined dataset or the \code{fishshapes} dataset in \code{trackter} must be used for training. \code{fishshapes} includes several arbitrary shapes (circrles, squares, U-shapes, etc.) as well as several fish shapes: sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle. A user-defined dataset must have shapes classified with factors identical to the \code{fishshapes} contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. 
+#'\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes. A user defined dataset or the \code{fishshapes} dataset in \code{trackter} must be used for training. \code{fishshapes} includes several arbitrary shapes (circles, squares, U-shapes, etc.) as well as several fish shapes: sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle. A user-defined dataset must have shapes classified with factors identical to the \code{fishshapes} contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. 
 #'
-#'\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therfore incomplete.
-#'\code{retrain} After this value, the LDA analysis will use the ROIs determined as 'fish' and 'not.fish' in the frames $>=$ \code{retrain} to discrimate fish from non-fish shapes. This speeds up analysis considerably.
-#'\code{ties} Determiens how to chose ROIs if more than one fish-like ROI is found in any frame. 'fish' will result in chosing the ROI with shape types in which the best *and* second-best fish-like shape (according to posterior probabilities) match a fish-like shape in the trainin and/or retraining datasets.'post' will chose the best fish-like shape according the the highest posterior probability from LDA.
+#'\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.
+#'\code{retrain} After this value, the LDA analysis will use the ROIs determined as 'fish' and 'not.fish' in the frames $>=$ \code{retrain} to discriminate fish from non-fish shapes. This speeds up analysis considerably.
+#'\code{ties} Determines  how to chose ROIs if more than one fish-like ROI is found in any frame. 'fish' will result in choosing the ROI with shape types in which the best *and* second-best fish-like shape (according to posterior probabilities) match a fish-like shape in the training and/or retraining datasets.'post' will chose the best fish-like shape according the the highest posterior probability from LDA.
 #'
 #' @return A list with the following components:
 #'
@@ -439,7 +439,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #'
 #' \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
 #' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
+#' #' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
 #' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
 #' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 #' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
@@ -449,7 +449,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 #' \itemize{
 #' \item 'frame': the frame
-#' #' \item 'x' and 'y': the x and y positions of the countours
+#' #' \item 'x' and 'y': the x and y positions of the contours
 #' }
 #' 
 #' \code{all.classes} A data table containing the following for all ROIs detected: 
@@ -828,7 +828,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 
 #' @title  Simplified midline tracking over image sequences 
 
-#' @description  Automatically retrieves the midline of a detected ROIbased on size. Assumes the ROI of interest is the largest detected and not interesecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
+#' @description  Automatically retrieves the midline of a detected ROI based on size. Assumes the ROI of interest is the largest detected and not intersecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
 #'
 #'
 #' @param image.dir character, directory containing images to analyze.
@@ -849,9 +849,9 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' @export
 #'
 #' @details
-#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body mideline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body midline  overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 #'
-#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 #'
 #' @return A list with the following components:
 #'
@@ -866,7 +866,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #'
 #' \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
 #' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
+#' #' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
 #' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{ant.per} (green points in the outputted images/video if 'plot.pml=TRUE')
 #' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 #' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
@@ -876,7 +876,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 #' \itemize{
 #' \item 'frame': the frame
-#' \item 'x' and 'y': the x and y positions of the countours
+#' \item 'x' and 'y': the x and y positions of the contours
 #' }
 #' 
 #' \code{all.classes} A data table containing the following for all ROIs detected:  
@@ -1137,11 +1137,11 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' @details
 #'The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with \code{\link{coo_flipx}} and \code{\link{coo_flipy}} after converting contour to class \code{coo}.
 #'
-#'  \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficently smoothed fin contour, will have countour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} ($<$5) should be avoided if the contour is jagged, perhaps due to digitization.
+#'  \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} ($<$5) should be avoided if the contour is jagged, perhaps due to digitization.
 #'  
 #'In addition to fin amplitude and contour extraction, also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by \code{smoothing} and number of points indicated by \code{x.bins}. 
 #'  
-#'  \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculted from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
+#'  \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculated from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
 #'  
 #'
 #' @return A list with the following components:
@@ -1162,8 +1162,8 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' 
 #' \itemize{
 #' \item  x,y coordinates of the fin tips, start, and end within the range of \code{fin.pos}.
-#' \item 'ang': the angle formed by the coordinataes and their adjacent points.
-#' \item 'pos': descripiton of the coordinates' positions, 'start', 'end' or 'tip'.
+#' \item 'ang': the angle formed by the coordinates and their adjacent points.
+#' \item 'pos': description  of the coordinates' positions, 'start', 'end' or 'tip'.
 #' }
 #' 
 #' \code{comp} a data table describing the composite contour of the body minus the fins.

@@ -9,7 +9,7 @@
 data(fishshapes)
 }
 \description{
-Contour data constructed with the \code{Momocs} package of several fish shapes and arbritrary polygons. Intended for training of PCA and LDA analyis with \code{LDA}. Shapes are classified with shape, type, and edge factors.
+Contour data constructed with the \code{Momocs} package of several fish shapes and arbitrary polygons. Intended for training of PCA and LDA analysis with \code{LDA}. Shapes are classified with shape, type, and edge factors.
 }
 \details{
 \itemize{
@@ -28,7 +28,7 @@ Shapes of type 'fish' include the follow classification levels:
 
 Each of these fish types include contours sampled regularly over one tail-beat cycle.
 
-Shapes of type 'not.fish' include 'Ellipse', 'Lshape', 'Ushape', Ushape2', 'Ushape3','triangle', 'rectangle', and 'square'. Each 'not.fish' type was resampled 6 times with different \code{efourier} analyses with 'nb.h' values ranging from 5 to 30. This produces shape classes with subtly varialbe countours.
+Shapes of type 'not.fish' include 'Ellipse', 'Lshape', 'Ushape', Ushape2', 'Ushape3','triangle', 'rectangle', and 'square'. Each 'not.fish' type was resampled 6 times with different \code{efourier} analyses with 'nb.h' values ranging from 5 to 30. This produces shape classes with subtly variable contours.
 
 The 'edge' factor is included so as to have the classification factors match those of the \code{efourier} and \code{LDA} analysis in \code{kin.LDA}.
 }

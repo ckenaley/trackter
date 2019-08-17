@@ -61,7 +61,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #' @title Stitches images into a video file
 #' @description Stitches images into a video file of type indicated by "vid.ext"
 #'
-#' @param image.dir Character; directory containing images to stich.
+#' @param image.dir Character; directory containing images to stitch.
 #' @param vid.name character; file name to be give video including extension.  mp4 currently works best.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
 #' @param frame.rate numeric; video frame rate in fps.
@@ -135,7 +135,7 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,s
 }
 
 
-#' @title Extracts images from a video file with ffmep
+#' @title Extracts images from a video file with ffmpeg
 #' @description Extract images from video file using ffmpegs flexible video filters and codecs
 #'
 #' @param vid.path Character; path of video file to be processed.
@@ -207,10 +207,10 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #'
 #' @description Wrapper for ffmpeg video operations. Permits flexible filtering.
 #'
-#' @param image.dir character; directory containing images to stich.
+#' @param image.dir character; directory containing images to stitch.
 #' @param vid.name character; file name to be given video.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
-#' @param vid.ext chacracter; video type to output. mp4 currently works best.
+#' @param vid.ext character; video type to output. mp4 currently works best.
 #' @param frame.rate numeric; video frame rate in fps.
 #' @param raw logical; encodes a raw AVI video with the "rawvideo" codec.
 #' @param filt character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}.

@@ -8,7 +8,7 @@ images.to.video(image.dir = NULL, vid.name = NULL, qual = 50,
   frame.rate = 10, silent = TRUE)
 }
 \arguments{
-\item{image.dir}{Character; directory containing images to stich.}
+\item{image.dir}{Character; directory containing images to stitch.}
 
 \item{vid.name}{character; file name to be give video including extension.  mp4 currently works best.}
 

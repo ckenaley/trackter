@@ -22,7 +22,7 @@ kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
 
 \item{tips, }{numeric, the proportion the the midline data to use in calculation of the head and tail position.}
 
-\item{edges}{logical, shoudd ROIs on image edges by evaluated. See Details.}
+\item{edges}{logical, should ROIs on image edges by evaluated. See Details.}
 
 \item{train.dat}{Classified \code{Out} and \code{Coo} outlines that are produced from \code{Momocs}. See Details.}
 
@@ -30,11 +30,11 @@ kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
 
 \item{harms}{numeric, the number of harmonics to use. If missing, \code{Momocs} sets 'nh.b' to 12. Will produce messages.}
 
-\item{enorm}{logical, should the EFA coeffecients from \code{efourier} operations be normalized or not. See \code{details} and \code{\link{efourier}}}
+\item{enorm}{logical, should the EFA coefficients from \code{efourier} operations be normalized or not. See \code{details} and \code{\link{efourier}}}
 
 \item{retrain}{numeric, the number of frames on which to retrain the LDA data set. See details.}
 
-\item{after.train}{character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This peeds calculations considerably. If 'LDA', the default, LDA will continue usining the retraining classifications from frames $<=$ 'train'.}
+\item{after.train}{character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This speeds calculations considerably. If 'LDA', the default, LDA will continue using the retraining classifications from frames $<=$ 'train'.}
 
 \item{ties}{character, how to chose ROI's in any one frame that appear fish-like. See details.}
 
@@ -71,7 +71,7 @@ A list with the following components:
 
 \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
 \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
+#' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
 \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
 \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
@@ -81,7 +81,7 @@ A list with the following components:
 \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 \itemize{
 \item 'frame': the frame
-#' \item 'x' and 'y': the x and y positions of the countours
+#' \item 'x' and 'y': the x and y positions of the contours
 }
 
 \code{all.classes} A data table containing the following for all ROIs detected: 
@@ -94,22 +94,22 @@ A list with the following components:
 \code{dim} the x and y dimensions of the images analyzed
 }
 \description{
-Experimental. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentatio. Chose a fish-like ROI class detected through linear discrimate analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+Experimental and untested. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body mideline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body midline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 
-Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 
-Before \code{train}, ROIs are chosen according to LDA of a PCA object constructed from \code{efourier} analysis. LDA is trained by a user define 'train.dat' when the frame $<=$ \code{retrain}. LDA will procede after \code{retrain} if \code{after.train}='LDA', but the LDA will be trained by the contours classified as 'fish' and 'not.fish' found during the chosen training period. 
+Before \code{train}, ROIs are chosen according to LDA of a PCA object constructed from \code{efourier} analysis. LDA is trained by a user define 'train.dat' when the frame $<=$ \code{retrain}. LDA will proceed after \code{retrain} if \code{after.train}='LDA', but the LDA will be trained by the contours classified as 'fish' and 'not.fish' found during the chosen training period. 
 
-\code{enorm} Normalization of EFA coefficents is often perilous, especially for symetrical shapes, a conditional met for undulating, bilaterally sysmetical organisms at least some of the time and perhaps for many of the frames included in any analysis. Thus, 'enorm' by default is set to 'FALSE'. 'enorm=TRUE' may produce odd ROI choices and should be used cautiously.
+\code{enorm} Normalization of EFA coefficients is often perilous, especially for symmetrical shapes, a conditional met for undulating, bilaterally symmetrical organisms at least some of the time and perhaps for many of the frames included in any analysis. Thus, 'enorm' by default is set to 'FALSE'. 'enorm=TRUE' may produce odd ROI choices and should be used cautiously.
 
-\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes. A user defined dataset or the \code{fishshapes} dataset in \code{trackter} must be used for training. \code{fishshapes} includes several arbitrary shapes (circrles, squares, U-shapes, etc.) as well as several fish shapes: sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle. A user-defined dataset must have shapes classified with factors identical to the \code{fishshapes} contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. 
+\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes. A user defined dataset or the \code{fishshapes} dataset in \code{trackter} must be used for training. \code{fishshapes} includes several arbitrary shapes (circles, squares, U-shapes, etc.) as well as several fish shapes: sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle. A user-defined dataset must have shapes classified with factors identical to the \code{fishshapes} contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. 
 
-\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therfore incomplete.
-\code{retrain} After this value, the LDA analysis will use the ROIs determined as 'fish' and 'not.fish' in the frames $>=$ \code{retrain} to discrimate fish from non-fish shapes. This speeds up analysis considerably.
-\code{ties} Determiens how to chose ROIs if more than one fish-like ROI is found in any frame. 'fish' will result in chosing the ROI with shape types in which the best *and* second-best fish-like shape (according to posterior probabilities) match a fish-like shape in the trainin and/or retraining datasets.'post' will chose the best fish-like shape according the the highest posterior probability from LDA.
+\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.
+\code{retrain} After this value, the LDA analysis will use the ROIs determined as 'fish' and 'not.fish' in the frames $>=$ \code{retrain} to discriminate fish from non-fish shapes. This speeds up analysis considerably.
+\code{ties} Determines  how to chose ROIs if more than one fish-like ROI is found in any frame. 'fish' will result in choosing the ROI with shape types in which the best *and* second-best fish-like shape (according to posterior probabilities) match a fish-like shape in the training and/or retraining datasets.'post' will chose the best fish-like shape according the the highest posterior probability from LDA.
 }
 \examples{
 # produce a classic midline waveform plot of swimming 

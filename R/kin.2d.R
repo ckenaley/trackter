@@ -404,7 +404,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
 #' @param x Numeric; x position (or sample number)
 #' @param y numeric; y position
 #' @param sf numeric; sample frequency (i.e., how often was x and y sampled) in Hz
-#' @return a list with amplitude "a", frequence "f", amplitude returned from a smoothed sign function "a.f" based on output from \code{features}, signal to noise ratio "snr".
+#' @return a list with amplitude "a", frequency "f", amplitude returned from a smoothed sign function "a.f" based on output from \code{features}, signal to noise ratio "snr".
 #' @export
 #' @import features
 #' @seealso \code{\link{features}}

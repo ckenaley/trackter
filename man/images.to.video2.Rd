@@ -9,13 +9,13 @@ images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
   silent = TRUE)
 }
 \arguments{
-\item{image.dir}{character; directory containing images to stich.}
+\item{image.dir}{character; directory containing images to stitch.}
 
 \item{vid.name}{character; file name to be given video.}
 
 \item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
 
-\item{vid.ext}{chacracter; video type to output. mp4 currently works best.}
+\item{vid.ext}{character; video type to output. mp4 currently works best.}
 
 \item{frame.rate}{numeric; video frame rate in fps.}
 

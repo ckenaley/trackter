@@ -14,7 +14,7 @@ amp.freq(x = NULL, y, sf = 100)
 \item{sf}{numeric; sample frequency (i.e., how often was x and y sampled) in Hz}
 }
 \value{
-a list with amplitude "a", frequence "f", amplitude returned from a smoothed sign function "a.f" based on output from \code{features}, signal to noise ratio "snr".
+a list with amplitude "a", frequency "f", amplitude returned from a smoothed sign function "a.f" based on output from \code{features}, signal to noise ratio "snr".
 }
 \description{
 Computes amplitude(s) and wavelength(s) of a wave form, amongst other things, based on a sampling frequency

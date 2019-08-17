@@ -2,7 +2,7 @@
 % Please edit documentation in R/kin.R
 \name{kin.search}
 \alias{kin.search}
-\title{Midline tracking over image seqences}
+\title{Midline tracking over image sequences}
 \usage{
 kin.search(image.dir = NULL, frames = NULL, thr = "otsu",
   plot.pml = TRUE, show.prog = FALSE, ant.per = 0.1, tips = 0.02,
@@ -17,7 +17,7 @@ kin.search(image.dir = NULL, frames = NULL, thr = "otsu",
 
 \item{thr}{numeric or character ('otsu') threshold to determine binary image. See Details.}
 
-\item{plot.pml}{logical, value indicating if outputted images should include an overlay of the theoretical amidline based on \code{ant.per}.}
+\item{plot.pml}{logical, value indicating if outputted images should include an overlay of the theoretical midline based on \code{ant.per}.}
 
 \item{show.prog}{logical value indicating if outputted image should be displayed during analysis.}
 
@@ -65,7 +65,7 @@ A list with the following components:
 \code{midline} A data table containing, for each frame described by \code{frames}, the following: 
 \itemize{
 \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
+#' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
 \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
 \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
@@ -75,7 +75,7 @@ A list with the following components:
 \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 \itemize{
 \item 'frame': the frame
-\item 'x' and 'y': the x and y positions of the countours
+\item 'x' and 'y': the x and y positions of the contours
 }
 
 \code{all.classes} A data table containing the following for all ROIs detected:
@@ -127,7 +127,7 @@ Automatically retrieves the midline of a detected ROI in each image of a sequenc
 \details{
 The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.
 
-Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 
 \code{search.for} determines how ROIs are chosen: 
 \itemize{
@@ -139,7 +139,7 @@ Thresholding operations can be performed with an arbitrary (user defined) numeri
 
 These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.
 
-\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therfore incomplete.
+\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.
 
 \code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.
 }

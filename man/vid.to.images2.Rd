@@ -2,7 +2,7 @@
 % Please edit documentation in R/ffmpeg.R
 \name{vid.to.images2}
 \alias{vid.to.images2}
-\title{Extracts images from a video file with ffmep}
+\title{Extracts images from a video file with ffmpeg}
 \usage{
 vid.to.images2(vid.path = NULL, filt = NULL, codec = NULL,
   silent = TRUE)

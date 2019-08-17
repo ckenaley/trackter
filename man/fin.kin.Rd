@@ -41,8 +41,8 @@ A list with the following components:
 
 \itemize{
 \item  x,y coordinates of the fin tips, start, and end within the range of \code{fin.pos}.
-\item 'ang': the angle formed by the coordinataes and their adjacent points.
-\item 'pos': descripiton of the coordinates' positions, 'start', 'end' or 'tip'.
+\item 'ang': the angle formed by the coordinates and their adjacent points.
+\item 'pos': description  of the coordinates' positions, 'start', 'end' or 'tip'.
 }
 
 \code{comp} a data table describing the composite contour of the body minus the fins.
@@ -64,11 +64,11 @@ Estimates the amplitudes of regions along a body contour that are protruding. Us
 \details{
 The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with \code{\link{coo_flipx}} and \code{\link{coo_flipy}} after converting contour to class \code{coo}.
 
- \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficently smoothed fin contour, will have countour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} ($<$5) should be avoided if the contour is jagged, perhaps due to digitization.
+ \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} ($<$5) should be avoided if the contour is jagged, perhaps due to digitization.
  
 In addition to fin amplitude and contour extraction, also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by \code{smoothing} and number of points indicated by \code{x.bins}. 
  
- \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculted from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
+ \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculated from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
 }
 \examples{
 ###plot pectoral-fin amplitudes of a swimming sunfish

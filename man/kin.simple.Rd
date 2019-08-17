@@ -52,7 +52,7 @@ A list with the following components:
 
 \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
 \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
+#' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
 \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{ant.per} (green points in the outputted images/video if 'plot.pml=TRUE')
 \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
@@ -62,7 +62,7 @@ A list with the following components:
 \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 \itemize{
 \item 'frame': the frame
-\item 'x' and 'y': the x and y positions of the countours
+\item 'x' and 'y': the x and y positions of the contours
 }
 
 \code{all.classes} A data table containing the following for all ROIs detected:  
@@ -75,12 +75,12 @@ A list with the following components:
 \code{dim} the x and y dimensions of the images analyzed
 }
 \description{
-Automatically retrieves the midline of a detected ROIbased on size. Assumes the ROI of interest is the largest detected and not interesecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
+Automatically retrieves the midline of a detected ROI based on size. Assumes the ROI of interest is the largest detected and not intersecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body mideline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body midline  overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 
-Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 }
 \examples{
 # produce a classic midline waveform plot of swimming fish 
