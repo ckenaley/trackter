@@ -12,6 +12,7 @@ os:
   
 install: 
   - R -e 'install.packages("BiocManager"); BiocManager::install("EBImage")'
+  - R -e 'install.packages("testthat")'
   
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
