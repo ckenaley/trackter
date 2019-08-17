@@ -2,7 +2,7 @@
 % Please edit documentation in R/trig.funs.R
 \name{cosine.ang}
 \alias{cosine.ang}
-\title{Computes angle between two segments of a triangle.}
+\title{Computes angle between two segments sharing a point.}
 \usage{
 cosine.ang(l, r, o)
 }

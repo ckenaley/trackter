@@ -154,7 +154,9 @@ download.file(f,"temp.zip")
 unzip("temp.zip")
 unlink("temp.zip")
 
-kin <- kin.search(image.dir ="example",search.for = "largest",smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",image.type="bin",smooth=0.4)
+kin <- kin.search(image.dir ="example",search.for = "largest",
+smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
+image.type="bin",smooth=0.4)
 
 ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
 p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
@@ -174,7 +176,8 @@ print(p)
 
 ### Make a video of processed frames
 
-images.to.video2(image.dir = "processed_images", vid.name = "trout_test", qual=50,frame.rate =10,silent=T)
+images.to.video2(image.dir = "processed_images", vid.name = "trout_test", 
+qual=50,frame.rate =10,silent=T)
 
 #delete 'example', images','processed_images' folders
 unlink("processed_images",recursive = T)

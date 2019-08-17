@@ -67,7 +67,9 @@ y <- sin(x^2*pi)
 w.z <- wave(x,y,method="zeros",smoothing="spline",smooth=0.1)
 
 #plot wave with detected full waves using fitted 'zeros' method
-ggplot()+geom_point(aes(x=x,y=y))+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)+theme_classic()
+p <- ggplot()+geom_point(aes(x=x,y=y))
+p <- p+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)
+p+theme_classic()
 
 #plot lambda as it varies with position
 

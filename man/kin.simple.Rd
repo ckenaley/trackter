@@ -83,7 +83,8 @@ The algorithm assumes a left-right orientation, i.e., the head of the ROI is pos
 Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 }
 \examples{
-#produce a classic midline waveform plot of swimming fish searching a image field with a two fish-like ROIs
+# produce a classic midline waveform plot of swimming fish 
+# searching a image field with a two fish-like ROIs
 \dontrun{
 require(wesanderson)
 
@@ -110,7 +111,8 @@ ml <- merge(ml,ml2,by="frame") #merge these
 
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",
+method = "loess", size = 1.5,alpha = 0.5)
 print(p)
 
 #make a video of extracted midlines over original images

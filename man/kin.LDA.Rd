@@ -112,7 +112,8 @@ Before \code{train}, ROIs are chosen according to LDA of a PCA object constructe
 \code{ties} Determiens how to chose ROIs if more than one fish-like ROI is found in any frame. 'fish' will result in chosing the ROI with shape types in which the best *and* second-best fish-like shape (according to posterior probabilities) match a fish-like shape in the trainin and/or retraining datasets.'post' will chose the best fish-like shape according the the highest posterior probability from LDA.
 }
 \examples{
-#produce a classic midline waveform plot of swimming fish searching a image field with a two fish-like ROIs
+# produce a classic midline waveform plot of swimming 
+# fish searching a image field with a two fish-like ROIs
 \dontrun{
 require(wesanderson)
 require(ggplot2)
@@ -128,7 +129,9 @@ unlink("temp.zip")
 
 #load fishshapes data
 data(fishshapes)
-kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,ant.per=.25,enorm=F,show.prog = F,retrain=2,train.dat = fishshapes,after.train="LDA",edges=F)
+kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
+ant.per=.25,enorm=F,show.prog = F,retrain=2,
+train.dat = fishshapes,after.train="LDA",edges=F)
 ml <- kin$midline
  #x start at 0
 ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -140,7 +143,8 @@ ml <- merge(ml,ml2,by="frame") #merge these
 
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+p <- p+geom_line(aes(group=frame,color=amp.i),
+stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 print(p)
 
 

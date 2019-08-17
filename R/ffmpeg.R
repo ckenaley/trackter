@@ -87,7 +87,8 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #'   dev.off()
 #'   }
 #'
-#'images.to.video(image.dir=paste0(getwd(),"/images"),vid.name="spiral",frame.rate=5,qual=100,silent=FALSE)
+#'images.to.video(image.dir=paste0(getwd(),"/images"),
+#'vid.name="spiral",frame.rate=5,qual=100,silent=FALSE)
 
 images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,silent=TRUE)  {
   
@@ -237,7 +238,8 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #'   dev.off()
 #'   }
 #'
-#' images.to.video2(image.dir=paste0(getwd(),"/images"),vid.name="spiral",frame.rate=5,qual=100,raw=FALSE)
+#' images.to.video2(image.dir=paste0(getwd(),"/images"),
+#' vid.name="spiral",frame.rate=5,qual=100,raw=FALSE)
 #'
 
 images.to.video2 <- function(image.dir=NULL,vid.name=NULL,qual=50,vid.ext=".mp4",frame.rate=10,raw=TRUE,filt=NULL,silent=TRUE)  {

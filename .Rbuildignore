@@ -6,3 +6,5 @@
 ^\_config\.yml$
 ^figure$
 ^appveyor\.yml$
+^README\.rmd$
+^NEWS\.Rmd$

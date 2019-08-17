@@ -52,7 +52,8 @@ for(i in seq(1,length(theta),30)) {
   dev.off()
   }
 
-images.to.video2(image.dir=paste0(getwd(),"/images"),vid.name="spiral",frame.rate=5,qual=100,raw=FALSE)
+images.to.video2(image.dir=paste0(getwd(),"/images"),
+vid.name="spiral",frame.rate=5,qual=100,raw=FALSE)
 
 }
 \seealso{

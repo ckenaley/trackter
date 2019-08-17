@@ -140,7 +140,9 @@
 #' unzip("temp.zip")
 #' unlink("temp.zip")
 #'
-#'kin <- kin.search(image.dir ="example",search.for = "largest",smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",image.type="bin",smooth=0.4)
+#'kin <- kin.search(image.dir ="example",search.for = "largest",
+#'smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
+#'image.type="bin",smooth=0.4)
 #'
 #' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
 #' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
@@ -160,7 +162,8 @@
 #' 
 #' ### Make a video of processed frames
 #'
-#' images.to.video2(image.dir = "processed_images", vid.name = "trout_test", qual=50,frame.rate =10,silent=T)
+#' images.to.video2(image.dir = "processed_images", vid.name = "trout_test", 
+#' qual=50,frame.rate =10,silent=T)
 #'
 #' #delete 'example', images','processed_images' folders
 #' unlink("processed_images",recursive = T)
@@ -467,7 +470,8 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #'
 #' 
 #' @examples
-#' #produce a classic midline waveform plot of swimming fish searching a image field with a two fish-like ROIs
+#' # produce a classic midline waveform plot of swimming 
+#' # fish searching a image field with a two fish-like ROIs
 #' \dontrun{
 #' require(wesanderson)
 #' require(ggplot2)
@@ -483,7 +487,9 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' 
 #' #load fishshapes data
 #' data(fishshapes)
-#'kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,ant.per=.25,enorm=F,show.prog = F,retrain=2,train.dat = fishshapes,after.train="LDA",edges=F)
+#'kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
+#'ant.per=.25,enorm=F,show.prog = F,retrain=2,
+#'train.dat = fishshapes,after.train="LDA",edges=F)
 #' ml <- kin$midline
 #'  #x start at 0
 #' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
@@ -495,7 +501,8 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #'
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+#' p <- p+geom_line(aes(group=frame,color=amp.i),
+#' stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 #' print(p)
 #'
 #'
@@ -890,7 +897,8 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' @importFrom EBImage bwlabel otsu
 #' 
 #' @examples
-#' #produce a classic midline waveform plot of swimming fish searching a image field with a two fish-like ROIs
+#' # produce a classic midline waveform plot of swimming fish 
+#' # searching a image field with a two fish-like ROIs
 #' \dontrun{
 #' require(wesanderson)
 #'
@@ -917,7 +925,8 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #'
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+#' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",
+#' method = "loess", size = 1.5,alpha = 0.5)
 #' print(p)
 #' 
 #' #make a video of extracted midlines over original images

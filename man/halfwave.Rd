@@ -69,7 +69,8 @@ qplot(x,y)
 w.z <- halfwave(x,y,method="zeros",fit=TRUE,smoothing="spline")
 
 #plot waveform with detected half waves using fitted 'zeros' method
-p <- ggplot()+geom_point(aes(x=x,y=y))+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)
+p <- ggplot()+geom_point(aes(x=x,y=y))
+p <- p+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)
 p+theme_classic()
 
 #plot lambda as it varies with position

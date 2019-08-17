@@ -55,7 +55,8 @@
 #' w.z <- halfwave(x,y,method="zeros",fit=TRUE,smoothing="spline")
 #'
 #' #plot waveform with detected half waves using fitted 'zeros' method
-#' p <- ggplot()+geom_point(aes(x=x,y=y))+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)
+#' p <- ggplot()+geom_point(aes(x=x,y=y))
+#' p <- p+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)
 #' p+theme_classic()
 #' 
 #' #plot lambda as it varies with position
@@ -250,7 +251,9 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
 #' w.z <- wave(x,y,method="zeros",smoothing="spline",smooth=0.1)
 #' 
 #' #plot wave with detected full waves using fitted 'zeros' method
-#'ggplot()+geom_point(aes(x=x,y=y))+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)+theme_classic()
+#'p <- ggplot()+geom_point(aes(x=x,y=y))
+#'p <- p+geom_line(data=w.z$names,aes(x=x,y=y,col=wave),alpha=0.4,size=3,inherit.aes=FALSE)
+#'p+theme_classic()
 #'
 #'#plot lambda as it varies with position
 #'
