@@ -12,7 +12,7 @@ os:
   
 install: 
   - R -e 'install.packages("BiocManager"); BiocManager::install("EBImage")'
-  - R -e 'install.packages("testthat")'
+  - R -e 'install.packages("data.table", "dplyr", "Momocs", "raster", "zoo", "plyr", "pastecs", "animation", "features", "wesanderson", "ggplot2","testhat")' #install these because of devel issues "Package suggested but not available: ‘testthat’" 
   
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
