@@ -12,8 +12,9 @@ os:
   
 install: 
   - R -e 'install.packages("BiocManager"); BiocManager::install("EBImage")'
-  - R -e 'install.packages("data.table", "dplyr", "Momocs", "raster", "zoo", "plyr", "pastecs", "animation", "features", "wesanderson", "ggplot2","testthat")' #install these because of devel issues "Package suggested but not available: ‘testthat’" 
+  - R -e 'install.packages("testthat")' #install testthat because of devel issues 
   
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
+  - R -e 'source("https://install-github.me/r-lib/remotes")'
