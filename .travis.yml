@@ -13,7 +13,9 @@ os:
 install: 
   - R -e 'install.packages("BiocManager"); BiocManager::install("EBImage")'
   - R -e 'install.packages("testthat")' #install testthat because of devel issues 
-  
+  - git clone --depth 1 https://github.com/r-lib/remotes && R CMD build --no-build-vignettes remotes && R CMD INSTALL remotes*tar.gz && rm -rf remotes remotes*tar.gz
+  - R -e 'install.packages("curl")' -e 'remotes::install_deps(".", dependencies = TRUE)'
+
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
