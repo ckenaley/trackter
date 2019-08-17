@@ -9,5 +9,4 @@
 ^README\.rmd$
 ^NEWS\.Rmd$
 ^README\rmd$
-^NEWS\.md$
 ^cran-comments\.md$

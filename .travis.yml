@@ -4,7 +4,7 @@ language: r
 r:
   - release
   - devel
-  - bioc-devel
+  - bioc-release
   
 cache: packages
 bioc_packages: EBImage
