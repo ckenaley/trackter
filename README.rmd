@@ -78,10 +78,10 @@ __Tools for image and video processing using FFmpeg__
 
 * Relevant functions: `images.to.videos`, `images.to.videos2`, `vid.to.images`, and `vid.to.images2`
 
-__Other miscellaneous tools for kinematic analysis__
+__Other miscellaneous, low-level tools for kinematic analysis__
 
-* Compute distances in 2d space, angles, heading/bearing, convert radians to degrees.
-* Relevant functions: `dist.2d`, `cosine.ang`, `bearing`, `deg`
+* Compute distances in 2d space, angles, heading/bearing, convert radians to degrees and vice versa.
+* Relevant functions: `dist.2d`, `cosine.ang`, `bearing.xy`, `deg`, `rad`
 
 
 ## Examples
