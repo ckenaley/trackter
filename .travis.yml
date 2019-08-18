@@ -2,18 +2,15 @@
 
 language: r
 r:
+  - oldrel
   - release
-  #- devel
+  - bioc-devel
   
 cache: packages
-
+bioc_packages: EBImage
 os:
   - osx
-  
-install: 
-  - R -e 'install.packages("BiocManager"); BiocManager::install("EBImage")'
-   
-  
+
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
