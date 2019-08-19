@@ -538,6 +538,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' unlink(paste0(t,"/example"),recursive = T)
 #' }
 #' 
+
 kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edges=FALSE,train.dat=NULL,rescale=FALSE,harms=15,enorm=T,retrain=5,after.train="LDA",ties="fish",size.min=0.05,show.prog=FALSE,smoothing="loess",smooth=.3,smooth.points=200,save=T,out.dir=NULL,image.type="orig",plot.pml=TRUE,flip=TRUE){
   
   type <- shape <- post <- type2 <- x <- y.pred <- wave.y <- mid.pred <- roi <- index <-  NULL#to avoid NSE errors in R CMD check
