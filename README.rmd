@@ -88,7 +88,7 @@ __Other miscellaneous, low-level tools for kinematic analysis__
 
 ### Analyzing a single image
 
-*trackter* was developed to analyze image data from videos of swimming fish, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish from *trackter*'s system data, reading it, writing it to a local subdirectory, and displaying it.
+*trackter* was developed to analyze image data from videos of swimming fishes, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish from *trackter*'s system data, reading it, writing it to a local subdirectory, and displaying it.
 
 ```{r,fig.height=2.5,fig.cap="An image of a swimming sunfish."}
 y <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))

@@ -17,6 +17,7 @@
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. 
+#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
 #' @param search.for character, the search parameter. See Details. 
 #' @param edges logical, should ROIs on image edges be evaluated. See Details.
@@ -137,13 +138,16 @@
 #'
 #' #download example images and place in 'example' subdirectory
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-#' download.file(f,"temp.zip")
-#' unzip("temp.zip")
-#' unlink("temp.zip")
+#' t <- tempdir()
+#' download.file(f, paste0(t,"/temp.zip"))
+#' unzip(paste0(t,"/temp.zip"),exdir=t)
+#' unlink(paste0(t,"/temp.zip"))
 #'
-#'kin <- kin.search(image.dir ="example",search.for = "largest",
-#'smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
-#'image.type="bin",smooth=0.4)
+#'
+#' kin <- kin.search(image.dir =paste0(t,"/example"),
+#'        search.for = "largest",
+#'       smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
+#'       image.type="bin",smooth=0.4,out.dir=tempdir())
 #'
 #' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
 #' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
@@ -152,7 +156,7 @@
 #' ### midline plot
 #' ml <- kin$midline
 #' #leftmost x starts at 0
-#' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+#' ml <- ml[,x2:=x-x[1],by=frame]
 #'
 #' ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
 #'
@@ -163,23 +167,31 @@
 #' 
 #' ### Make a video of processed frames
 #'
-#' images.to.video2(image.dir = "processed_images", vid.name = "trout_test", 
-#' qual=50,frame.rate =10,silent=T)
+#' images.to.video2(image.dir=paste0(t,"/processed_images"),
+#' vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
+#' file.exists(paste0(t,"/trout_test_red.mp4"))
 #'
-#' #delete 'example', images','processed_images' folders
-#' unlink("processed_images",recursive = T)
-#' unlink("images",recursive = T)
-#' unlink("example",recursive = T)
+#' #delete 'example','processed_images' folders
+#' unlink(paste0(t,"/processed_images"),recursive = T)
+#' unlink(paste0(t,"/example"),recursive = T)
 #'}
 #'
-kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.2, smooth.points=200, image.type="orig",save=TRUE,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE){
+kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.2, smooth.points=200, image.type="orig",save=TRUE,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE){
   
   size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE errors on R CMD check
   
-  if(save){unlink("processed_images",recursive = T)
+  if(save & is.null(out.dir)){
+    unlink("processed_images",recursive = T)
     dir.create("processed_images")
     proc.dir <- "processed_images"
+  }else{
+    if(save){
+      proc.dir <- paste0(out.dir,"/processed_images")
+    if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)
+    dir.create(proc.dir)
+    }
   }
+  
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
   
   if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")
@@ -382,7 +394,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 
 #' @title  Midline tracking over image sequences with ROI search using LDA
 
-#' @description  Experimental and untested. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+#' @description  Experimental and untested (in the unit-testing sense). Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 #'
 #' @param image.dir character, directory containing images to analyze.
 #' @param frames numeric, vector indicating which images to process.
@@ -405,6 +417,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.
+#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save==FALSE'.
 #' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param flip logical, indicating if binary should be flipped.
@@ -469,6 +482,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #' @importFrom EBImage ocontour otsu bwlabel
+#' @importFrom zoo index
 #'
 #' 
 #' @examples
@@ -483,21 +497,25 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #'
 #' #download example images and place in 'example' subdirectory
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-#' download.file(f,"temp.zip")
-#' unzip("temp.zip")
-#' unlink("temp.zip")
-#' 
+#' t <- tempdir()
+#' download.file(f, paste0(t,"/temp.zip"))
+#' unzip(paste0(t,"/temp.zip"),exdir=t)
+#' unlink(paste0(t,"/temp.zip"))
+#'
 #' #load fishshapes data
 #' data(fishshapes)
-#'kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
-#'ant.per=.25,enorm=F,show.prog = F,retrain=2,
-#'train.dat = fishshapes,after.train="LDA",edges=F)
+#' 
+#' 
+#'kin <- kin.LDA(image.dir = paste0(t,"/example"),frames=1:20,thr=0.7,
+#'               ant.per=.25,enorm=F,show.prog = F,retrain=2,
+#'               train.dat = fishshapes,after.train="LDA",edges=F, 
+#'               out.dir=tempdir())
 #' ml <- kin$midline
 #'  #x start at 0
-#' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+#' ml <-ml[,x2:=x-x[1],by=frame]
 #'
 #' #compute instantaneous amplitude of tail (last/rightmost point) and wave crest x position  by frame
-#' ml2 <- ddply(ml,.(frame),summarize,amp.i=abs(last(wave.y)))
+#' ml2 <-ml[,.(amp.i=abs(last(wave.y))),by=frame]
 #'
 #' ml <- merge(ml,ml2,by="frame") #merge these
 #'
@@ -508,24 +526,33 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' print(p)
 #'
 #'
-#' #make a video of extracted midlines over original images
-#' images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
-#' 
-#' #delete 'example', images','processed_images' folders
-#' unlink("processed_images",recursive = T)
-#' unlink("images",recursive = T)
-#' unlink("example",recursive = T)
+#' ### Make a video of processed frames
+#'
+#' images.to.video2(image.dir=paste0(t,"/processed_images"),
+#' vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
+#' file.exists(paste0(t,"/trout_test_red.mp4"))
+#'
+#' #delete 'example','processed_images' folders
+#' unlink(paste0(t,"/processed_images"),recursive = T)
+#' unlink(paste0(t,"/example"),recursive = T)
 #' }
-kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edges=FALSE,train.dat=NULL,rescale=FALSE,harms=15,enorm=T,retrain=5,after.train="LDA",ties="fish",size.min=0.05,show.prog=FALSE,smoothing="loess",smooth=.3,smooth.points=200,save=T,image.type="orig",plot.pml=TRUE,flip=TRUE){
+#' 
+kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edges=FALSE,train.dat=NULL,rescale=FALSE,harms=15,enorm=T,retrain=5,after.train="LDA",ties="fish",size.min=0.05,show.prog=FALSE,smoothing="loess",smooth=.3,smooth.points=200,save=T,out.dir=NULL,image.type="orig",plot.pml=TRUE,flip=TRUE){
   
   type <- shape <- post <- type2 <- x <- y.pred <- wave.y <- mid.pred <- roi <- index <-  NULL#to avoid NSE errors in R CMD check
   
   if(is.null(train.dat)) stop("'train.dat' must be specified") ###load training data 
   
-  if(save){unlink("processed_images",recursive = T)
+  if(save & is.null(out.dir)){
+    unlink("processed_images",recursive = T)
     dir.create("processed_images")
-    
     proc.dir <- "processed_images"
+  }else{
+    if(save){
+      proc.dir <- paste0(out.dir,"/processed_images")
+      if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)
+      dir.create(proc.dir)
+    }
   }
   
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
@@ -843,6 +870,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' @param smooth numeric; if \code{smoothing} is set to 'loess', passed to 'span' parameter of \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' parameter of \code{\link{smooth.spline}}
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.
+#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.
 #' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
 #' @param flip logical, indicating if binary image should be flipped.
@@ -906,51 +934,63 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' \dontrun{
 #' require(wesanderson)
 #'
-#' #download example avi video
-#' f <- "https://github.com/ckenaley/exampledata/blob/master/trout1_63_test.avi?raw=true"
-#' download.file(f,"trout1_63_test.avi")
-#' 
-#' #extract images and reduce them to 600 px wide with a filter
-#' filt.red <- " -vf scale=600:-1 " #filter
-#' vid.to.images2(vid.path="trout1_63_test.avi",filt = filt.red) #extract
-#' 
-#' #number of frames
+#' #download example images and place in 'example' subdirectory
+#' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
+#' t <- tempdir()
+#' download.file(f, paste0(t,"/temp.zip"))
+#' unzip(paste0(t,"/temp.zip"),exdir=t)
+#' unlink(paste0(t,"/temp.zip"))
+#'
 #' fr <-1:50
 #' #extract midline and other data
-#' kin <- kin.simple(image.dir = "images",frames=fr,thr=0.6,ant.per = 0.2,show.prog=T)
+#' kin <- kin.simple(image.dir =paste0(t,"/example"),
+#'       smoothing = "loess",frames=fr,show.prog =F,thr = "otsu",
+#'       image.type="bin",smooth=0.4,out.dir=tempdir())
+#'
+#' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
+#' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
+#' print(p)
+#' 
+#' ### midline plot
 #' ml <- kin$midline
-#' #normalize x (y is normalized to midline by \code{kin.simple})
-#' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+#' #leftmost x starts at 0
+#' ml <- ml[,x2:=x-x[1],by=frame]
 #'
-#' #compute instantaneous amplitude of tail (last/rightmost points) and wave crest x position  by frame
-#' ml2 <- ddply(ml,.(frame),summarize,amp.i=abs(last(wave.y)))
-#'
-#' ml <- merge(ml,ml2,by="frame") #merge these
+#' ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
 #'
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",
-#' method = "loess", size = 1.5,alpha = 0.5)
+#' p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 #' print(p)
 #' 
-#' #make a video of extracted midlines over original images
-#' images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
-#' 
-#' #delete 'images' and 'processed_images' folders and avi file
-#' unlink("processed_images",recursive = T)
-#' unlink("images",recursive = T)
-#' unlink("trout1_63_test.avi",recursive = T)
+#' ### Make a video of processed frames
+#'
+#' images.to.video2(image.dir=paste0(t,"/processed_images"),
+#' vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
+#' file.exists(paste0(t,"/trout_test_red.mp4"))
+#'
+#' #delete 'example','processed_images' folders
+#' unlink(paste0(t,"/processed_images"),recursive = T)
+#' unlink(paste0(t,"/example"),recursive = T)
 #'}
 #'
 
-kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.2,smooth.points=200,save=TRUE,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
+kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.2,smooth.points=200,save=TRUE,out.dir=NULL,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
   
   size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE erros or R CD check
   
-  if(save){unlink("processed_images",recursive = T)
+  if(save & is.null(out.dir)){
+    unlink("processed_images",recursive = T)
     dir.create("processed_images")
     proc.dir <- "processed_images"
+  }else{
+    if(save){
+      proc.dir <- paste0(out.dir,"/processed_images")
+      if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)
+      dir.create(proc.dir)
+    }
   }
+  
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
   
   if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")

@@ -4,84 +4,89 @@ test_that("vid.to.images works", {
   
   
   v <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
-  file.copy(v,getwd())
-  vid.to.images(vid.path = "sunfish_BCF.avi")  
-  expect_true(dir.exists("images"))
-  expect_true(length(list.files("images"))==2)
+  file.copy(v,tempdir())
+  vid.to.images(vid.path = paste0(tempdir(),"/sunfish_BCF.avi")  )
+  expect_true(dir.exists(paste0(tempdir(),"/images")))
+  expect_true(length(list.files(paste0(tempdir(),"/images")))==2)
   expect_error(vid.to.images(vid.path = NULL,silent=T))
-  expect_error(vid.to.images(vid.path = "foo.avi",silent=T))
+  expect_error(vid.to.images(vid.path = paste0(tempdir(),"/foo.avi"),silent=T))
 
-  unlink("images",recursive = T)
-  unlink("sunfish_BCF.avi")
+  unlink(paste0(tempdir(),"/images"),recursive = T)
+  unlink(paste0(tempdir(),"/sunfish_BCF.avi"))
 })
 
 test_that("images.to.video works", {
-  if(dir.exists("sunfish")) unlink("sunfish",recursive = T)
-  dir.create("sunfish")
+  if(dir.exists(paste0(tempdir(),"/sunfish"))) unlink(paste0(tempdir(),"/sunfish"),recursive = T)
+  dir.create(paste0(tempdir(),"/sunfish"))
  v <- system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
-file.copy(v,paste0(getwd(),"/sunfish/img_001.jpg"))
-file.copy(v,paste0(getwd(),"/sunfish/img_002.jpg"))
+ 
+file.copy(v,paste0(tempdir(),"/sunfish/img_001.jpg"))
+file.copy(v,paste0(tempdir(),"/sunfish/img_002.jpg"))
   
- images.to.video(image.dir = paste0(getwd(),"/sunfish"),vid.name = "test.mp4",silent = T)  
+images.to.video(image.dir = paste0(tempdir(),"/sunfish"),vid.name = paste0(tempdir(),"/test.mp4"), silent = T)
+ 
+
   
-  expect_true(file.exists("test.mp4"))
-  expect_true(file.size("test.mp4")>10)
-  unlink("test.mp4")
-  unlink("sunfisf",recursive=T)
+  expect_true(file.exists(paste0(tempdir(),"/test.mp4")))
+  expect_true(file.size(paste0(tempdir(),"/test.mp4"))>10)
+  
+  
+  unlink(paste0(tempdir(),"/test.mp4"))
+
+  unlink(paste0(tempdir(),"/sunfish"),recursive = T)
   
  })
 
 test_that("vid.to.images2 works", {
-  
-  
   v <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
-  file.copy(v,getwd())
-  vid.to.images2(vid.path = "sunfish_BCF.avi")  
-  expect_true(dir.exists("images"))
-  expect_true(length(list.files("images"))==2)
-  img1 <- EBImage::readImage(paste0("images/",list.files("images")[1]))
-  
- 
-
+  file.copy(v,tempdir())
+  vid.to.images2(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"))  
+  expect_true(dir.exists(paste0(tempdir(),"/images")))
+  expect_true(length(list.files(paste0(tempdir(),"/images")))==2)
+  img1 <- EBImage::readImage(paste0(tempdir(),"/images/",list.files(paste0(tempdir(),"/images"))[1]))
   expect_error(vid.to.images2(vid.path = NULL))
-  expect_error(vid.to.images2(vid.path = "foo.avi"))
+  expect_error(vid.to.images2(vid.path = paste0(tempdir(),"/foo.avi")))
   
-  vid.to.images2(vid.path = "sunfish_BCF.avi",filt = " -vf scale=200:-1 ") 
-  img2 <- EBImage::readImage(paste0("images/",list.files("images")[1]))
+  vid.to.images2(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),filt = " -vf scale=200:-1 ") 
+  img2 <- EBImage::readImage(paste0(tempdir(),"/images/",list.files(paste0(tempdir(),"/images"))[1]))
   expect_true(dim(img1)[1]>dim(img2)[1]) #images with scaling filter are smaller
   
-  unlink("images",recursive = T)
-  unlink("sunfish_BCF.avi")
+  unlink(paste0(tempdir(),"/images"),recursive = T)
+  unlink(paste0(tempdir(),"/sunfish_BCF.avi"))
   
 })
 
 test_that("images.to.video2 works", {
-  if(dir.exists("sunfish")) unlink("sunfish",recursive = T)
-  dir.create("sunfish")
+  
+  if(dir.exists(paste0(tempdir(),"/sunfish"))) unlink(paste0(tempdir(),"/sunfish"),recursive = T)
+  dir.create(paste0(tempdir(),"/sunfish"))
   v <- system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
-  file.copy(v,paste0(getwd(),"/sunfish/img_001.jpg"))
-  file.copy(v,paste0(getwd(),"/sunfish/img_002.jpg"))
   
-  images.to.video2(image.dir = paste0(getwd(),"/sunfish"),vid.name = "test",silent = T,raw = T)
+  file.copy(v,paste0(tempdir(),"/sunfish/img_001.jpg"))
+  file.copy(v,paste0(tempdir(),"/sunfish/img_002.jpg"))
   
-  expect_true(file.exists("test.avi"))
-  expect_true(file.size("test.avi")>10)
-  f.s1 <- file.size("test.avi")
-  images.to.video2(image.dir = paste0(getwd(),"/sunfish"),vid.name = "test",silent = T,raw = F)
-  f.s2 <- file.size("test_red.mp4")
+  images.to.video2(image.dir = paste0(tempdir(),"/sunfish"),vid.name = paste0(tempdir(),"/test"), silent = T)
+  
+  
+  expect_true(file.exists(paste0(tempdir(),"/test.avi")))
+  expect_true(file.size(paste0(tempdir(),"/test.avi"))>10)
+  
+  f.s1 <- file.size(paste0(tempdir(),"/test.avi"))
+  images.to.video2(image.dir = paste0(tempdir(),"/sunfish"),vid.name = paste0(tempdir(),"/test"),silent = T,raw = F,overwrite = T)
+  f.s2 <- file.size(paste0(tempdir(),"/test_red.mp4"))
   
   expect_true(f.s1>f.s2) #is compressed file <raw file
   
-  images.to.video2(image.dir = paste0(getwd(),"/sunfish"),vid.name = "test",silent = T,raw = F,filt = " -s 120x80 ") #reduce scale
-  f.s3 <- file.size("test_red.mp4")
-
+  images.to.video2(image.dir = paste0(tempdir(),"/sunfish"),vid.name = paste0(tempdir(),"/test"),silent = F,raw = F,filt = " -s 120x80 ",overwrite = T) #reduce scale
+  f.s3 <- file.size(paste0(tempdir(),"/test_red.mp4"))
+  
   expect_true(f.s1>f.s3)
   expect_true(f.s2>f.s3)
   
-  expect_message(  images.to.video2(image.dir = paste0(getwd(),"/sunfish"),vid.name = "test",silent = T,raw = T),"video saved to")
+  expect_message(images.to.video2(paste0(tempdir(),"/sunfish"),vid.name = paste0(tempdir(),"/test"),silent = T,raw = T,overwrite = T),"video saved to")
   
-  unlink("test_red.mp4")
-  unlink("test.avi")
-  unlink("sunfish",recursive=T)
+  unlink(paste0(tempdir(),"/test.mp4"))
+  unlink(paste0(tempdir(),"/sunfish"),recursive = T)
+  
   
 })

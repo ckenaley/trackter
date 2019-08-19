@@ -7,8 +7,8 @@
 kin.search(image.dir = NULL, frames = NULL, thr = "otsu",
   plot.pml = TRUE, show.prog = FALSE, ant.per = 0.1, tips = 0.02,
   smoothing = "loess", smooth = 0.2, smooth.points = 200,
-  image.type = "orig", save = TRUE, flip = TRUE, size.min = 0.02,
-  search.for = "largest", edges = FALSE)
+  image.type = "orig", save = TRUE, out.dir = NULL, flip = TRUE,
+  size.min = 0.02, search.for = "largest", edges = FALSE)
 }
 \arguments{
 \item{image.dir}{character, directory containing images to analyze.}
@@ -34,6 +34,8 @@ kin.search(image.dir = NULL, frames = NULL, thr = "otsu",
 \item{image.type}{character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.}
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
+
+\item{out.dir}{character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.}
 
 \item{flip}{logical, indicating if binary should be flipped.}
 
@@ -125,7 +127,8 @@ A list with the following components:
 Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  
+By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.
 
 Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 
@@ -150,13 +153,16 @@ require(wesanderson)
 
 #download example images and place in 'example' subdirectory
 f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-download.file(f,"temp.zip")
-unzip("temp.zip")
-unlink("temp.zip")
+t <- tempdir()
+download.file(f, paste0(t,"/temp.zip"))
+unzip(paste0(t,"/temp.zip"),exdir=t)
+unlink(paste0(t,"/temp.zip"))
 
-kin <- kin.search(image.dir ="example",search.for = "largest",
-smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
-image.type="bin",smooth=0.4)
+
+kin <- kin.search(image.dir =paste0(t,"/example"),
+       search.for = "largest",
+      smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
+      image.type="bin",smooth=0.4,out.dir=tempdir())
 
 ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
 p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
@@ -165,7 +171,7 @@ print(p)
 ### midline plot
 ml <- kin$midline
 #leftmost x starts at 0
-ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+ml <- ml[,x2:=x-x[1],by=frame]
 
 ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
 
@@ -176,13 +182,13 @@ print(p)
 
 ### Make a video of processed frames
 
-images.to.video2(image.dir = "processed_images", vid.name = "trout_test", 
-qual=50,frame.rate =10,silent=T)
+images.to.video2(image.dir=paste0(t,"/processed_images"),
+vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
+file.exists(paste0(t,"/trout_test_red.mp4"))
 
-#delete 'example', images','processed_images' folders
-unlink("processed_images",recursive = T)
-unlink("images",recursive = T)
-unlink("example",recursive = T)
+#delete 'example','processed_images' folders
+unlink(paste0(t,"/processed_images"),recursive = T)
+unlink(paste0(t,"/example"),recursive = T)
 }
 
 }

@@ -9,7 +9,8 @@ kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
   harms = 15, enorm = T, retrain = 5, after.train = "LDA",
   ties = "fish", size.min = 0.05, show.prog = FALSE,
   smoothing = "loess", smooth = 0.3, smooth.points = 200, save = T,
-  image.type = "orig", plot.pml = TRUE, flip = TRUE)
+  out.dir = NULL, image.type = "orig", plot.pml = TRUE,
+  flip = TRUE)
 }
 \arguments{
 \item{image.dir}{character, directory containing images to analyze.}
@@ -49,6 +50,8 @@ kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
 \item{smooth.points}{numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.}
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
+
+\item{out.dir}{character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.}
 
 \item{image.type}{character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save==FALSE'.}
 
@@ -94,10 +97,11 @@ A list with the following components:
 \code{dim} the x and y dimensions of the images analyzed
 }
 \description{
-Experimental and untested. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+Experimental and untested (in the unit-testing sense). Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body midline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  
+If 'save=TRUE', images are saved as binary or the original with a body midline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 
 Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 
@@ -123,21 +127,25 @@ require(EBImage)
 
 #download example images and place in 'example' subdirectory
 f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-download.file(f,"temp.zip")
-unzip("temp.zip")
-unlink("temp.zip")
+t <- tempdir()
+download.file(f, paste0(t,"/temp.zip"))
+unzip(paste0(t,"/temp.zip"),exdir=t)
+unlink(paste0(t,"/temp.zip"))
 
 #load fishshapes data
 data(fishshapes)
-kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
-ant.per=.25,enorm=F,show.prog = F,retrain=2,
-train.dat = fishshapes,after.train="LDA",edges=F)
+
+
+kin <- kin.LDA(image.dir = paste0(t,"/example"),frames=1:20,thr=0.7,
+              ant.per=.25,enorm=F,show.prog = F,retrain=2,
+              train.dat = fishshapes,after.train="LDA",edges=F, 
+              out.dir=tempdir())
 ml <- kin$midline
  #x start at 0
-ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+ml <-ml[,x2:=x-x[1],by=frame]
 
 #compute instantaneous amplitude of tail (last/rightmost point) and wave crest x position  by frame
-ml2 <- ddply(ml,.(frame),summarize,amp.i=abs(last(wave.y)))
+ml2 <-ml[,.(amp.i=abs(last(wave.y))),by=frame]
 
 ml <- merge(ml,ml2,by="frame") #merge these
 
@@ -148,14 +156,17 @@ stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 print(p)
 
 
-#make a video of extracted midlines over original images
-images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
+### Make a video of processed frames
 
-#delete 'example', images','processed_images' folders
-unlink("processed_images",recursive = T)
-unlink("images",recursive = T)
-unlink("example",recursive = T)
+images.to.video2(image.dir=paste0(t,"/processed_images"),
+vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
+file.exists(paste0(t,"/trout_test_red.mp4"))
+
+#delete 'example','processed_images' folders
+unlink(paste0(t,"/processed_images"),recursive = T)
+unlink(paste0(t,"/example"),recursive = T)
 }
+
 }
 \seealso{
 \code{\link{kin.simple}}, \code{\link{kin.search}}, \code{\link{efourier}} \code{\link{LDA}}, \code{\link{fishshapes}}.

@@ -5,16 +5,18 @@
 \title{Stitches images into a video file}
 \usage{
 images.to.video(image.dir = NULL, vid.name = NULL, qual = 50,
-  frame.rate = 10, silent = TRUE)
+  frame.rate = 10, overwrite = FALSE, silent = TRUE)
 }
 \arguments{
 \item{image.dir}{Character; directory containing images to stitch.}
 
-\item{vid.name}{character; file name to be give video including extension.  mp4 currently works best.}
+\item{vid.name}{character; file name or path to be given video including extension.  mp4 currently works best.}
 
 \item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
 
 \item{frame.rate}{numeric; video frame rate in fps.}
+
+\item{overwrite}{logical; should path described by vid.name  be overwritten if it exhists.}
 
 \item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
 }

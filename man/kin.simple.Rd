@@ -6,8 +6,9 @@
 \usage{
 kin.simple(image.dir = NULL, frames = NULL, thr = 0.7,
   size.min = 0.05, ant.per = 0.2, tips = 0.02, smoothing = "loess",
-  smooth = 0.2, smooth.points = 200, save = TRUE, plot.pml = TRUE,
-  image.type = "orig", flip = TRUE, show.prog = FALSE)
+  smooth = 0.2, smooth.points = 200, save = TRUE, out.dir = NULL,
+  plot.pml = TRUE, image.type = "orig", flip = TRUE,
+  show.prog = FALSE)
 }
 \arguments{
 \item{image.dir}{character, directory containing images to analyze.}
@@ -29,6 +30,8 @@ kin.simple(image.dir = NULL, frames = NULL, thr = 0.7,
 \item{smooth.points}{numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.}
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.}
+
+\item{out.dir}{character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.}
 
 \item{plot.pml}{logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).}
 
@@ -78,7 +81,9 @@ A list with the following components:
 Automatically retrieves the midline of a detected ROI based on size. Assumes the ROI of interest is the largest detected and not intersecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body midline  overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefore establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  
+
+If 'save=TRUE', images are saved as binary or the original with a body midline  overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 
 Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 }
@@ -88,40 +93,44 @@ Thresholding operations can be performed with an arbitrary (user defined) numeri
 \dontrun{
 require(wesanderson)
 
-#download example avi video
-f <- "https://github.com/ckenaley/exampledata/blob/master/trout1_63_test.avi?raw=true"
-download.file(f,"trout1_63_test.avi")
+#download example images and place in 'example' subdirectory
+f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
+t <- tempdir()
+download.file(f, paste0(t,"/temp.zip"))
+unzip(paste0(t,"/temp.zip"),exdir=t)
+unlink(paste0(t,"/temp.zip"))
 
-#extract images and reduce them to 600 px wide with a filter
-filt.red <- " -vf scale=600:-1 " #filter
-vid.to.images2(vid.path="trout1_63_test.avi",filt = filt.red) #extract
-
-#number of frames
 fr <-1:50
 #extract midline and other data
-kin <- kin.simple(image.dir = "images",frames=fr,thr=0.6,ant.per = 0.2,show.prog=T)
+kin <- kin.simple(image.dir =paste0(t,"/example"),
+      smoothing = "loess",frames=fr,show.prog =F,thr = "otsu",
+      image.type="bin",smooth=0.4,out.dir=tempdir())
+
+### plot instantaneous amplitude of tail (last/rightmost point) over frames 
+p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
+print(p)
+
+### midline plot
 ml <- kin$midline
-#normalize x (y is normalized to midline by \\code{kin.simple})
-ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+#leftmost x starts at 0
+ml <- ml[,x2:=x-x[1],by=frame]
 
-#compute instantaneous amplitude of tail (last/rightmost points) and wave crest x position  by frame
-ml2 <- ddply(ml,.(frame),summarize,amp.i=abs(last(wave.y)))
-
-ml <- merge(ml,ml2,by="frame") #merge these
+ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
 
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",
-method = "loess", size = 1.5,alpha = 0.5)
+p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 print(p)
 
-#make a video of extracted midlines over original images
-images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
+### Make a video of processed frames
 
-#delete 'images' and 'processed_images' folders and avi file
-unlink("processed_images",recursive = T)
-unlink("images",recursive = T)
-unlink("trout1_63_test.avi",recursive = T)
+images.to.video2(image.dir=paste0(t,"/processed_images"),
+vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
+file.exists(paste0(t,"/trout_test_red.mp4"))
+
+#delete 'example','processed_images' folders
+unlink(paste0(t,"/processed_images"),recursive = T)
+unlink(paste0(t,"/example"),recursive = T)
 }
 
 }

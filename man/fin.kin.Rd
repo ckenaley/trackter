@@ -10,7 +10,7 @@ fin.kin(x, fin.pos = NULL, smooth.n = 50, tip.ang = 10,
 \arguments{
 \item{x}{a data frame or matrix with 'x' and 'y' data as columns.}
 
-\item{fin.pos}{numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the the length.}
+\item{fin.pos}{numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the body length.}
 
 \item{smooth.n}{numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'.}
 
@@ -59,7 +59,7 @@ A list with the following components:
 }
 }
 \description{
-Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produce from \link{kin.LDA}, \link{kin.simple}, \link{kin.search}. Also computes a smoothed midline based on the body outline with the fin region removed.
+Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  \link{kin.simple} and \link{kin.search}. Also computes a smoothed midline based on the body outline with the fin region removed.
 }
 \details{
 The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with \code{\link{coo_flipx}} and \code{\link{coo_flipy}} after converting contour to class \code{coo}.

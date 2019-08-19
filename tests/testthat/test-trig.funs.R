@@ -38,6 +38,13 @@ test_that("deg works fine", {
    
 })
 
+
+test_that("rad works fine", {
+   
+   expect_identical(rad(180),pi)
+   
+})
+
 test_that("bearing works fine", {
    
     A <- c(0,0)

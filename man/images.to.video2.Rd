@@ -4,14 +4,16 @@
 \alias{images.to.video2}
 \title{Stitches images from video file passing filters to ffmpeg}
 \usage{
-images.to.video2(image.dir = NULL, vid.name = NULL, qual = 50,
-  vid.ext = ".mp4", frame.rate = 10, raw = TRUE, filt = NULL,
-  silent = TRUE)
+images.to.video2(image.dir = NULL, vid.name = NULL, overwrite = T,
+  qual = 50, vid.ext = ".mp4", frame.rate = 10, raw = TRUE,
+  filt = NULL, silent = TRUE)
 }
 \arguments{
 \item{image.dir}{character; directory containing images to stitch.}
 
-\item{vid.name}{character; file name to be given video.}
+\item{vid.name}{character; file or path name to be given video (should not include file extension)}
+
+\item{overwrite}{logical; should path described by vid.name  be overwritten if it exhists.}
 
 \item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
 
@@ -38,7 +40,7 @@ Assumes images are appended with a numeric sequence beginning with "_".
 
 #make some spiralled images and video
 
-dir.create("images") #make a directory to store images
+dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 
 a <- 2
 b <- 3
@@ -47,13 +49,15 @@ r <- a + b*theta
 df <- data.frame(x=r*cos(theta), y=r*sin(theta)) # Cartesian coords
 every.i <- 30
 for(i in seq(1,length(theta),30)) {
-  jpeg(paste0(getwd(),"/images/image_",sprintf("\%03d",which(i==seq(1,length(theta),30))),".jpg"))
+  jpeg(paste0(tempdir(),"/images/image_",sprintf("\%03d",which(i==seq(1,length(theta),30))),".jpg"))
   with(df[1:i,],plot(x,y,xlim=range(df$x),ylim=range(df$y),col="red"))
   dev.off()
   }
 
-images.to.video2(image.dir=paste0(getwd(),"/images"),
-vid.name="spiral",frame.rate=5,qual=100,raw=FALSE)
+images.to.video2(image.dir=paste0(tempdir(),"/images"),
+vid.name=paste0(tempdir(),"/spiral"),frame.rate=5,qual=100,raw=FALSE)
+
+"spiral_red.mp4"\%in\% list.files(tempdir())
 
 }
 \seealso{
