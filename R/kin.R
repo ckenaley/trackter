@@ -972,8 +972,8 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' file.exists(paste0(t,"/trout_test_red.mp4"))
 #'
 #' #delete 'example','processed_images' folders
-#' unlink(paste0(t,"/processed_images"),recursive = T)
-#' unlink(paste0(t,"/example"),recursive = T)
+#' #unlink(paste0(t,"/processed_images"),recursive = T)
+#' #unlink(paste0(t,"/example"),recursive = T)
 #'}
 #'
 
