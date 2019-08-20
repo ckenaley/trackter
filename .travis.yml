@@ -1,16 +1,36 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-r:
-  - oldrel
-  - release
-  - bioc-release
-  
 cache: packages
-bioc_packages: EBImage
-os:
-  - osx
+latex: false
+pandoc: false
 
-before_install:
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
+matrix:
+  include:
+    - dist: trusty
+    - dist: xenial
+    - dist: xenial
+      addons:
+        apt:
+          update: true
+          packages: libavfilter-dev
+          sources:
+            - sourceline: 'ppa:cran/ffmpeg-4'
+            - sourceline: 'ppa:cran/ffmpeg-3'
+    - os: osx
+      brew_packages: ffmpeg
+    - os: osx
+      disable_homebrew: true
+    - os: osx
+      osx_image: xcode7.3
+      disable_homebrew: true
+      before_install: sed -i.bak 's/-isysroot /-I/g' $(R RHOME)/etc/Makeconf
+
+addons:
+  apt:
+    update: true
+    packages: libavdevice-dev
+    sources:
+      - sourceline: 'ppa:cran/ffmpeg-3'
+
+warnings_are_errors: true
