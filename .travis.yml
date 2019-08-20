@@ -4,7 +4,7 @@ language: r
 r:
   - oldrel
   - release
-  - bioc-devel
+  - bioc-release
   
 cache: packages
 bioc_packages: EBImage
