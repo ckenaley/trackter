@@ -5,6 +5,11 @@ cache: packages
 latex: false
 pandoc: false
 
+r:
+  - oldrel
+  - release
+  - bioc-release
+  
 matrix:
   include:
     - dist: trusty
