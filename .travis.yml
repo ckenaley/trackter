@@ -1,8 +1,6 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-cache: packages
-bioc_packages: EBImage
 latex: false
 pandoc: false
 
@@ -11,18 +9,11 @@ r:
   - release
   - bioc-release
   
+cache: packages
+bioc_packages: EBImage
+  
 matrix:
   include:
-    - dist: trusty
-    - dist: xenial
-    - dist: xenial
-      addons:
-        apt:
-          update: true
-          packages: libavfilter-dev
-          sources:
-            - sourceline: 'ppa:cran/ffmpeg-4'
-            - sourceline: 'ppa:cran/ffmpeg-3'
     - os: osx
       brew_packages: ffmpeg
     - os: osx
