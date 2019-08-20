@@ -2,6 +2,7 @@
 
 language: r
 cache: packages
+bioc_packages: EBImage
 latex: false
 pandoc: false
 
