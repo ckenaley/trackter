@@ -8,9 +8,12 @@ r:
   - oldrel
   - release
   - bioc-release
-  
+
 cache: packages
 bioc_packages: EBImage
+
+os:
+  - osx
   
 matrix:
   include:
