@@ -146,7 +146,7 @@
 #'
 #' kin <- kin.search(image.dir =paste0(t,"/example"),
 #'        search.for = "largest",
-#'       smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
+#'       smoothing = "loess",frames=1:50,show.prog = F,thr = "otsu",
 #'       image.type="bin",smooth=0.4,out.dir=tempdir())
 #'
 #' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
@@ -971,9 +971,9 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
 #' file.exists(paste0(t,"/trout_test_red.mp4"))
 #'
-#' #delete 'example','processed_images' folders
-#' #unlink(paste0(t,"/processed_images"),recursive = T)
-#' #unlink(paste0(t,"/example"),recursive = T)
+#' delete 'example','processed_images' folders
+#' unlink(paste0(t,"/processed_images"),recursive = T)
+#' unlink(paste0(t,"/example"),recursive = T)
 #'}
 #'
 
