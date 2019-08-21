@@ -12,6 +12,10 @@ bioc_packages: EBImage
 os:
   - osx
 
+env:
+  global:
+    - R_CHECK_ARGS="--no-build-vignettes --no-manual --timings"
+
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
