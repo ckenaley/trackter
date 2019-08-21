@@ -161,7 +161,7 @@ unlink(paste0(t,"/temp.zip"))
 
 kin <- kin.search(image.dir =paste0(t,"/example"),
        search.for = "largest",
-      smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",
+      smoothing = "loess",frames=1:50,show.prog = F,thr = "otsu",
       image.type="bin",smooth=0.4,out.dir=tempdir())
 
 ### plot instantaneous amplitude of tail (last/rightmost point) over frames 

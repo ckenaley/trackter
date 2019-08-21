@@ -128,9 +128,9 @@ images.to.video2(image.dir=paste0(t,"/processed_images"),
 vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
 file.exists(paste0(t,"/trout_test_red.mp4"))
 
-#delete 'example','processed_images' folders
-#unlink(paste0(t,"/processed_images"),recursive = T)
-#unlink(paste0(t,"/example"),recursive = T)
+delete 'example','processed_images' folders
+unlink(paste0(t,"/processed_images"),recursive = T)
+unlink(paste0(t,"/example"),recursive = T)
 }
 
 }
