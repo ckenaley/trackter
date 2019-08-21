@@ -46,110 +46,110 @@ kin.search(image.dir = NULL, frames = NULL, thr = "otsu",
 \item{edges}{logical, should ROIs on image edges be evaluated. See Details.}
 }
 \value{
-A list with the following components:
+A list with the following components:	
 
-\code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.
-\itemize{
-\item the frame number
+\code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.	
+\itemize{	
+\item the frame number	
 
-\item 'x' and ''y': the position of the tail (rightmost or posteriormost)
-\item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)
-\item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}
-\item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)
-\item 'roi': a character indicating the ROI ranked by size ('a' being the largest)
-\item 'edge': indicating whether ROI was on the edge of the image field
-\item 'size': size of the ROI in pixels^2
-\item 'offset.x': ROI distance from horizontal center
-\item 'offset.y': ROI distance from vertical center
-\item 'offset': linear distance of ROI's centroid to image center
-}
+\item 'x' and ''y': the position of the tail (rightmost or posteriormost)	
+\item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)	
+\item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}	
+\item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)	
+\item 'roi': a character indicating the ROI ranked by size ('a' being the largest)	
+\item 'edge': indicating whether ROI was on the edge of the image field	
+\item 'size': size of the ROI in pixels^2	
+\item 'offset.x': ROI distance from horizontal center	
+\item 'offset.y': ROI distance from vertical center	
+\item 'offset': linear distance of ROI's centroid to image center	
+}	
 
-\code{midline} A data table containing, for each frame described by \code{frames}, the following: 
-\itemize{
-\item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
-\item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-\item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-\item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
-\item 'roi': a character indicating ROI size ('a' being the largest)
-}
-
-\code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
-\itemize{
-\item 'frame': the frame
-\item 'x' and 'y': the x and y positions of the contours
-}
-
-\code{all.classes} A data table containing the following for all ROIs detected:
-\itemize{
-\item 'frame': the frame
-\item 'roi': the name of each ROI found in a frame.
-\item 'edge': indicating whether ROI was on the edge of the image field
-\item 'size': size of the ROI in pixels^2
-\item 'offset.x': ROI distance from horizontal center
-\item 'offset.y': ROI distance from vertical center
-\item 'offset': linear distance of ROI's centroid to image center
-}
-
+\code{midline} A data table containing, for each frame described by \code{frames}, the following: 	
+\itemize{	
+\item 'x' and 'y.m': x and y positions of the midline of the ROI	
+#' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation	
+\item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)	
+\item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)	
+\item 'wave.y': midline points 'y.pred' relative to 'mid.pred'	
+\item 'roi': a character indicating ROI size ('a' being the largest)	
+}	
+	
+\code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 	
+\itemize{	
+\item 'frame': the frame	
+\item 'x' and 'y': the x and y positions of the contours	
+}	
+	
+\code{all.classes} A data table containing the following for all ROIs detected:	
+\itemize{	
+\item 'frame': the frame	
+\item 'roi': the name of each ROI found in a frame.	
+\item 'edge': indicating whether ROI was on the edge of the image field	
+\item 'size': size of the ROI in pixels^2	
+\item 'offset.x': ROI distance from horizontal center	
+\item 'offset.y': ROI distance from vertical center	
+\item 'offset': linear distance of ROI's centroid to image center	
+}	
+	
 \code{dim} the x and y dimensions of the images analyzed
 
-A list with the following components:
+A list with the following components:	
 
-\code{kin.dat} a data frame consisting of frame-by-frame position parameters for the ROI indicated by \code{n.blob}:
-\itemize{
-\item the frame number
+\code{kin.dat} a data frame consisting of frame-by-frame position parameters for the ROI indicated by \code{n.blob}:	
+\itemize{	
+\item the frame number	
 
-\item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)
-\item 'x' and 'y': the position of the tail (rightmost or posteriormost)
-\item 'amp': the amplitude (\code{amp}) of the tail
-\item 'cent.x' and 'cent.y': centroid coordinate of ROI
-\item 'roi': a character indicating ROI size ('a' being the largest)
-\item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
+\item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)	
+\item 'x' and 'y': the position of the tail (rightmost or posteriormost)	
+\item 'amp': the amplitude (\code{amp}) of the tail	
+\item 'cent.x' and 'cent.y': centroid coordinate of ROI	
+\item 'roi': a character indicating ROI size ('a' being the largest)	
+\item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}	
 
-\code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{
-\item 'x' and 'y.m': x and y positions of the midline of the ROI
-\item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-\item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-\item 'wave.y': midline points 'y.pred' normalized to 'mid.pred'
-\item 'roi': a character indicating ROI size ('a' being the largest)
-\item 'cent.x': x centroid of ROI
-\item 'cent.y': y centroid of ROI
-\item 'offset.x': ROI distance from horizontal center
-\item 'offset.y': ROI distance from vertical center
-\item 'offset.total': sum of ROI offset.x and offset.y
-\item 'ar': aspect ration of the ROI
-\item 'size': size of ROI in pixels
-}
-
+\code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{	
+\item 'x' and 'y.m': x and y positions of the midline of the ROI	
+\item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)	
+\item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)	
+\item 'wave.y': midline points 'y.pred' normalized to 'mid.pred'	
+\item 'roi': a character indicating ROI size ('a' being the largest)	
+\item 'cent.x': x centroid of ROI	
+\item 'cent.y': y centroid of ROI	
+\item 'offset.x': ROI distance from horizontal center	
+\item 'offset.y': ROI distance from vertical center	
+\item 'offset.total': sum of ROI offset.x and offset.y	
+\item 'ar': aspect ration of the ROI	
+\item 'size': size of ROI in pixels	
+}	
+	
 \code{dim} the x and y dimensions of the images analyzed
 }
 \description{
 Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  
-By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  	
+By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.	
 
-Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
 
-\code{search.for} determines how ROIs are chosen: 
-\itemize{
-\item "offset", the ROI with a centroid that is the shortest linear distance to the center of the field
-\item "offset.x", the ROI with a centroid x position that is closest to the x position of the center of the field
-\item "offset.y", the ROI with a centroid y position that is closest to the y position of the center of the field
-\item "largest", the largest ROI. 
-}
-
-These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.
-
-\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.
-
+\code{search.for} determines how ROIs are chosen: 	
+\itemize{	
+\item "offset", the ROI with a centroid that is the shortest linear distance to the center of the field	
+\item "offset.x", the ROI with a centroid x position that is closest to the x position of the center of the field	
+\item "offset.y", the ROI with a centroid y position that is closest to the y position of the center of the field	
+\item "largest", the largest ROI. 	
+}	
+	
+These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.	
+	
+\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	
+	
 \code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.
 }
 \examples{
-#plot caudal amplitude and produce a classic midline waveform plot of swimming fish
-\dontrun{
-require(wesanderson)
+#plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+\dontrun{	
+require(wesanderson)	
 }
 
 }
