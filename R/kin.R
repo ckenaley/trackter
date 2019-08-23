@@ -159,9 +159,10 @@
 #'	
 #' ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these	
 #'	
-#' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette	
+#' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
+#' 
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)	
-#' p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)	
+#' p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)	
 #' print(p)	
 #' 	
 #' ### Make a video of processed frames	
@@ -506,7 +507,7 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
 #' file.exists(paste0(t,"/trout_test_red.mp4"))
 #'
-#' delete 'example','processed_images' folders
+#' #delete 'example','processed_images' folders
 #' unlink(paste0(t,"/processed_images"),recursive = T)
 #' unlink(paste0(t,"/example"),recursive = T)
 #'}
@@ -1248,6 +1249,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' #extract contours and other data
 #' kin <- kin.simple(image.dir = "images",frames=c(1:fr),thr=0.9,ant.per = 0.25)
 #' #fin amplitudes by frame with data.table
+#' fin.pos <- c(0.25,.5)
 #' fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos);
 #' list(amp=f$amp$amp,fin=f$amp$fin,amp.bl=f$amp$amp.bl)},by=list(frame)]
 #' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=fin))+geom_line()+theme_classic(15)

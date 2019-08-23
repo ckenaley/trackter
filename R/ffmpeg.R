@@ -19,12 +19,12 @@
 #'   animation::ani.pause()
 #'   }
 #' }
-#' animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+#' animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0.2)
 #'
-#' vid.to.images(vid.path="wave.mp4",qual=100)
+#' vid.to.images(vid.path=paste0(tempdir(),"/wave.mp4"),qual=100)
 #'
 #' #see the images in the "images" directory
-#' list.files( paste0(getwd(),"/","images"))
+#' list.files( paste0(tempdir(),"/images"))
 
 
 vid.to.images <- function(vid.path=NULL,qual=50)  {
@@ -74,7 +74,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #' @examples
 #'
 #' #make some images
-#' dir.create("images") #make a directory to store images
+#' dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 #'
 #' a <- 2
 #' b <- 3
@@ -83,13 +83,15 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #' df <- data.frame(x=r*cos(theta), y=r*sin(theta)) # Cartesian coords
 #' every.i <- 30
 #' for(i in seq(1,length(theta),30)) {
-#'   jpeg(paste0(getwd(),"/images/image_",sprintf("%03d",which(i==seq(1,length(theta),30))),".jpg"))
+#'   jpeg(paste0(tempdir(),"/images/image_",sprintf("%03d",which(i==seq(1,length(theta),30))),".jpg"))
 #'   with(df[1:i,],plot(x,y,xlim=range(df$x),ylim=range(df$y),col="red"))
 #'   dev.off()
 #'   }
 #'
-#'images.to.video(image.dir=paste0(getwd(),"/images"),
-#'vid.name="spiral",frame.rate=5,qual=100,silent=FALSE)
+#'images.to.video(image.dir=paste0(tempdir(),"/images"),
+#'vid.name=paste0(tempdir(),"/spiral.mp4"),frame.rate=5,qual=100,silent=FALSE)
+#'
+#'file.exists(paste0(tempdir(),"/spiral.mp4"))
 
 images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,overwrite=FALSE,silent=TRUE)  {
   
@@ -150,6 +152,7 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,o
 #' @seealso \code{\link{images.to.video}}
 #' @export
 #' @examples
+#' 
 #' #make a video with animation package
 #' fun <- function(){
 #' y <- sin(1:50)
@@ -159,16 +162,18 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,o
 #'   animation::ani.pause()
 #'   }
 #' }
-#' animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+#' animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0.2)
 #'
 #'#reduce the image images to 200 px wide maintaining aspect ratio
 #'#notice the spaces at the beginning/end of string
 #'filt.red <- " -vf scale=200:-1 "
 #'c <- " -c:v libx264 "
-#' vid.to.images2(vid.path="wave.mp4",filt=filt.red,codec=NULL)
+#' vid.to.images2(vid.path=paste0(tempdir(),"/wave.mp4"),filt=filt.red,codec=NULL)
 #'
 #' #see the images in the "images" directory
-#' list.files( paste0(getwd(),"/","images"))
+#' list.files( paste0(tempdir(),"/images"))
+#' 
+#' 
 
 vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
   
