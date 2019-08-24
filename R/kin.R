@@ -171,7 +171,6 @@
 #' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)	
 #' file.exists("trout_test_red.mp4")
 #'	
-#' #delete 'example','processed_images' folders	
 #'}
 #'
 
@@ -505,7 +504,6 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
 #' file.exists("trout_test_red.mp4")
 #'
-#' #delete 'example','processed_images' folders
 #'}
 #'
 
@@ -833,7 +831,6 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
 #' file.exists("trout_test_red.mp4")
 #'
-#' #delete 'example','processed_images' folders
 #' }
 #' 
 
@@ -1248,7 +1245,6 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=fin))+geom_line()+theme_classic(15)
 #'print(p)
 #'
-#'#delete 'images' and 'processed_images' folders
 #' 
 #' ## plot body and fin contours of frame 1
 #' cont <- data.frame(x=kin$cont[frame==2,list(x,y)]$x,y=kin$cont[frame==2,list(y)]$y)
