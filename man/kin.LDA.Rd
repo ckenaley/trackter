@@ -162,9 +162,6 @@ vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
 file.exists("trout_test_red.mp4")
 
 #delete 'example','processed_images' folders
-unlink("processed_images",recursive = T)
-unlink("example",recursive = T)
-unlink("trout_test_red.mp4")
 }
 
 }

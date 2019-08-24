@@ -172,9 +172,6 @@
 #' file.exists("trout_test_red.mp4")
 #'	
 #' #delete 'example','processed_images' folders	
-#' unlink("processed_images",recursive = T)	
-#' unlink("example",recursive = T)
-#' unlink("trout_test_red.mp4")
 #'}
 #'
 
@@ -509,9 +506,6 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' file.exists("trout_test_red.mp4")
 #'
 #' #delete 'example','processed_images' folders
-#' unlink("processed_images",recursive = T)
-#' unlink("example",recursive = T)
-#' unlink("trout_test_red.mp4")
 #'}
 #'
 
@@ -840,9 +834,6 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' file.exists("trout_test_red.mp4")
 #'
 #' #delete 'example','processed_images' folders
-#' unlink("processed_images",recursive = T)
-#' unlink("example",recursive = T)
-#' unlink("trout_test_red.mp4")
 #' }
 #' 
 
@@ -1258,8 +1249,6 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
 #'print(p)
 #'
 #'#delete 'images' and 'processed_images' folders
-#' unlink("processed_images",recursive = T)
-#' unlink("images",,recursive = T)
 #' 
 #' ## plot body and fin contours of frame 1
 #' cont <- data.frame(x=kin$cont[frame==2,list(x,y)]$x,y=kin$cont[frame==2,list(y)]$y)

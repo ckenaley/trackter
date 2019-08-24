@@ -95,8 +95,6 @@ p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=fin))+geom_line()+theme_classic(15
 print(p)
 
 #delete 'images' and 'processed_images' folders
-unlink("processed_images",recursive = T)
-unlink("images",,recursive = T)
 
 ## plot body and fin contours of frame 1
 cont <- data.frame(x=kin$cont[frame==2,list(x,y)]$x,y=kin$cont[frame==2,list(y)]$y)
