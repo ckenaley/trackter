@@ -149,19 +149,19 @@ These choices will be made on ROI sets that are not on the edge of the field if 
 \examples{
 #plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
 \dontrun{	
-#'	
+
 #download example images and place in 'example' subdirectory	
 f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"	
-t <- tempdir()	
-download.file(f, paste0(t,"/temp.zip"))	
-unzip(paste0(t,"/temp.zip"),exdir=t)	
-unlink(paste0(t,"/temp.zip"))	
+
+download.file(f, "temp.zip")	
+unzip("temp.zip")	
+unlink("temp.zip")	
 
 
-kin <- kin.search(image.dir =paste0(t,"/example"),	
+kin <- kin.search(image.dir ="example",	
        search.for = "largest",	
       smoothing = "loess",frames=1:50,show.prog = F,thr = "otsu",	
-      image.type="bin",smooth=0.4,out.dir=tempdir())	
+      image.type="bin",smooth=0.4)	
 
 ### plot instantaneous amplitude of tail (last/rightmost point) over frames 	
 p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
@@ -182,13 +182,14 @@ print(p)
 	
 ### Make a video of processed frames	
 
-images.to.video2(image.dir=paste0(t,"/processed_images"),	
-vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)	
-file.exists(paste0(t,"/trout_test_red.mp4"))	
+images.to.video2(image.dir="processed_images",	
+vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)	
+file.exists("trout_test_red.mp4")
 
 #delete 'example','processed_images' folders	
-unlink(paste0(t,"/processed_images"),recursive = T)	
-unlink(paste0(t,"/example"),recursive = T)
+unlink("processed_images",recursive = T)	
+unlink("example",recursive = T)
+unlink("trout_test_red.mp4")
 }
 
 }

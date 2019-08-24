@@ -1,71 +1,444 @@
-######### kin.search
+######### kin.search	
 
-#' @title  Midline tracking over image seqences
+#' @title  Midline tracking over image sequences	
 
-#' @description  Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+#' @description  Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.	
+#'	
+#' @param image.dir character, directory containing images to analyze.	
+#' @param frames numeric, vector indicating which images to process.	
+#' @param thr numeric or character ('otsu') threshold to determine binary image. See Details.	
+#' @param ant.per numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.	
+#' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position. 	
+#' @param plot.pml logical, value indicating if outputted images should include an overlay of the theoretical midline based on \code{ant.per}.	
+#' @param smoothing character, the midline smoothing method, either 'loess' or "spline".	
+#' @param smooth numeric; if \code{smoothing} is set to 'loess', smoothing parameter value for plotted midline.	
+#' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.	
+#' @param flip logical, indicating if binary should be flipped.	
+#' @param show.prog logical value indicating if outputted image should be displayed during analysis.	
+#' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.	
+#' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. 	
+#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.	
+#' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.	
+#' @param search.for character, the search parameter. See Details. 	
+#' @param edges logical, should ROIs on image edges be evaluated. See Details.	
+#' 	
+#' @export	
+#' 	
+#'	
+#' @details	
+#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  	
+#'By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.	
+#'	
+#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
+#'	
+#' \code{search.for} determines how ROIs are chosen: 	
+#' \itemize{	
+#' \item "offset", the ROI with a centroid that is the shortest linear distance to the center of the field	
+#' \item "offset.x", the ROI with a centroid x position that is closest to the x position of the center of the field	
+#' \item "offset.y", the ROI with a centroid y position that is closest to the y position of the center of the field	
+#' \item "largest", the largest ROI. 	
+#' }	
+#' 	
+#' These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.	
+#' 	
+#' \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	
+#' 	
+#'\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.	
+#'	
+#' @return A list with the following components:	
+#'	
+#' \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.	
+#' \itemize{	
+#' \item the frame number	
+#'	
+#' \item 'x' and ''y': the position of the tail (rightmost or posteriormost)	
+#' \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)	
+#' \item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}	
+#' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)	
+#'\item 'roi': a character indicating the ROI ranked by size ('a' being the largest)	
+#'\item 'edge': indicating whether ROI was on the edge of the image field	
+#'\item 'size': size of the ROI in pixels^2	
+#' \item 'offset.x': ROI distance from horizontal center	
+#' \item 'offset.y': ROI distance from vertical center	
+#' \item 'offset': linear distance of ROI's centroid to image center	
+#' }	
+#'	
+#' \code{midline} A data table containing, for each frame described by \code{frames}, the following: 	
+#' \itemize{	
+#' \item 'x' and 'y.m': x and y positions of the midline of the ROI	
+#' #' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation	
+#' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)	
+#' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)	
+#' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'	
+#' \item 'roi': a character indicating ROI size ('a' being the largest)	
+#' }	
+#' 	
+#' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 	
+#' \itemize{	
+#' \item 'frame': the frame	
+#' \item 'x' and 'y': the x and y positions of the contours	
+#' }	
+#' 	
+#' \code{all.classes} A data table containing the following for all ROIs detected:	
+#' \itemize{	
+#' \item 'frame': the frame	
+#' \item 'roi': the name of each ROI found in a frame.	
+#' \item 'edge': indicating whether ROI was on the edge of the image field	
+#' \item 'size': size of the ROI in pixels^2	
+#' \item 'offset.x': ROI distance from horizontal center	
+#' \item 'offset.y': ROI distance from vertical center	
+#' \item 'offset': linear distance of ROI's centroid to image center	
+#' }	
+#' 	
+#' \code{dim} the x and y dimensions of the images analyzed	
+#' 	
+#' 	
+#' @return A list with the following components:	
+#'	
+#' \code{kin.dat} a data frame consisting of frame-by-frame position parameters for the ROI indicated by \code{n.blob}:	
+#' \itemize{	
+#' \item the frame number	
+#'	
+#' \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)	
+#' \item 'x' and 'y': the position of the tail (rightmost or posteriormost)	
+#' \item 'amp': the amplitude (\code{amp}) of the tail	
+#' \item 'cent.x' and 'cent.y': centroid coordinate of ROI	
+#' \item 'roi': a character indicating ROI size ('a' being the largest)	
+#' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}	
+#'	
+#' \code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{	
+#' \item 'x' and 'y.m': x and y positions of the midline of the ROI	
+#' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)	
+#' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)	
+#' \item 'wave.y': midline points 'y.pred' normalized to 'mid.pred'	
+#' \item 'roi': a character indicating ROI size ('a' being the largest)	
+#' \item 'cent.x': x centroid of ROI	
+#' \item 'cent.y': y centroid of ROI	
+#' \item 'offset.x': ROI distance from horizontal center	
+#' \item 'offset.y': ROI distance from vertical center	
+#' \item 'offset.total': sum of ROI offset.x and offset.y	
+#' \item 'ar': aspect ration of the ROI	
+#' \item 'size': size of ROI in pixels	
+#' }	
+#' 	
+#' \code{dim} the x and y dimensions of the images analyzed	
+#' 	
+#' @export	
+#' 	
+#' @importFrom graphics lines	
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline	
+#' @importFrom utils head setTxtProgressBar tail txtProgressBar	
+#'	
+#' 	
+#' @seealso \code{\link{kin.simple}}	
+#' @examples	
+#' #plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+#' \dontrun{	
+#'	
+#' #download example images and place in 'example' subdirectory	
+#' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"	
+#' 
+#' download.file(f, "temp.zip")	
+#' unzip("temp.zip")	
+#' unlink("temp.zip")	
+#'	
+#'	
+#' kin <- kin.search(image.dir ="example",	
+#'        search.for = "largest",	
+#'       smoothing = "loess",frames=1:50,show.prog = F,thr = "otsu",	
+#'       image.type="bin",smooth=0.4)	
+#'	
+#' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 	
+#' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
+#' print(p)	
+#' 	
+#' ### midline plot	
+#' ml <- kin$midline	
+#' #leftmost x starts at 0	
+#' ml <- ml[,x2:=x-x[1],by=frame]	
+#'	
+#' ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these	
+#'	
+#' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
+#' 
+#' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)	
+#' p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)	
+#' print(p)	
+#' 	
+#' ### Make a video of processed frames	
+#'	
+#' images.to.video2(image.dir="processed_images",	
+#' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)	
+#' file.exists("trout_test_red.mp4")
+#'	
+#' #delete 'example','processed_images' folders	
+#' unlink("processed_images",recursive = T)	
+#' unlink("example",recursive = T)
+#' unlink("trout_test_red.mp4")
+#'}
+#'
+
+kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.2, smooth.points=200, image.type="orig",save=TRUE,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE){	
+
+size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE errors on R CMD check	
+
+if(save & is.null(out.dir)){	
+  unlink("processed_images",recursive = T)	
+  dir.create("processed_images")	
+  proc.dir <- "processed_images"	
+}else{	
+  if(save){	
+    proc.dir <- paste0(out.dir,"/processed_images")	
+    if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)	
+    dir.create(proc.dir)	
+  }	
+}	
+
+images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r	
+
+if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")	
+if(!is.null(frames)) images <- images[frames]	
+
+
+trial <- gsub("\\.[^.]*$", "", basename(images[1]))	
+
+kin.l <- list()	
+midline.l<- list()	
+classes.l <- list()	
+lms <- list()	
+conts <- list()	
+
+pb = txtProgressBar(min = 0, max = length(images), initial = 0,style=3)	
+
+roi.outs <- list() #store the rois for each image	
+
+for(im in images){	
+  
+  frame <- which(im==images)-1	
+  
+  img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"	
+  
+  img.dim <- dim(img)[1:2]	
+  
+  
+  # computes binary mask	
+  if(thr!="otsu" & !is.numeric(thr)) stop("'thr' must be set to 'otsu' or a numeric value=0-1")	
+  if(thr=="otsu"){EBImage::colorMode(img)=EBImage::Grayscale	
+  thr <- EBImage::otsu(img)[1]}	
+  
+  y = img >thr #contrast threshold	
+  
+  if(flip){#flip binary	
+    y[y==1] <- 5	
+    y[y==0] <- 1	
+    y[y==5] <- 0	
+  }	
+  z = EBImage::bwlabel(y)	
+  
+  rois <- tabulate(z)	
+  
+  pix <- dim(z[,,1])[1]*dim(z[,,1])[2]	
+  w <- dim(z[,,1])[1] #width of image	
+  h <- dim(z[,,1])[2] #height of image	
+  per <- rois/(w*h) #how big are rois compared to pixel field	
+  
+  c.roi <-  which(per>=size.min) #candidate rois, filtered by size of of pixel field	
+  
+  names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])	
+  
+  z.l <- list()	
+  out.l <- list()	
+  
+  for(r in c.roi){	
+    r.name <- as.character(names(c.roi)[c.roi==r])	
+    z.r <- z	
+    z.r[z!=r] <- 0	
+    z.r[z==r] <- 1	
+    z.m <- z.r[,,1]	
+    z.m[1,1] <- 0 #this gets a 1 when	
+    z.l[[r.name]] <- z.m	
+    
+    z.c <- EBImage::ocontour(z.m)	
+    
+    wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)	
+    
+    r.out <- Out(EBImage::ocontour(z.m))	
+    if(wall ) edge <- T	
+    if(!wall) edge <- F	
+    r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)	
+    out.l[[r.name]] <- r.out	
+    rois[c.roi[r.name]]	
+    
+  }	
+  
+  #don't combine if only one ROI	
+  if(length(out.l)==1){roi.out2 <- out.l[[1]]}else{roi.out2 <- Momocs::combine(out.l)}	
+  
+  #centroids	
+  cent <- coo_centpos(roi.out2) #centroids	
+  offset.x <- abs((img.dim[1]/2)-cent[,"x"])	
+  offset.y <- abs((img.dim[2]/2)-cent[,"y"])	
+  
+  offset <- apply(cent,1,function(x) dist.2d(x["x"],img.dim[1]/2,x["y"],img.dim[2]/2))	
+  
+  classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),edge=roi.out2$fac$edge,size=rois[c.roi],offset.x=offset.x,offset.y=offset.y,offset=offset)	
+  
+  classes.l[[paste0(frame)]] <- data.table(frame=frame,classes)	
+  
+  if(edges==F){ classes <- classes[edge==F]	
+  if(nrow(classes)==0) stop("no ROI found that is not on edge")	
+  }	
+  
+  if(search.for=="offset") {	
+    z.best <- z.l[[classes[which.min(offset),]$roi]] #best segment	
+    r.name <-classes[which.min(offset),]$roi	
+    best.class <- classes[which.min(offset),]	
+  }	
+  
+  if(search.for=="offset.x") {	
+    z.best <- z.l[[classes[which.min(offset.x),]$roi]] #best segment	
+    r.name <-classes[which.min(offset.x),]$roi	
+    best.class <- classes[which.min(offset.x),]	
+  }	
+  
+  if(search.for=="offset.y") {	
+    z.best <- z.l[[classes[which.min(offset.y),]$roi]] #best segment	
+    r.name <-classes[which.min(offset.y),]$roi	
+    best.class <- classes[which.min(offset.y),]	
+  }	
+  
+  if(search.for=="largest") {	
+    z.best <- z.l[[classes[which.max(size),]$roi]] #best segment	
+    r.name <-classes[which.max(size),]$roi	
+    best.class <- classes[which.max(size),]	
+  }	
+  
+  
+  if(show.prog) {	
+    suppressMessages( EBImage::display(z.best,method = "raster"))	
+  }	
+  
+  best.cont <- data.table(EBImage::ocontour(z.best)[[1]])	
+  colnames(best.cont) <- c("x","y")	
+  
+  conts[[paste0(frame)]] <- data.table(frame=frame,best.cont)	
+  
+  y.df <- best.cont[,list(y.min=min(y),y.max=max(y),y.m=mean(y)),by=list(x)]	
+  setkey(y.df,"x")	
+  
+  ends <- ceiling(nrow(y.df)*tips)	
+  tip.y <- mean(tail(y.df$y.m[!is.na(y.df$y.m)],ends))#tip is mean y.m of last 30 pixels	
+  tip.x <- mean(tail(y.df$x[!is.na(y.df$y.m)],ends))#tip is mean y.m of last 30 pixels	
+  
+  head.y <- mean(head(y.df$y.m[!is.na(y.df$y.m)],ends))#tip is mean y.m of first 30 pixels	
+  head.x <- mean(head(y.df$x[!is.na(y.df$y.m)],ends))#tip is mean y.m of first 30 pixels	
+  
+  #n midline points	
+  if(is.null(smooth.points)) smooth.points <- nrow(y.df)	
+  midline <- y.df[seq(1,nrow(y.df),length.out = smooth.points),] #two hundred points on midline	
+  
+  midline <- midline[complete.cases(midline)]	
+  midline <- data.table(frame,midline)	
+  
+  
+  ####which type of lines to be fitted, spline or loess	
+  if(!any(c("spline","loess")==smoothing)) stop("'smoothing' must = 'loess' or 'spline'")	
+  
+  if(smoothing=="loess")  ml.pred <- fitted(loess(midline$y.m~midline$x,span=smooth,degree=1))	
+  if(smoothing=="spline") ml.pred <- smooth.spline(x = midline$x,y=midline$y.m,spar=smooth)$y	
+  
+  midline[,y.pred:=ml.pred]#add smoothed predictions	
+  
+  #head section	
+  head.dat <- midline[1:(ant.per*smooth.points),]	
+  head.lm <- lm(y.pred~x,head.dat)	
+  
+  head.p <- summary(head.lm)$r.squared #how well does head lm fit	
+  
+  midline$mid.pred <- predict(head.lm,newdata=midline)#add lm prediction to midline df	
+  
+  midline <- midline[complete.cases(midline),]	
+  
+  midline[,wave.y:=y.pred-mid.pred] #wave y based on midline y and straight head.lm pred points	
+  
+  midline[,roi:=r.name]	
+  n.roi <- paste0(basename(im),"-",r)	
+  
+  kin.l[[paste(frame)]] <- data.table(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last(midline$wave.y),head.pval=head.p,best.class)	
+  midline.l[[paste(frame)]] <- midline	
+  
+  
+  if(save){	
+    
+    jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)	
+    if(image.type=="bin") suppressMessages( EBImage::display(z,method = "raster"))	
+    if(image.type=="orig") suppressMessages( EBImage:: display(img,method = "raster"))	
+    
+    
+    if(plot.pml) lines(predict(lm(mid.pred~x,midline)),x=midline$x,col="blue",lwd=4)	
+    with(midline,lines(y.pred~x,col="red",lwd=4))	
+    if(plot.pml) with(midline[1:ceiling(ant.per*smooth.points),],points(x,y.pred,col="green",pch=16,cex=0.75))	
+    
+    dev.off()	
+  }	
+  setTxtProgressBar(pb,which(images==im))	
+}	
+
+classes.dat <- do.call(rbind,classes.l)	
+kin.dat <- do.call(rbind,kin.l)	
+midline.dat <- data.table(do.call(rbind,midline.l))	
+cont.dat <- do.call(rbind,conts)	
+
+return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classes.dat,dim=img.dim))	
+}
+
+#### kin.simple
+
+#' @title  Simplified midline tracking over image sequences 
+
+#' @description  Automatically retrieves the midline of a detected ROI based on size. Assumes the ROI of interest is the largest detected and not intersecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
+#'
 #'
 #' @param image.dir character, directory containing images to analyze.
 #' @param frames numeric, vector indicating which images to process.
 #' @param thr numeric or character ('otsu') threshold to determine binary image. See Details.
-#' @param ant.per numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.
+#' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.05.
+#' @param ant.per numeric; left-most proportion of ROI that establishes the horizontal reference for the midline displacement.
 #' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position. 
-#' @param plot.pml logical, value indicating if outputted images should include an overlay of the theoretical amidline based on \code{ant.per}.
-#' @param smoothing character, the midline smoothing method, either 'loess' or "spline".
-#' @param smooth numeric; if \code{smoothing} is set to 'loess', smoothing parameter value for plotted midline.
+#' @param smoothing character, the midline smoothing method, either 'loess' or 'spline'.
+#' @param smooth numeric; if \code{smoothing} is set to 'loess', passed to 'span' parameter of \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' parameter of \code{\link{smooth.spline}}
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
-#' @param flip logical, indicating if binary should be flipped.
-#' @param show.prog logical value indicating if outputted image should be displayed during analysis.
-#' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.
-#' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. 
+#' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.
+#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.
+#' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
-#' @param search.for character, the search parameter. See Details. 
-#' @param edges logical, should ROIs on image edges be evaluated. See Details.
+#' @param flip logical, indicating if binary image should be flipped.
+#' @param show.prog logical, indicating if outputted image should be displayed during analysis.
 #' 
 #' @export
-#' 
 #'
 #' @details
-#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.
+#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefore establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  
 #'
-#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#'If 'save=TRUE', images are saved as binary or the original with a body midline  overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 #'
-#' \code{search.for} determines how ROIs are chosen: 
-#' \itemize{
-#' \item "offset", the ROI with a centroid that is the shortest linear distance to the center of the field
-#' \item "offset.x", the ROI with a centroid x position that is closest to the x position of the center of the field
-#' \item "offset.y", the ROI with a centroid y position that is closest to the y position of the center of the field
-#' \item "largest", the largest ROI. 
-#' }
-#' 
-#' These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.
-#' 
-#' \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therfore incomplete.
-#' 
-#'\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.
+#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 #'
 #' @return A list with the following components:
 #'
-#' \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.
+#' \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by LDA analysis.
 #' \itemize{
 #' \item the frame number
-#'
-#' \item 'x' and ''y': the position of the tail (rightmost or posteriormost)
+#' \item 'x' and 'y': the position of the tail (rightmost or posteriormost)
 #' \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)
-#' \item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}
-#' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)
-#'\item 'roi': a character indicating the ROI ranked by size ('a' being the largest)
-#'\item 'edge': indicating whether ROI was on the edge of the image field
-#'\item 'size': size of the ROI in pixels^2
-#' \item 'offset.x': ROI distance from horizontal center
-#' \item 'offset.y': ROI distance from vertical center
-#' \item 'offset': linear distance of ROI's centroid to image center
-#' }
+#' \item 'amp': the amplitude (\code{amp}) of the tail relative to the theoretical midline determined by the \code{lm()} predictions from \code{ant.per}
+#' \item 'roi': a character indicating the ROI ranked by size ('a' being the largest)
+#' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
 #'
-#' \code{midline} A data table containing, for each frame described by \code{frames}, the following: 
-#' \itemize{
+#' \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
 #' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
-#' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
+#' #' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
+#' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{ant.per} (green points in the outputted images/video if 'plot.pml=TRUE')
 #' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 #' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
 #' \item 'roi': a character indicating ROI size ('a' being the largest)
@@ -74,73 +447,44 @@
 #' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 #' \itemize{
 #' \item 'frame': the frame
-#' \item 'x' and 'y': the x and y positions of the countours
+#' \item 'x' and 'y': the x and y positions of the contours
 #' }
 #' 
-#' \code{all.classes} A data table containing the following for all ROIs detected:
+#' \code{all.classes} A data table containing the following for all ROIs detected:  
 #' \itemize{
 #' \item 'frame': the frame
 #' \item 'roi': the name of each ROI found in a frame.
-#' \item 'edge': indicating whether ROI was on the edge of the image field
-#' \item 'size': size of the ROI in pixels^2
-#' \item 'offset.x': ROI distance from horizontal center
-#' \item 'offset.y': ROI distance from vertical center
-#' \item 'offset': linear distance of ROI's centroid to image center
+#' \item 'size': the size of each ROI
 #' }
 #' 
 #' \code{dim} the x and y dimensions of the images analyzed
-#' 
-#' 
-#' @return A list with the following components:
-#'
-#' \code{kin.dat} a data frame consisting of frame-by-frame position parameters for the ROI indicated by \code{n.blob}:
-#' \itemize{
-#' \item the frame number
-#'
-#' \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)
-#' \item 'x' and 'y': the position of the tail (rightmost or posteriormost)
-#' \item 'amp': the amplitude (\code{amp}) of the tail
-#' \item 'cent.x' and 'cent.y': centroid coordinate of ROI
-#' \item 'roi': a character indicating ROI size ('a' being the largest)
-#' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
-#'
-#' \code{midline} A data frame containing, for each frame described by \code{frames}, the following: \itemize{
-#' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-#' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-#' \item 'wave.y': midline points 'y.pred' normalized to 'mid.pred'
-#' \item 'roi': a character indicating ROI size ('a' being the largest)
-#' \item 'cent.x': x centroid of ROI
-#' \item 'cent.y': y centroid of ROI
-#' \item 'offset.x': ROI distance from horizontal center
-#' \item 'offset.y': ROI distance from vertical center
-#' \item 'offset.total': sum of ROI offset.x and offset.y
-#' \item 'ar': aspect ration of the ROI
-#' \item 'size': size of ROI in pixels
-#' }
-#' 
-#' \code{dim} the x and y dimensions of the images analyzed
-#' 
+#' @seealso \code{\link{kin.search}}
 #' @export
 #' 
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
-#'
+#' @importFrom grDevices dev.off jpeg
+#' @importFrom EBImage bwlabel otsu
 #' 
-#' @seealso \code{\link{kin.simple}}
 #' @examples
-#' #plot caudal amplitude and produce a classic midline waveform plot of swimming fish
+#' # produce a classic midline waveform plot of swimming fish 
+#' # searching a image field with a two fish-like ROIs
 #' \dontrun{
 #' require(wesanderson)
 #'
 #' #download example images and place in 'example' subdirectory
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-#' download.file(f,"temp.zip")
+
+#' download.file(f, "temp.zip")
 #' unzip("temp.zip")
 #' unlink("temp.zip")
 #'
-#'kin <- kin.search(image.dir ="example",search.for = "largest",smoothing = "loess",frames=1:50,show.prog = T,thr = "otsu",image.type="bin",smooth=0.4)
+#' fr <-1:50
+#' #extract midline and other data
+#' kin <- kin.simple(image.dir ="example",
+#'       smoothing = "loess",frames=fr,show.prog =F,thr = "otsu",
+#'       image.type="bin",smooth=0.4)
 #'
 #' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
 #' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
@@ -149,7 +493,7 @@
 #' ### midline plot
 #' ml <- kin$midline
 #' #leftmost x starts at 0
-#' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+#' ml <- ml[,x2:=x-x[1],by=frame]
 #'
 #' ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
 #'
@@ -160,22 +504,33 @@
 #' 
 #' ### Make a video of processed frames
 #'
-#' images.to.video2(image.dir = "processed_images", vid.name = "trout_test", qual=50,frame.rate =10,silent=T)
+#' images.to.video2(image.dir="processed_images",
+#' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
+#' file.exists("trout_test_red.mp4")
 #'
-#' #delete 'example', images','processed_images' folders
+#' #delete 'example','processed_images' folders
 #' unlink("processed_images",recursive = T)
-#' unlink("images",recursive = T)
 #' unlink("example",recursive = T)
+#' unlink("trout_test_red.mp4")
 #'}
 #'
-kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.2, smooth.points=200, image.type="orig",save=TRUE,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE){
+
+kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.2,smooth.points=200,save=TRUE,out.dir=NULL,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
   
-  size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE errors on R CMD check
+  size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE erros or R CD check
   
-  if(save){unlink("processed_images",recursive = T)
+  if(save & is.null(out.dir)){
+    unlink("processed_images",recursive = T)
     dir.create("processed_images")
     proc.dir <- "processed_images"
+  }else{
+    if(save){
+      proc.dir <- paste0(out.dir,"/processed_images")
+      if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)
+      dir.create(proc.dir)
+    }
   }
+  
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
   
   if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")
@@ -189,11 +544,10 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
   classes.l <- list()
   lms <- list()
   conts <- list()
-  
   pb = txtProgressBar(min = 0, max = length(images), initial = 0,style=3)
   
-  roi.outs <- list() #store the rois for each image
   
+  roi.outs <- list() #store the rois for each image
   for(im in images){
     
     frame <- which(im==images)-1
@@ -201,7 +555,6 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
     img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"
     
     img.dim <- dim(img)[1:2]
-    
     
     # computes binary mask
     if(thr!="otsu" & !is.numeric(thr)) stop("'thr' must be set to 'otsu' or a numeric value=0-1")
@@ -215,7 +568,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
       y[y==0] <- 1
       y[y==5] <- 0
     }
-    z = bwlabel(y)
+    z = EBImage::bwlabel(y)
     
     rois <- tabulate(z)
     
@@ -240,11 +593,13 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
       z.m[1,1] <- 0 #this gets a 1 when
       z.l[[r.name]] <- z.m
       
-      z.c <- ocontour(z.m)
+      z.c <- EBImage::ocontour(z.m)
+  
       
       wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)
       
-      r.out <- Out(ocontour(z.m))
+      
+      r.out <- Out(EBImage::ocontour(z.m))
       if(wall ) edge <- T
       if(!wall) edge <- F
       r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
@@ -252,55 +607,24 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
       rois[c.roi[r.name]]
       
     }
-    
     #don't combine if only one ROI
     if(length(out.l)==1){roi.out2 <- out.l[[1]]}else{roi.out2 <- Momocs::combine(out.l)}
     
-    #centroids
-    cent <- coo_centpos(roi.out2) #centroids
-    offset.x <- abs((img.dim[1]/2)-cent[,"x"])
-    offset.y <- abs((img.dim[2]/2)-cent[,"y"])
     
-    offset <- apply(cent,1,function(x) dist.2d(x["x"],img.dim[1]/2,x["y"],img.dim[2]/2))
     
-    classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),edge=roi.out2$fac$edge,size=rois[c.roi],offset.x=offset.x,offset.y=offset.y,offset=offset)
+    classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),edge=roi.out2$fac$edge,size=rois[c.roi])
     
     classes.l[[paste0(frame)]] <- data.table(frame=frame,classes)
-    
-    if(edges==F){ classes <- classes[edge==F]
-    if(nrow(classes)==0) stop("no ROI found that is not on edge")
-    }
-    
-    if(search.for=="offset") {
-      z.best <- z.l[[classes[which.min(offset),]$roi]] #best segment
-      r.name <-classes[which.min(offset),]$roi
-      best.class <- classes[which.min(offset),]
-    }
-    
-    if(search.for=="offset.x") {
-      z.best <- z.l[[classes[which.min(offset.x),]$roi]] #best segment
-      r.name <-classes[which.min(offset.x),]$roi
-      best.class <- classes[which.min(offset.x),]
-    }
-    
-    if(search.for=="offset.y") {
-      z.best <- z.l[[classes[which.min(offset.y),]$roi]] #best segment
-      r.name <-classes[which.min(offset.y),]$roi
-      best.class <- classes[which.min(offset.y),]
-    }
-    
-    if(search.for=="largest") {
-      z.best <- z.l[[classes[which.max(size),]$roi]] #best segment
-      r.name <-classes[which.max(size),]$roi
-      best.class <- classes[which.max(size),]
-    }
+    z.best <- z.l[[classes[edge==F,][which.max(size)]$roi]]
+    r.name <-classes[edge==F,][which.max(size)]$roi
+    best.class <- classes[edge==F,][which.max(size)]
     
     
     if(show.prog) {
-      suppressMessages( EBImage::display(z.best,method = "raster"))
+      EBImage::display(z.best,method = "raster")
     }
     
-    best.cont <- data.table(ocontour(z.best)[[1]])
+    best.cont <- data.table(EBImage::ocontour(z.best)[[1]])
     colnames(best.cont) <- c("x","y")
     
     conts[[paste0(frame)]] <- data.table(frame=frame,best.cont)
@@ -353,8 +677,8 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
     if(save){
       
       jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
-      if(image.type=="bin") suppressMessages( EBImage::display(z,method = "raster"))
-      if(image.type=="orig") suppressMessages( EBImage:: display(img,method = "raster"))
+      if(image.type=="bin")EBImage::display(z,method = "raster")
+      if(image.type=="orig")EBImage:: display(img,method = "raster")
       
       
       if(plot.pml) lines(predict(lm(mid.pred~x,midline)),x=midline$x,col="blue",lwd=4)
@@ -378,22 +702,22 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 
 #' @title  Midline tracking over image sequences with ROI search using LDA
 
-#' @description  Experimental. Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentatio. Chose a fish-like ROI class detected through linear discrimate analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+#' @description  Experimental and untested (in the unit-testing sense). Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 #'
 #' @param image.dir character, directory containing images to analyze.
 #' @param frames numeric, vector indicating which images to process.
 #' @param thr numeric or character ('otsu') threshold to determine binary image. See Details.
 #' @param ant.per numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.
 #' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position. 
-#' @param edges logical, shoudd ROIs on image edges by evaluated. See Details.
+#' @param edges logical, should ROIs on image edges by evaluated. See Details.
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.05.
-#' @param enorm logical, should the EFA coeffecients from \code{efourier} operations be normalized or not. See \code{details} and \code{\link{efourier}}
+#' @param enorm logical, should the EFA coefficients from \code{efourier} operations be normalized or not. See \code{details} and \code{\link{efourier}}
 #' @param harms numeric, the number of harmonics to use. If missing, \code{Momocs} sets 'nh.b' to 12. Will produce messages.
 #'
 #'@param rescale logical, should all shapes in PCA be rescaled. Performs best as 'FALSE'.
 #'@param train.dat Classified \code{Out} and \code{Coo} outlines that are produced from \code{Momocs}. See Details. 
 #'@param retrain numeric, the number of frames on which to retrain the LDA data set. See details.
-#'@param after.train character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This peeds calculations considerably. If 'LDA', the default, LDA will continue usining the retraining classifications from frames $<=$ 'train'.
+#'@param after.train character, if set to 'size', LDA will be skipped after \code{retrain} and the ROI with a size closest to the ROI found by the LDA $>=$ will be chosen. This speeds calculations considerably. If 'LDA', the default, LDA will continue using the retraining classifications from frames $<=$ 'train'.
 #'
 #'@param ties character, how to chose ROI's in any one frame that appear fish-like. See details.
 #' @param smoothing character, the midline smoothing method, either 'loess' or 'spline'.
@@ -401,6 +725,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.
+#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save==FALSE'.
 #' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param flip logical, indicating if binary should be flipped.
@@ -408,19 +733,20 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' @export
 #'
 #' @details
-#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body mideline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
+#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  
+#'If 'save=TRUE', images are saved as binary or the original with a body midline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
 #'
-#' Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#' Thresholding operations can be performed with an arbitrary (user-defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 #'
-#'Before \code{train}, ROIs are chosen according to LDA of a PCA object constructed from \code{efourier} analysis. LDA is trained by a user define 'train.dat' when the frame $<=$ \code{retrain}. LDA will procede after \code{retrain} if \code{after.train}='LDA', but the LDA will be trained by the contours classified as 'fish' and 'not.fish' found during the chosen training period. 
+#'Before \code{train}, ROIs are chosen according to LDA of a PCA object constructed from \code{efourier} analysis. LDA is trained by a user define 'train.dat' when the frame $<=$ \code{retrain}. LDA will proceed after \code{retrain} if \code{after.train}='LDA', but the LDA will be trained by the contours classified as 'fish' and 'not.fish' found during the chosen training period. 
 #'
-#'\code{enorm} Normalization of EFA coefficents is often perilous, especially for symetrical shapes, a conditional met for undulating, bilaterally sysmetical organisms at least some of the time and perhaps for many of the frames included in any analysis. Thus, 'enorm' by default is set to 'FALSE'. 'enorm=TRUE' may produce odd ROI choices and should be used cautiously.
+#'\code{enorm} Normalization of EFA coefficients is often perilous, especially for symmetrical shapes, a conditional met for undulating, bilaterally symmetrical organisms at least some of the time and perhaps for many of the frames included in any analysis. Thus, 'enorm' by default is set to 'FALSE'. 'enorm=TRUE' may produce odd ROI choices and should be used cautiously.
 #'
-#'\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes. A user defined dataset or the \code{fishshapes} dataset in \code{trackter} must be used for training. \code{fishshapes} includes several arbitrary shapes (circrles, squares, U-shapes, etc.) as well as several fish shapes: sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle. A user-defined dataset must have shapes classified with factors identical to the \code{fishshapes} contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. 
+#'\code{train.dat} This should be a \code{Coo} and \code{Out} object produced by \code{efourier} analysis of predefined shapes. A user defined dataset or the \code{fishshapes} dataset in \code{trackter} must be used for training. \code{fishshapes} includes several arbitrary shapes (circles, squares, U-shapes, etc.) as well as several fish shapes: sunfish (genus Lepomis), eel (genus Anguilla), and trout (genus Onchorhynchus) swimming over one tail-beat cycle. A user-defined dataset must have shapes classified with factors identical to the \code{fishshapes} contours, that is by shape, type, and edge. Shape levels should indicate what type of shape is described by the contour (e.g., 'circle', 'L-shape', 'trout', 'eel', etc). The type levels must describe the shape as 'fish' or 'not.fish'. The edge levels must be 'FALSE'. 
 #'
-#'\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therfore incomplete.
-#'\code{retrain} After this value, the LDA analysis will use the ROIs determined as 'fish' and 'not.fish' in the frames $>=$ \code{retrain} to discrimate fish from non-fish shapes. This speeds up analysis considerably.
-#'\code{ties} Determiens how to chose ROIs if more than one fish-like ROI is found in any frame. 'fish' will result in chosing the ROI with shape types in which the best *and* second-best fish-like shape (according to posterior probabilities) match a fish-like shape in the trainin and/or retraining datasets.'post' will chose the best fish-like shape according the the highest posterior probability from LDA.
+#'\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.
+#'\code{retrain} After this value, the LDA analysis will use the ROIs determined as 'fish' and 'not.fish' in the frames $>=$ \code{retrain} to discriminate fish from non-fish shapes. This speeds up analysis considerably.
+#'\code{ties} Determines  how to chose ROIs if more than one fish-like ROI is found in any frame. 'fish' will result in choosing the ROI with shape types in which the best *and* second-best fish-like shape (according to posterior probabilities) match a fish-like shape in the training and/or retraining datasets.'post' will chose the best fish-like shape according the the highest posterior probability from LDA.
 #'
 #' @return A list with the following components:
 #'
@@ -436,7 +762,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #'
 #' \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
 #' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
+#' #' \item 'y.min' and 'y.max': min and max y positions ROI's contour used in y.m calculation
 #' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
 #' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
 #' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
@@ -446,7 +772,7 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
 #' \itemize{
 #' \item 'frame': the frame
-#' #' \item 'x' and 'y': the x and y positions of the countours
+#' #' \item 'x' and 'y': the x and y positions of the contours
 #' }
 #' 
 #' \code{all.classes} A data table containing the following for all ROIs detected: 
@@ -461,13 +787,15 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #' @seealso \code{\link{kin.simple}}, \code{\link{kin.search}}, \code{\link{efourier}} \code{\link{LDA}}, \code{\link{fishshapes}}.
 #' 
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #' @importFrom EBImage ocontour otsu bwlabel
+#' @importFrom zoo index
 #'
 #' 
 #' @examples
-#' #produce a classic midline waveform plot of swimming fish searching a image field with a two fish-like ROIs
+#' # produce a classic midline waveform plot of swimming 
+#' # fish searching a image field with a two fish-like ROIs
 #' \dontrun{
 #' require(wesanderson)
 #' require(ggplot2)
@@ -477,46 +805,63 @@ kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.
 #'
 #' #download example images and place in 'example' subdirectory
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-#' download.file(f,"temp.zip")
+#' download.file(f, "temp.zip")
 #' unzip("temp.zip")
 #' unlink("temp.zip")
-#' 
+#'
 #' #load fishshapes data
 #' data(fishshapes)
-#'kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,ant.per=.25,enorm=F,show.prog = F,retrain=2,train.dat = fishshapes,after.train="LDA",edges=F)
+#' 
+#' 
+#'kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
+#'               ant.per=.25,enorm=F,show.prog = F,retrain=2,
+#'               train.dat = fishshapes,after.train="LDA",edges=F, 
+#'               )
 #' ml <- kin$midline
 #'  #x start at 0
-#' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
+#' ml <-ml[,x2:=x-x[1],by=frame]
 #'
 #' #compute instantaneous amplitude of tail (last/rightmost point) and wave crest x position  by frame
-#' ml2 <- ddply(ml,.(frame),summarize,amp.i=abs(last(wave.y)))
+#' ml2 <-ml[,.(amp.i=abs(last(wave.y))),by=frame]
 #'
 #' ml <- merge(ml,ml2,by="frame") #merge these
 #'
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
 #' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
+#' p <- p+geom_line(aes(group=frame,color=amp.i),
+#' stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
 #' print(p)
 #'
 #'
-#' #make a video of extracted midlines over original images
-#' images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
-#' 
-#' #delete 'example', images','processed_images' folders
+#' ### Make a video of processed frames
+#'
+#' images.to.video2(image.dir="processed_images",
+#' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
+#' file.exists("trout_test_red.mp4")
+#'
+#' #delete 'example','processed_images' folders
 #' unlink("processed_images",recursive = T)
-#' unlink("images",recursive = T)
 #' unlink("example",recursive = T)
+#' unlink("trout_test_red.mp4")
 #' }
-kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edges=FALSE,train.dat=NULL,rescale=FALSE,harms=15,enorm=T,retrain=5,after.train="LDA",ties="fish",size.min=0.05,show.prog=FALSE,smoothing="loess",smooth=.3,smooth.points=200,save=T,image.type="orig",plot.pml=TRUE,flip=TRUE){
+#' 
+
+kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edges=FALSE,train.dat=NULL,rescale=FALSE,harms=15,enorm=T,retrain=5,after.train="LDA",ties="fish",size.min=0.05,show.prog=FALSE,smoothing="loess",smooth=.3,smooth.points=200,save=T,out.dir=NULL,image.type="orig",plot.pml=TRUE,flip=TRUE){
   
   type <- shape <- post <- type2 <- x <- y.pred <- wave.y <- mid.pred <- roi <- index <-  NULL#to avoid NSE errors in R CMD check
   
   if(is.null(train.dat)) stop("'train.dat' must be specified") ###load training data 
   
-  if(save){unlink("processed_images",recursive = T)
+  if(save & is.null(out.dir)){
+    unlink("processed_images",recursive = T)
     dir.create("processed_images")
-    
     proc.dir <- "processed_images"
+  }else{
+    if(save){
+      proc.dir <- paste0(out.dir,"/processed_images")
+      if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)
+      dir.create(proc.dir)
+    }
   }
   
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
@@ -554,7 +899,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
       y[y==0] <- 1
       y[y==5] <- 0
     }
-    z = bwlabel(y)
+    z = EBImage::bwlabel(y)
     rois <- tabulate(z)
     pix <- dim(z[,,1])[1]*dim(z[,,1])[2]
     w <- dim(z[,,1])[1] #width of image
@@ -817,303 +1162,14 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
   return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classes.dat,dim=img.dim))
 }
 
-#### kin.simple
-
-#' @title  Simplified midline tracking over image sequences 
-
-#' @description  Automatically retrieves the midline of a detected ROIbased on size. Assumes the ROI of interest is the largest detected and not interesecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
-#'
-#'
-#' @param image.dir character, directory containing images to analyze.
-#' @param frames numeric, vector indicating which images to process.
-#' @param thr numeric or character ('otsu') threshold to determine binary image. See Details.
-#' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.05.
-#' @param ant.per numeric; left-most proportion of ROI that establishes the horizontal reference for the midline displacement.
-#' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position. 
-#' @param smoothing character, the midline smoothing method, either 'loess' or 'spline'.
-#' @param smooth numeric; if \code{smoothing} is set to 'loess', passed to 'span' parameter of \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' parameter of \code{\link{smooth.spline}}
-#' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
-#' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.
-#' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
-#' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
-#' @param flip logical, indicating if binary image should be flipped.
-#' @param show.prog logical, indicating if outputted image should be displayed during analysis.
-#' 
-#' @export
-#'
-#' @details
-#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head.  If 'save=TRUE', images are saved as binary or the original with a body mideline overlay and, if chosen, with the theoretical midline (based on \code{ant.per}). 
-#'
-#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter choses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
-#'
-#' @return A list with the following components:
-#'
-#' \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by LDA analysis.
-#' \itemize{
-#' \item the frame number
-#' \item 'x' and 'y': the position of the tail (rightmost or posteriormost)
-#' \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)
-#' \item 'amp': the amplitude (\code{amp}) of the tail relative to the theoretical midline determined by the \code{lm()} predictions from \code{ant.per}
-#' \item 'roi': a character indicating the ROI ranked by size ('a' being the largest)
-#' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)}
-#'
-#' \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
-#' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' #' \item 'y.min' and 'y.max': min and max y positions ROI's countour used in y.m calculation
-#' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{ant.per} (green points in the outputted images/video if 'plot.pml=TRUE')
-#' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-#' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
-#' \item 'roi': a character indicating ROI size ('a' being the largest)
-#' }
-#' 
-#' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following: 
-#' \itemize{
-#' \item 'frame': the frame
-#' \item 'x' and 'y': the x and y positions of the countours
-#' }
-#' 
-#' \code{all.classes} A data table containing the following for all ROIs detected:  
-#' \itemize{
-#' \item 'frame': the frame
-#' \item 'roi': the name of each ROI found in a frame.
-#' \item 'size': the size of each ROI
-#' }
-#' 
-#' \code{dim} the x and y dimensions of the images analyzed
-#' @seealso \code{\link{kin.search}}
-#' @export
-#' 
-#' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
-#' @importFrom utils head setTxtProgressBar tail txtProgressBar
-#' @importFrom grDevices dev.off jpeg
-#' @importFrom EBImage bwlabel otsu
-#' 
-#' @examples
-#' #produce a classic midline waveform plot of swimming fish searching a image field with a two fish-like ROIs
-#' \dontrun{
-#' require(wesanderson)
-#'
-#' #download example avi video
-#' f <- "https://github.com/ckenaley/exampledata/blob/master/trout1_63_test.avi?raw=true"
-#' download.file(f,"trout1_63_test.avi")
-#' 
-#' #extract images and reduce them to 600 px wide with a filter
-#' filt.red <- " -vf scale=600:-1 " #filter
-#' vid.to.images2(vid.path="trout1_63_test.avi",filt = filt.red) #extract
-#' 
-#' #number of frames
-#' fr <-1:50
-#' #extract midline and other data
-#' kin <- kin.simple(image.dir = "images",frames=fr,thr=0.6,ant.per = 0.2,show.prog=T)
-#' ml <- kin$midline
-#' #normalize x (y is normalized to midline by \code{kin.simple})
-#' ml <- ddply(ml,.(frame),transform,x2=x-x[1])
-#'
-#' #compute instantaneous amplitude of tail (last/rightmost points) and wave crest x position  by frame
-#' ml2 <- ddply(ml,.(frame),summarize,amp.i=abs(last(wave.y)))
-#'
-#' ml <- merge(ml,ml2,by="frame") #merge these
-#'
-#' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
-#' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p <- p+geom_line(aes(group=frame,color=amp.i),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-#' print(p)
-#' 
-#' #make a video of extracted midlines over original images
-#' images.to.video2(image.dir = "processed_images",vid.name = "trout_test")
-#' 
-#' #delete 'images' and 'processed_images' folders and avi file
-#' unlink("processed_images",recursive = T)
-#' unlink("images",recursive = T)
-#' unlink("trout1_63_test.avi",recursive = T)
-#'}
-#'
-
-kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.2,smooth.points=200,save=TRUE,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
-  
-  size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE erros or R CD check
-  
-  if(save){unlink("processed_images",recursive = T)
-    dir.create("processed_images")
-    proc.dir <- "processed_images"
-  }
-  images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
-  
-  if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")
-  if(!is.null(frames)) images <- images[frames]
-  
-  
-  trial <- gsub("\\.[^.]*$", "", basename(images[1]))
-  
-  kin.l <- list()
-  midline.l<- list()
-  classes.l <- list()
-  lms <- list()
-  conts <- list()
-  pb = txtProgressBar(min = 0, max = length(images), initial = 0,style=3)
-  
-  
-  roi.outs <- list() #store the rois for each image
-  for(im in images){
-    
-    frame <- which(im==images)-1
-    
-    img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"
-    
-    img.dim <- dim(img)[1:2]
-    
-    # computes binary mask
-    if(thr!="otsu" & !is.numeric(thr)) stop("'thr' must be set to 'otsu' or a numeric value=0-1")
-    if(thr=="otsu"){EBImage::colorMode(img)=EBImage::Grayscale
-    thr <- EBImage::otsu(img)[1]}
-    
-    y = img >thr #contrast threshold
-    
-    if(flip){#flip binary
-      y[y==1] <- 5
-      y[y==0] <- 1
-      y[y==5] <- 0
-    }
-    z = bwlabel(y)
-    
-    rois <- tabulate(z)
-    
-    pix <- dim(z[,,1])[1]*dim(z[,,1])[2]
-    w <- dim(z[,,1])[1] #width of image
-    h <- dim(z[,,1])[2] #height of image
-    per <- rois/(w*h) #how big are rois compared to pixel field
-    
-    c.roi <-  which(per>=size.min) #candidate rois, filtered by size of of pixel field
-    
-    names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
-    
-    z.l <- list()
-    out.l <- list()
-    
-    for(r in c.roi){
-      r.name <- as.character(names(c.roi)[c.roi==r])
-      z.r <- z
-      z.r[z!=r] <- 0
-      z.r[z==r] <- 1
-      z.m <- z.r[,,1]
-      z.m[1,1] <- 0 #this gets a 1 when
-      z.l[[r.name]] <- z.m
-      
-      z.c <- ocontour(z.m)
-      
-      
-      wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)
-      
-      
-      r.out <- Out(ocontour(z.m))
-      if(wall ) edge <- T
-      if(!wall) edge <- F
-      r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
-      out.l[[r.name]] <- r.out
-      rois[c.roi[r.name]]
-      
-    }
-    #don't combine if only one ROI
-    if(length(out.l)==1){roi.out2 <- out.l[[1]]}else{roi.out2 <- Momocs::combine(out.l)}
-    
-    
-    
-    classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),edge=roi.out2$fac$edge,size=rois[c.roi])
-    
-    classes.l[[paste0(frame)]] <- data.table(frame=frame,classes)
-    z.best <- z.l[[classes[edge==F,][which.max(size)]$roi]]
-    r.name <-classes[edge==F,][which.max(size)]$roi
-    best.class <- classes[edge==F,][which.max(size)]
-    
-    
-    if(show.prog) {
-      EBImage::display(z.best,method = "raster")
-    }
-    
-    best.cont <- data.table(ocontour(z.best)[[1]])
-    colnames(best.cont) <- c("x","y")
-    
-    conts[[paste0(frame)]] <- data.table(frame=frame,best.cont)
-    
-    y.df <- best.cont[,list(y.min=min(y),y.max=max(y),y.m=mean(y)),by=list(x)]
-    setkey(y.df,"x")
-    
-    ends <- ceiling(nrow(y.df)*tips)
-    tip.y <- mean(tail(y.df$y.m[!is.na(y.df$y.m)],ends))#tip is mean y.m of last 30 pixels
-    tip.x <- mean(tail(y.df$x[!is.na(y.df$y.m)],ends))#tip is mean y.m of last 30 pixels
-    
-    head.y <- mean(head(y.df$y.m[!is.na(y.df$y.m)],ends))#tip is mean y.m of first 30 pixels
-    head.x <- mean(head(y.df$x[!is.na(y.df$y.m)],ends))#tip is mean y.m of first 30 pixels
-    
-    #n midline points
-    if(is.null(smooth.points)) smooth.points <- nrow(y.df)
-    midline <- y.df[seq(1,nrow(y.df),length.out = smooth.points),] #two hundred points on midline
-    
-    midline <- midline[complete.cases(midline)]
-    midline <- data.table(frame,midline)
-    
-    
-    ####which type of lines to be fitted, spline or loess
-    if(!any(c("spline","loess")==smoothing)) stop("'smoothing' must = 'loess' or 'spline'")
-    
-    if(smoothing=="loess")  ml.pred <- fitted(loess(midline$y.m~midline$x,span=smooth,degree=1))
-    if(smoothing=="spline") ml.pred <- smooth.spline(x = midline$x,y=midline$y.m,spar=smooth)$y
-    
-    midline[,y.pred:=ml.pred]#add smoothed predictions
-    
-    #head section
-    head.dat <- midline[1:(ant.per*smooth.points),]
-    head.lm <- lm(y.pred~x,head.dat)
-    
-    head.p <- summary(head.lm)$r.squared #how well does head lm fit
-    
-    midline$mid.pred <- predict(head.lm,newdata=midline)#add lm prediction to midline df
-    
-    midline <- midline[complete.cases(midline),]
-    
-    midline[,wave.y:=y.pred-mid.pred] #wave y based on midline y and straight head.lm pred points
-    
-    midline[,roi:=r.name]
-    n.roi <- paste0(basename(im),"-",r)
-    
-    kin.l[[paste(frame)]] <- data.table(frame,x=tip.x,y=tip.y,head.x,head.y,amp=last(midline$wave.y),head.pval=head.p,best.class)
-    midline.l[[paste(frame)]] <- midline
-    
-    
-    if(save){
-      
-      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
-      if(image.type=="bin")EBImage::display(z,method = "raster")
-      if(image.type=="orig")EBImage:: display(img,method = "raster")
-      
-      
-      if(plot.pml) lines(predict(lm(mid.pred~x,midline)),x=midline$x,col="blue",lwd=4)
-      with(midline,lines(y.pred~x,col="red",lwd=4))
-      if(plot.pml) with(midline[1:ceiling(ant.per*smooth.points),],points(x,y.pred,col="green",pch=16,cex=0.75))
-      
-      dev.off()
-    }
-    setTxtProgressBar(pb,which(images==im))
-  }
-  
-  classes.dat <- do.call(rbind,classes.l)
-  kin.dat <- do.call(rbind,kin.l)
-  midline.dat <- data.table(do.call(rbind,midline.l))
-  cont.dat <- do.call(rbind,conts)
-  
-  return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classes.dat,dim=img.dim))
-}
-
-
 ######### fin.kin
 
 #' @title Tracking of fin-like extensions of body contours 
 
-#' @description  Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produce from \link{kin.LDA}, \link{kin.simple}, \link{kin.search}. Also computes a smoothed midline based on the body outline with the fin region removed.
+#' @description  Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  \link{kin.simple} and \link{kin.search}. Also computes a smoothed midline based on the body outline with the fin region removed.
 #'
 #' @param x a data frame or matrix with 'x' and 'y' data as columns.
-#' @param fin.pos numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the the length. 
+#' @param fin.pos numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the body length. 
 #' @param smooth.n numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'.
 #' @param tip.ang the minimum angle, in degrees, that defines tip of each fin. See Details.
 #' @param x.bins numeric, when less than or equal to 1, the proportion of contour coordinates to sample for midline estimation. If greater than 1, the absolute number of equally spaced x values from which to compute the midline. See Details.
@@ -1122,17 +1178,17 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' 
 #' @export
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #'
 #' @details
 #'The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with \code{\link{coo_flipx}} and \code{\link{coo_flipy}} after converting contour to class \code{coo}.
 #'
-#'  \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficently smoothed fin contour, will have countour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} ($<$5) should be avoided if the contour is jagged, perhaps due to digitization.
+#'  \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} ($<$5) should be avoided if the contour is jagged, perhaps due to digitization.
 #'  
 #'In addition to fin amplitude and contour extraction, also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by \code{smoothing} and number of points indicated by \code{x.bins}. 
 #'  
-#'  \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculted from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
+#'  \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculated from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
 #'  
 #'
 #' @return A list with the following components:
@@ -1153,8 +1209,8 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' 
 #' \itemize{
 #' \item  x,y coordinates of the fin tips, start, and end within the range of \code{fin.pos}.
-#' \item 'ang': the angle formed by the coordinataes and their adjacent points.
-#' \item 'pos': descripiton of the coordinates' positions, 'start', 'end' or 'tip'.
+#' \item 'ang': the angle formed by the coordinates and their adjacent points.
+#' \item 'pos': description  of the coordinates' positions, 'start', 'end' or 'tip'.
 #' }
 #' 
 #' \code{comp} a data table describing the composite contour of the body minus the fins.
@@ -1174,7 +1230,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' @export
 #' 
 #' @importFrom graphics lines
-#' @importFrom stats complete.cases fitted lm loess na.omit predict smooth.spline
+#' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #'
 #' @examples
@@ -1195,6 +1251,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' #extract contours and other data
 #' kin <- kin.simple(image.dir = "images",frames=c(1:fr),thr=0.9,ant.per = 0.25)
 #' #fin amplitudes by frame with data.table
+#' fin.pos <- c(0.25,.5)
 #' fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos);
 #' list(amp=f$amp$amp,fin=f$amp$fin,amp.bl=f$amp$amp.bl)},by=list(frame)]
 #' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=fin))+geom_line()+theme_classic(15)

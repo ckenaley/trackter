@@ -1,33 +1,14 @@
 language: r
-latex: false
-pandoc: false
-
 r:
   - oldrel
   - release
-  - bioc-release
+  - bioc-devel
   
 cache: packages
 bioc_packages: EBImage
-
 os:
   - osx
-
-script:
-  - R CMD build . --compact-vignettes=gs+qpdf
-  - R CMD check *tar.gz --as-cran
-  
-addons:
-  apt:
-    update: true
-    packages:
-      - libgs-dev
-      - qpdf
-      - ghostscript
-  
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
-  
-  

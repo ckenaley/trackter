@@ -127,19 +127,18 @@ require(EBImage)
 
 #download example images and place in 'example' subdirectory
 f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-t <- tempdir()
-download.file(f, paste0(t,"/temp.zip"))
-unzip(paste0(t,"/temp.zip"),exdir=t)
-unlink(paste0(t,"/temp.zip"))
+download.file(f, "temp.zip")
+unzip("temp.zip")
+unlink("temp.zip")
 
 #load fishshapes data
 data(fishshapes)
 
 
-kin <- kin.LDA(image.dir = paste0(t,"/example"),frames=1:20,thr=0.7,
+kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
               ant.per=.25,enorm=F,show.prog = F,retrain=2,
               train.dat = fishshapes,after.train="LDA",edges=F, 
-              out.dir=tempdir())
+              )
 ml <- kin$midline
  #x start at 0
 ml <-ml[,x2:=x-x[1],by=frame]
@@ -158,13 +157,14 @@ print(p)
 
 ### Make a video of processed frames
 
-images.to.video2(image.dir=paste0(t,"/processed_images"),
-vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)
-file.exists(paste0(t,"/trout_test_red.mp4"))
+images.to.video2(image.dir="processed_images",
+vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
+file.exists("trout_test_red.mp4")
 
 #delete 'example','processed_images' folders
-unlink(paste0(t,"/processed_images"),recursive = T)
-unlink(paste0(t,"/example"),recursive = T)
+unlink("processed_images",recursive = T)
+unlink("example",recursive = T)
+unlink("trout_test_red.mp4")
 }
 
 }
