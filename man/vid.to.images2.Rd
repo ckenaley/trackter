@@ -26,6 +26,7 @@ Extract images from video file using ffmpegs flexible video filters and codecs
 Particularly useful for resizing images
 }
 \examples{
+
 #make a video with animation package
 fun <- function(){
 y <- sin(1:50)
@@ -35,16 +36,18 @@ for(i in 1:50) {
   animation::ani.pause()
   }
 }
-animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0.2)
 
 #reduce the image images to 200 px wide maintaining aspect ratio
 #notice the spaces at the beginning/end of string
 filt.red <- " -vf scale=200:-1 "
 c <- " -c:v libx264 "
-vid.to.images2(vid.path="wave.mp4",filt=filt.red,codec=NULL)
+vid.to.images2(vid.path=paste0(tempdir(),"/wave.mp4"),filt=filt.red,codec=NULL)
 
 #see the images in the "images" directory
-list.files( paste0(getwd(),"/","images"))
+list.files( paste0(tempdir(),"/images"))
+
+
 }
 \seealso{
 \code{\link{images.to.video}}

@@ -149,7 +149,46 @@ These choices will be made on ROI sets that are not on the edge of the field if 
 \examples{
 #plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
 \dontrun{	
-require(wesanderson)	
+#'	
+#download example images and place in 'example' subdirectory	
+f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"	
+t <- tempdir()	
+download.file(f, paste0(t,"/temp.zip"))	
+unzip(paste0(t,"/temp.zip"),exdir=t)	
+unlink(paste0(t,"/temp.zip"))	
+
+
+kin <- kin.search(image.dir =paste0(t,"/example"),	
+       search.for = "largest",	
+      smoothing = "loess",frames=1:50,show.prog = F,thr = "otsu",	
+      image.type="bin",smooth=0.4,out.dir=tempdir())	
+
+### plot instantaneous amplitude of tail (last/rightmost point) over frames 	
+p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
+print(p)	
+	
+### midline plot	
+ml <- kin$midline	
+#leftmost x starts at 0	
+ml <- ml[,x2:=x-x[1],by=frame]	
+
+ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these	
+
+pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
+
+p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)	
+p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)	
+print(p)	
+	
+### Make a video of processed frames	
+
+images.to.video2(image.dir=paste0(t,"/processed_images"),	
+vid.name=paste0(t,"/trout_test"),frame.rate=5,qual=100,raw=FALSE)	
+file.exists(paste0(t,"/trout_test_red.mp4"))	
+
+#delete 'example','processed_images' folders	
+unlink(paste0(t,"/processed_images"),recursive = T)	
+unlink(paste0(t,"/example"),recursive = T)
 }
 
 }

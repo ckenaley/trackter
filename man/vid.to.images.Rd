@@ -29,12 +29,12 @@ for(i in 1:50) {
   animation::ani.pause()
   }
 }
-animation::saveVideo(fun(),video.name="wave.mp4",interval = 0.2)
+animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0.2)
 
-vid.to.images(vid.path="wave.mp4",qual=100)
+vid.to.images(vid.path=paste0(tempdir(),"/wave.mp4"),qual=100)
 
 #see the images in the "images" directory
-list.files( paste0(getwd(),"/","images"))
+list.files( paste0(tempdir(),"/images"))
 }
 \seealso{
 \code{\link{images.to.video}}

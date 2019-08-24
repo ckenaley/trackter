@@ -32,7 +32,7 @@ Assumes images are appended with a numeric sequence.
 \examples{
 
 #make some images
-dir.create("images") #make a directory to store images
+dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 
 a <- 2
 b <- 3
@@ -41,13 +41,15 @@ r <- a + b*theta
 df <- data.frame(x=r*cos(theta), y=r*sin(theta)) # Cartesian coords
 every.i <- 30
 for(i in seq(1,length(theta),30)) {
-  jpeg(paste0(getwd(),"/images/image_",sprintf("\%03d",which(i==seq(1,length(theta),30))),".jpg"))
+  jpeg(paste0(tempdir(),"/images/image_",sprintf("\%03d",which(i==seq(1,length(theta),30))),".jpg"))
   with(df[1:i,],plot(x,y,xlim=range(df$x),ylim=range(df$y),col="red"))
   dev.off()
   }
 
-images.to.video(image.dir=paste0(getwd(),"/images"),
-vid.name="spiral",frame.rate=5,qual=100,silent=FALSE)
+images.to.video(image.dir=paste0(tempdir(),"/images"),
+vid.name=paste0(tempdir(),"/spiral.mp4"),frame.rate=5,qual=100,silent=FALSE)
+
+file.exists(paste0(tempdir(),"/spiral.mp4"))
 }
 \seealso{
 \code{\link{vid.to.images}}
