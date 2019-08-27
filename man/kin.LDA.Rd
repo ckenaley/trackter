@@ -6,11 +6,11 @@
 \usage{
 kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
   tips = 0.2, edges = FALSE, train.dat = NULL, rescale = FALSE,
-  harms = 15, enorm = T, retrain = 5, after.train = "LDA",
+  harms = 15, enorm = TRUE, retrain = 5, after.train = "LDA",
   ties = "fish", size.min = 0.05, show.prog = FALSE,
-  smoothing = "loess", smooth = 0.3, smooth.points = 200, save = T,
-  out.dir = NULL, image.type = "orig", plot.pml = TRUE,
-  flip = TRUE)
+  smoothing = "loess", smooth = 0.3, smooth.points = 200,
+  save = TRUE, out.dir = NULL, image.type = "orig",
+  plot.pml = TRUE, flip = TRUE)
 }
 \arguments{
 \item{image.dir}{character, directory containing images to analyze.}
@@ -136,8 +136,8 @@ data(fishshapes)
 
 
 kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
-              ant.per=.25,enorm=F,show.prog = F,retrain=2,
-              train.dat = fishshapes,after.train="LDA",edges=F, 
+              ant.per=.25,enorm=FALSE,show.prog = FALSE,retrain=2,
+              train.dat = fishshapes,after.train="LDA",edges=FALSE, 
               )
 ml <- kin$midline
  #x start at 0
@@ -161,7 +161,6 @@ images.to.video2(image.dir="processed_images",
 vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
 file.exists("trout_test_red.mp4")
 
-#delete 'example','processed_images' folders
 }
 
 }

@@ -31,7 +31,7 @@ kin.simple(image.dir = NULL, frames = NULL, thr = 0.7,
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.}
 
-\item{out.dir}{character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.}
+\item{out.dir}{character, the directory to which outputted images should be saved.}
 
 \item{plot.pml}{logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).}
 
@@ -88,48 +88,65 @@ If 'save=TRUE', images are saved as binary or the original with a body midline  
 Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 }
 \examples{
-# produce a classic midline waveform plot of swimming fish 
-# searching a image field with a two fish-like ROIs
-\dontrun{
-require(wesanderson)
+#### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+##A very long example.
+\dontrun{	
 
-#download example images and place in 'example' subdirectory
-f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-download.file(f, "temp.zip")
-unzip("temp.zip")
-unlink("temp.zip")
+#download example images and place in 'example' subdirectory	
+f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"	
 
-fr <-1:50
-#extract midline and other data
-kin <- kin.simple(image.dir ="example",
-      smoothing = "loess",frames=fr,show.prog =F,thr = "otsu",
-      image.type="bin",smooth=0.4)
+download.file(f, paste0(tempdir(),"/temp.zip"))
+unzip(paste0(tempdir(),"/temp.zip"), exdir=tempdir())	
+unlink(paste0(tempdir(),"/temp.zip"))	
 
-### plot instantaneous amplitude of tail (last/rightmost point) over frames 
-p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
-print(p)
+dir.create(paste0(tempdir(),"/processed_images"))
+kin <- kin.simple(image.dir =paste0(tempdir(),"/example"),	
+      smoothing = "loess",frames=1:50,
+      out.dir=paste0(tempdir(),"/processed_images"),
+      show.prog = FALSE,thr = "otsu",	
+      image.type="bin",smooth=0.4)	
 
-### midline plot
-ml <- kin$midline
-#leftmost x starts at 0
-ml <- ml[,x2:=x-x[1],by=frame]
+#plot instantaneous amplitude of tail (last/rightmost point) over frames 	
+p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
+print(p)	
+	
+# midline plot	
+ml <- kin$midline	
+#leftmost x starts at 0	
+ml <- ml[,x2:=x-x[1],by=frame]	
 
-ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
+ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these	
 
 pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
-p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-print(p)
 
-### Make a video of processed frames
+p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)	
+p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)	
+print(p)	
+	
+#Make a video of processed frames	
 
-images.to.video2(image.dir="processed_images",
-vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
-file.exists("trout_test_red.mp4")
+images.to.video2(image.dir=paste0(tempdir(),"/processed_images"),	
+vid.name="trout_test",out.dir=tempdir(),frame.rate=5,qual=100,raw=FALSE)	
+file.exists(paste0(tempdir(),"/trout_test_red.mp4"))
 
-#delete 'example','processed_images' folders
 }
 
+## A very short example.
+
+#retrieve image 
+i <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
+#create directory and write image to it
+t <-tempdir()
+dir.create(paste0(t,"/images"))
+EBImage::writeImage(i,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
+
+#run kin.search and save output image to directory
+kin.i<- kin.simple(image.dir = paste0(t,"/images"),save = TRUE,out.dir = t)
+
+#plot midline
+with(kin.i$midline,plot(x,wave.y))
+i2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
+EBImage::display(i2,method="raster")
 }
 \seealso{
 \code{\link{kin.search}}

@@ -3,6 +3,8 @@
 #' @description Uses ffmpeg systems calls to extract images from a video.
 #'
 #' @param vid.path Character; path of video file to be processed.
+#' @param out.dir character; directory path in which to store images.
+#' @param overwrite logical; should path described by 'out.dir' be overwritten if it exhists. 
 #' @param qual numeric; the quality of the jpeg images to be rendered from 1-100\%. Defaults to 50\%.
 #' @return Extracts all the images of the video and saves them to an "images" directory with appended number sequence
 #' @seealso \code{\link{images.to.video}}
@@ -10,6 +12,7 @@
 #' @examples
 #'
 #' #make a video with animation package
+#' \dontrun{
 #' require(animation)
 #' fun <- function(){
 #' y <- sin(1:50)
@@ -21,13 +24,17 @@
 #' }
 #' animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0.2)
 #'
-#' vid.to.images(vid.path=paste0(tempdir(),"/wave.mp4"),qual=100)
+#' #create directory in which to store images
+#' dir.create(paste0(tempdir(),"/images"))
+#' vid.to.images(vid.path=paste0(tempdir(),"/wave.mp4"),
+#' out.dir= paste0(tempdir(),"/images"),qual=100)
 #'
-#' #see the images in the "images" directory
+#' #see the images in the "images" subdirectory
 #' list.files( paste0(tempdir(),"/images"))
+#' }
 
 
-vid.to.images <- function(vid.path=NULL,qual=50)  {
+vid.to.images <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,qual=50)  {
   
   version <-  try(system("ffmpeg -version", intern = TRUE))
   if (inherits(version, "try-error")) {
@@ -39,21 +46,24 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
   qual <- round(30-30*(qual/100)+1,0)
 
   
-  image.dir <- gsub(basename(vid.path),"images",vid.path)
-  
-  #delete or create the image directory
- 
-  if(!file.exists(vid.path)) stop("'vid.path' invalid")
+  #delete or create the out directory
+  if(is.null(out.dir)) stop("'out.dir' not specified.")
+  if(is.null(vid.path)) stop("'vid.path' not specified.")
 
-  unlink(image.dir,recursive = T)
-  dir.create(image.dir)
+  if(file.exists(out.dir) & overwrite==TRUE) unlink(out.dir,recursive = T)
+  
+  if(!file.exists(out.dir)) stop("Directory specified by 'out.dir' (", paste0(out.dir),") does not exist")
+ 
+  if(!file.exists(vid.path)) stop("Path specified by 'vid.path' (", paste0(vid.path),") does not exist")
+  
   
   vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path)
   
-  image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir)
+  image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",out.dir)
   
   video.name<- gsub(".avi","",basename(vid.path))
   
+
   system(paste0("ffmpeg -i ", vid.path, " -q:v ",qual," ", image.dir,"/",video.name,"_%5d.jpg")) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
   
 }
@@ -61,8 +71,9 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #' @title Stitches images into a video file
 #' @description Stitches images into a video file of type indicated by "vid.ext"
 #'
-#' @param image.dir Character; directory containing images to stitch.
-#' @param vid.name character; file name or path to be given video including extension.  mp4 currently works best.
+#' @param image.dir character; directory containing images to stitch.
+#' @param out.dir character; directory in which to store video.
+#' @param vid.name character; file name given to video including extension.  mp4 currently works best.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
 #' @param frame.rate numeric; video frame rate in fps.
 #' @param overwrite logical; should path described by vid.name  be overwritten if it exhists. 
@@ -74,6 +85,7 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #' @examples
 #'
 #' #make some images
+#' \dontrun{
 #' dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 #'
 #' a <- 2
@@ -89,11 +101,13 @@ vid.to.images <- function(vid.path=NULL,qual=50)  {
 #'   }
 #'
 #'images.to.video(image.dir=paste0(tempdir(),"/images"),
-#'vid.name=paste0(tempdir(),"/spiral.mp4"),frame.rate=5,qual=100,silent=FALSE)
+#'vid.name="spiral.mp4",out.dir=tempdir(),
+#'frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
 #'
 #'file.exists(paste0(tempdir(),"/spiral.mp4"))
+#'}
 
-images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,overwrite=FALSE,silent=TRUE)  {
+images.to.video <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,overwrite=FALSE,silent=TRUE)  {
   
   version <-  try(system(paste("ffmpeg -version"), intern = TRUE))
   if (inherits(version, "try-error")) {
@@ -104,14 +118,17 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,o
   
   qual <- round(30-30*(qual/100)+1,0)
   
-  if(!dir.exists(image.dir)) {
-    stop("The directory \"", image.dir, "\" does not exist.")}
+  if(!dir.exists(image.dir)) stop("Directory specified by 'image.dir' (", paste0(image.dir),") does not exist")
+ 
+  if(is.null(out.dir)) stop("'out.dir' not specified.")
+
+  if(!file.exists(out.dir)) stop("Directory specified by 'out.dir' (", paste0(out.dir),") does not exist")
   
-  vid.path <- vid.name
-  if(dirname(vid.name)==".") vid.path <- paste0(getwd(),"/",vid.name)
-  #delete video if it exists
   
-  if(file.exists(vid.path) & overwrite==FALSE) stop("vid.name and its path exist. To save file of this name, 'overwrite' must be 'TRUE'")
+  vid.path <- paste0(out.dir,"/",vid.name)
+
+  
+  if(file.exists(vid.path) & overwrite==FALSE) stop("video with name 'vid.name'  exist in 'out.dir' directory. To save file of this name in this location, 'overwrite' must be 'TRUE'")
   
   if(file.exists(vid.path) & overwrite==TRUE) unlink(vid.path,recursive = T)
   
@@ -135,7 +152,9 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,o
   
   system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -vcodec mpeg4 ", vid.path),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
   
-  if(!file.exists(vid.name)) warning("ffmpeg failed to create video. Retry and inspect output of system call with 'silent=F'")
+  if(!file.exists(vid.path)) warning("ffmpeg failed to create video. Retry and inspect output of system call with 'silent=FALSE'")
+  
+  if(file.exists(vid.path)) message("successfully created video \'", paste0(vid.path),"\'")
   
 }
 
@@ -143,7 +162,9 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,o
 #' @title Extracts images from a video file with ffmpeg
 #' @description Extract images from video file using ffmpegs flexible video filters and codecs
 #'
-#' @param vid.path Character; path of video file to be processed.
+#' @param vid.path character; path of video file to be processed.
+#' @param out.dir character; directory path in which to store images.
+#' @param overwrite logical; should path described by 'out.dir' be overwritten if it exhists.
 #' @param filt character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}
 #' @param codec character; video codec to apply in ffmpeg operation
 #' @param silent logical; should output of \code{system} call for ffmpeg operation be suppressed.
@@ -154,6 +175,7 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,o
 #' @examples
 #' 
 #' #make a video with animation package
+#' \dontrun{
 #' fun <- function(){
 #' y <- sin(1:50)
 #' x <- 1:50
@@ -168,14 +190,15 @@ images.to.video <- function(image.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,o
 #'#notice the spaces at the beginning/end of string
 #'filt.red <- " -vf scale=200:-1 "
 #'c <- " -c:v libx264 "
-#' vid.to.images2(vid.path=paste0(tempdir(),"/wave.mp4"),filt=filt.red,codec=NULL)
+#'dir.create(paste0(tempdir(),"/images"))
+#' vid.to.images2(vid.path=paste0(tempdir(),"/wave.mp4"),
+#' out.dir=paste0(tempdir(),"/images"),filt=filt.red,codec=NULL)
 #'
 #' #see the images in the "images" directory
 #' list.files( paste0(tempdir(),"/images"))
-#' 
-#' 
+#' }
 
-vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
+vid.to.images2 <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,filt=NULL,codec=NULL,silent=TRUE)  {
   
   version <-  try(system("ffmpeg -version", intern = TRUE))
   if (inherits(version, "try-error")) {
@@ -184,20 +207,23 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
                    "http://ffmpeg.org/download.html"))
     return()}
   
-  if(!file.exists(vid.path)) stop("'vid.path' invalid")
   
-  image.dir <- gsub(basename(vid.path),"images",vid.path)
+
+  #delete or create the out directory
+  if(is.null(out.dir)) stop("'out.dir' not specified.")
+  if(is.null(vid.path)) stop("'vid.path' not specified.")
   
-  #delete or create the image directory
+  if(file.exists(out.dir) & overwrite==TRUE) unlink(out.dir,recursive = T)
   
-  unlink(image.dir,recursive = T)
-  dir.create(image.dir)
+  if(!file.exists(out.dir)) stop("Directory specified by 'out.dir' (", paste0(out.dir),") does not exist")
+  
+  if(!file.exists(vid.path)) stop("Path specified by 'vid.path' (", paste0(vid.path),") does not exist")
   
   #vid.path <- gsub("Google Drive","\"Google Drive\"",vid.path) ## remove spaces from dir if google drive
   vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path)
   
   #image.dir <- paste0(gsub("Google Drive","\"Google Drive\"",image.dir),"/") #degooglize path
-  image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",image.dir)
+  image.dir <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",out.dir)
   
   video.name<- gsub(".avi","",basename(vid.path))
   video.name <- gsub(".avi","_red",video.name)
@@ -216,7 +242,8 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #' @description Wrapper for ffmpeg video operations. Permits flexible filtering.
 #'
 #' @param image.dir character; directory containing images to stitch.
-#' @param vid.name character; file or path name to be given video (should not include file extension)
+#' @param vid.name character; file name to be given video (should not include file extension).
+#' @param out.dir character; directory in which to store video.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
 #' @param vid.ext character; video type to output. mp4 currently works best.
 #' @param overwrite logical; should path described by vid.name  be overwritten if it exhists. 
@@ -233,6 +260,7 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #'
 #' #make some spiralled images and video
 #'
+#'\dontrun{
 #' dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 #'
 #' a <- 2
@@ -247,14 +275,14 @@ vid.to.images2 <- function(vid.path=NULL,filt=NULL,codec=NULL,silent=TRUE)  {
 #'   dev.off()
 #'   }
 #'
-#' images.to.video2(image.dir=paste0(tempdir(),"/images"),
-#' vid.name=paste0(tempdir(),"/spiral"),frame.rate=5,qual=100,raw=FALSE)
-#' 
-#' "spiral_red.mp4"%in% list.files(tempdir())
+#'images.to.video2(image.dir=paste0(tempdir(),"/images"),
+#'vid.name="spiral",out.dir=tempdir(),
+#'frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
 #'
+#'file.exists(paste0(tempdir(),"/spiral.mp4"))
+#'}
 
-images.to.video2 <- function(image.dir=NULL,vid.name=NULL,overwrite=T,qual=50,vid.ext=".mp4",frame.rate=10,raw=TRUE,filt=NULL,silent=TRUE)  {
-
+images.to.video2 <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,overwrite=TRUE,qual=50,vid.ext=".mp4",frame.rate=10,raw=TRUE,filt=NULL,silent=TRUE)  {
     
   if(!raw)   vid.name <- paste0(vid.name,"_red")
   
@@ -267,34 +295,24 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,overwrite=T,qual=50,vi
   
   qual <- round(30-30*(qual/100)+1,0)
   
-  if(!dir.exists(image.dir)) {
-    stop("The directory \"", image.dir, "\" does not exist.")}
+  if(!dir.exists(image.dir)) stop("Directory specified by 'image.dir' (", paste0(image.dir),") does not exist")
   
-  vid.ext <- ".mp4"
-  if(raw) vid.ext <-".avi"
+  if(is.null(out.dir)) stop("'out.dir' not specified.")
   
-  vid.path <- paste0(getwd(),"/",vid.name)
+  if(!file.exists(out.dir)) stop("Directory specified by 'out.dir' (", paste0(out.dir),") does not exist")
   
-  if(!dir.exists(image.dir)) {
-    stop("The directory \"", image.dir, "\" does not exist.")}
+  if(raw) vid.ext <- ".avi" 
   
-  vid.path <- vid.name
-  if(dirname(vid.name)==".") vid.path <- paste0(getwd(),"/",vid.name)
-  #delete video if it exists
+  vid.path <- paste0(out.dir,"/",vid.name)
+  vid.path2 <- paste0(out.dir,"/",vid.name,vid.ext)
+
+  if(file.exists(vid.path2) & overwrite==FALSE) stop("video with name 'vid.name'  exist in 'out.dir' directory. To save file of this name in this location, 'overwrite' must be 'TRUE'")
   
-  if(file.exists(vid.path) & overwrite==FALSE) stop("vid.name and its path exist. To save file of this name, 'overwrite' must be 'TRUE'")
-  
-  if(file.exists(vid.path) & overwrite==TRUE) unlink(vid.path,recursive = T)
+  if(file.exists(vid.path2) & overwrite==TRUE) unlink(vid.path2,recursive = T)
 
   
-  
-  vid.path <- gsub("\\/(\\w+ \\w+)\\/","/\"\\1\"/",vid.path) #if vid.path has spaces
-  
-  
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp",ignore.case = T))
-  
-  #[here]
-  
+
   
   image.name <- gsub("(.+)\\_\\d*\\.\\w+$", "\\1", basename(images[1]))
   
@@ -310,6 +328,7 @@ images.to.video2 <- function(image.dir=NULL,vid.name=NULL,overwrite=T,qual=50,vi
   
   if(!raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f mp4", filt," -vcodec libx264 -pix_fmt yuv420p ", vid.path,vid.ext, " -y"),ignore.stderr = silent) #see https://trac.ffmpeg.org/wiki/Encode/MPEG-4
   
+ 
   if(raw) system(paste0("ffmpeg -i ", image.dir,"/", image.name,num.for," -q:v ",qual," -r ", frame.rate," -f avi -vcodec rawvideo ", vid.path,vid.ext, " -y"),ignore.stderr = silent)
   
   message(paste0("video saved to ", vid.path,vid.ext))

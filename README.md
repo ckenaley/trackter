@@ -33,8 +33,10 @@ under development.
 ## External dependencies
 
 The core functions of *trackter* that extract shape and contour data
-from images ( `kin.simple` and `kin.search`) depend upon *EBImage* It
-can be installed easily with just a few lines of code:
+from images ( `kin.simple` and `kin.search`) depend upon *EBImage*,
+available on the Bioconductor repository. The current build version of
+*trackter* installs this dependency. If it does not install,it can be
+done so easily with just a few lines of code:
 
 ``` r
   if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -43,9 +45,10 @@ can be installed easily with just a few lines of code:
 ```
 
 *trackter* also contains several functions for image and video
-processing. These functions depend on the popular `FFmpeg` package.
-Installation is platform-dependent. I found the [`FFmpeg` wiki
-installation and compilation guide to be quite
+processing. These functions depend on the popular `FFmpeg` package and
+it must be installed if the user intends to use them. Installation is
+platform-dependent. I found the [`FFmpeg` wiki installation and
+compilation guide to be quite
 useful](https://trac.ffmpeg.org/wiki/CompilationGuide).
 
 ## Features
@@ -70,26 +73,27 @@ useful](https://trac.ffmpeg.org/wiki/CompilationGuide).
   - Relevant functions: `images.to.videos`, `images.to.videos2`,
     `vid.to.images`, and `vid.to.images2`
 
-**Other miscellaneous tools for kinematic analysis**
+**Other miscellaneous, low-level tools for kinematic analysis**
 
   - Compute distances in 2d space, angles, heading/bearing, convert
-    radians to degrees.
-  - Relevant functions: `dist.2d`, `cosine.ang`, `bearing`, `deg`
+    radians to degrees and vice versa.
+  - Relevant functions: `dist.2d`, `cosine.ang`, `bearing.xy`, `deg`,
+    `rad`
 
 ## Examples
 
 ### Analyzing a single image
 
 *trackter* was developed to analyze image data from videos of swimming
-fish, although any object in an image field has potential for analysis.
-Here, we start by accessing an image of a swimming fish from
+fishes, although any object in an image field has potential for
+analysis. Here, we start by accessing an image of a swimming fish from
 *trackter*’s system data, reading it, writing it to a local
 subdirectory, and displaying
 it.
 
 ``` r
 y <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
-t <- "images"
+t <- paste0(tempdir(),"/images")
 dir.create(t)
 EBImage::writeImage(y,paste0(t,"/sunfish001.jpg"),type = "jpeg")
 EBImage::display(y,method="raster")
@@ -100,7 +104,7 @@ EBImage::display(y,method="raster")
 Here, `kin.simple` is used to extract contour and shape information.
 
 ``` r
-kin.y <- kin.simple(image.dir = t)
+kin.y <- kin.simple(image.dir = t,out.dir = tempdir())
 ```
 
 The `kin` functions in *trackter* return a list of data tables/data
@@ -170,7 +174,7 @@ When “save=TRUE” (the default), the `kin` functions write images to a
 
 ``` r
 
-y2 <- EBImage::readImage("processed_images/sunfish001_000.jpg")
+y2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
 EBImage::display(y2,method="raster")
 ```
 
@@ -179,9 +183,9 @@ EBImage::display(y2,method="raster")
 ``` r
 
 #clean up
-unlink("images",recursive = T)
+unlink(t,recursive = T)
 
-unlink("processed_images",recursive = T)
+unlink(paste0(tempdir(),"/sunfish001_000.jpg"))
 ```
 
 ### Analyzing a video and multiple images
@@ -193,23 +197,26 @@ suffix. One can use the `FFmpeg` wrappers `vid.to.images` or
 `vid.to.images2` to extract a numbered sequence from a video. Users may
 otherwise produce an image sequence from their videos using other
 software (e.g., ImageJ). Here, `vid.to.images` extracts images from a
-video of a swimming fish to a subdirectory names “images” and these are
+video of a swimming fish to a subdirectory named “images” and these are
 passed through `kin.simple`. The threshold value for segmenting is set
 to 0.6 and the head section (“ant.per”) set to 0.2 in this
 case.
 
 ``` r
   v <- system.file("extdata/vid", "sunfish_BCF_red.avi", package = "trackter")
-  file.copy(v,getwd())
-  print(file.exists(v))
-  vid.to.images(vid.path = "sunfish_BCF_red.avi")  
+  
+  file.copy(v,tempdir())
+  ti <- paste0(tempdir(),"/images")
+  tv <- paste0(tempdir(),"/sunfish_BCF_red.avi")
+  print(file.exists(tv))
+  dir.create(ti)
+  vid.to.images(tv,out.dir=ti)  
 
-  kin.y2 <- kin.simple(image.dir = "images",thr=0.6,ant.per = 0.2)
+  kin.y2 <- kin.simple(image.dir = ti,thr=0.6,ant.per = 0.2,save = FALSE)
   
   #cleanup
-  unlink("images",recursive = T)
-  unlink("processed_images",recursive=T)
-  unlink("sunfish_BCF_red.avi")
+  unlink(ti,recursive = T)
+  unlink(tv)
   
 ```
 

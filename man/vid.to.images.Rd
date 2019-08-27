@@ -4,10 +4,15 @@
 \alias{vid.to.images}
 \title{Extracts images from a video file with ffmpeg}
 \usage{
-vid.to.images(vid.path = NULL, qual = 50)
+vid.to.images(vid.path = NULL, out.dir = NULL, overwrite = FALSE,
+  qual = 50)
 }
 \arguments{
 \item{vid.path}{Character; path of video file to be processed.}
+
+\item{out.dir}{character; directory path in which to store images.}
+
+\item{overwrite}{logical; should path described by 'out.dir' be overwritten if it exhists.}
 
 \item{qual}{numeric; the quality of the jpeg images to be rendered from 1-100\%. Defaults to 50\%.}
 }
@@ -20,6 +25,7 @@ Uses ffmpeg systems calls to extract images from a video.
 \examples{
 
 #make a video with animation package
+\dontrun{
 require(animation)
 fun <- function(){
 y <- sin(1:50)
@@ -31,10 +37,14 @@ for(i in 1:50) {
 }
 animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0.2)
 
-vid.to.images(vid.path=paste0(tempdir(),"/wave.mp4"),qual=100)
+#create directory in which to store images
+dir.create(paste0(tempdir(),"/images"))
+vid.to.images(vid.path=paste0(tempdir(),"/wave.mp4"),
+out.dir= paste0(tempdir(),"/images"),qual=100)
 
-#see the images in the "images" directory
+#see the images in the "images" subdirectory
 list.files( paste0(tempdir(),"/images"))
+}
 }
 \seealso{
 \code{\link{images.to.video}}

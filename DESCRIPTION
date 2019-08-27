@@ -2,7 +2,7 @@ Package: trackter
 Title: Automated Kinematic Analysis of Image Data
 Version: 0.1.0
 Authors@R: person(given="Christopher", family="Kenaley", email = "cpkenaley@gmail.com", role = c("aut", "cre"))
-Description: This package is intended for analysis of the shape of a region of interest (ROI) in image sequences and extracting midline and other kinematic data. 
+Description: Analysis of shape and contours in regions of interest (ROIs) in image sequences and extracting midline and other kinematic data. 
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
@@ -28,3 +28,4 @@ Imports:
 RoxygenNote: 6.1.1
 Suggests: 
     testthat (>= 2.1.0)
+SystemRequirements: FFmpeg

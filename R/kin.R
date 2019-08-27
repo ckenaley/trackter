@@ -17,7 +17,7 @@
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.	
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.	
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. 	
-#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.	
+#' @param out.dir character, the directory to which ouputted images should be saved.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.	
 #' @param search.for character, the search parameter. See Details. 	
 #' @param edges logical, should ROIs on image edges be evaluated. See Details.	
@@ -26,8 +26,7 @@
 #' 	
 #'	
 #' @details	
-#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  	
-#'By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.	
+#'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.	
 #'	
 #'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
 #'	
@@ -92,7 +91,6 @@
 #' 	
 #' \code{dim} the x and y dimensions of the images analyzed	
 #' 	
-#' 	
 #' @return A list with the following components:	
 #'	
 #' \code{kin.dat} a data frame consisting of frame-by-frame position parameters for the ROI indicated by \code{n.blob}:	
@@ -132,27 +130,31 @@
 #' 	
 #' @seealso \code{\link{kin.simple}}	
 #' @examples	
-#' #plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+#' 
+#' #### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+#' ##A very long example.
 #' \dontrun{	
 #'	
 #' #download example images and place in 'example' subdirectory	
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"	
 #' 
-#' download.file(f, "temp.zip")	
-#' unzip("temp.zip")	
-#' unlink("temp.zip")	
+#' download.file(f, paste0(tempdir(),"/temp.zip"))
+#' unzip(paste0(tempdir(),"/temp.zip"), exdir=tempdir())	
+#' unlink(paste0(tempdir(),"/temp.zip"))	
 #'	
-#'	
-#' kin <- kin.search(image.dir ="example",	
+#' dir.create(paste0(tempdir(),"/processed_images"))
+#' kin <- kin.search(image.dir =paste0(tempdir(),"/example"),	
 #'        search.for = "largest",	
-#'       smoothing = "loess",frames=1:50,show.prog = F,thr = "otsu",	
+#'       smoothing = "loess",frames=1:50,
+#'       out.dir=paste0(tempdir(),"/processed_images"),
+#'       show.prog = FALSE,thr = "otsu",	
 #'       image.type="bin",smooth=0.4)	
 #'	
-#' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 	
+#' #plot instantaneous amplitude of tail (last/rightmost point) over frames 	
 #' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
 #' print(p)	
 #' 	
-#' ### midline plot	
+#' # midline plot	
 #' ml <- kin$midline	
 #' #leftmost x starts at 0	
 #' ml <- ml[,x2:=x-x[1],by=frame]	
@@ -165,36 +167,54 @@
 #' p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)	
 #' print(p)	
 #' 	
-#' ### Make a video of processed frames	
+#' #Make a video of processed frames	
 #'	
-#' images.to.video2(image.dir="processed_images",	
-#' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)	
-#' file.exists("trout_test_red.mp4")
+#' images.to.video2(image.dir=paste0(tempdir(),"/processed_images"),	
+#' vid.name="trout_test",out.dir=tempdir(),frame.rate=5,qual=100,raw=FALSE)	
+#' file.exists(paste0(tempdir(),"/trout_test_red.mp4"))
 #'	
 #'}
 #'
+#' ## A very short example.
+#' 
+#' #retrieve image 
+#' i <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
+#' #create directory and write image to it
+#' t <-tempdir()
+#' dir.create(paste0(t,"/images"))
+#' EBImage::writeImage(i,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
+#' 
+#' #run kin.search and save output image to directory
+#' kin.i<- kin.search(image.dir = paste0(t,"/images"),save = TRUE,out.dir = t)
+#' 
+#' #plot midline
+#' with(kin.i$midline,plot(x,wave.y))
+#' i2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
+#' EBImage::display(i2,method="raster")
 
 kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.2, smooth.points=200, image.type="orig",save=TRUE,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE){	
 
 size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE errors on R CMD check	
 
-if(save & is.null(out.dir)){	
-  unlink("processed_images",recursive = T)	
-  dir.create("processed_images")	
-  proc.dir <- "processed_images"	
-}else{	
-  if(save){	
-    proc.dir <- paste0(out.dir,"/processed_images")	
-    if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)	
-    dir.create(proc.dir)	
-  }	
-}	
+if(!file.exists(image.dir)) stop("Directory specified by 'image.dir' (", paste0(image.dir),") does not exist")	
+
+if(!save & !is.null(out.dir)) stop("'out.dir' specified but 'save=FALSE'. To save processed images, 'save' must be 'TRUE'")
+  
+  if(save){ 
+    if(is.null(out.dir)) stop("'out.dir' not specified")
+    if(!file.exists(out.dir)) stop("Directory specified by 'out.dir' (", paste0(out.dir),") does not exist")	
+  
+  }
+
+proc.dir <- out.dir
+
 
 images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r	
 
 if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")	
 if(!is.null(frames)) images <- images[frames]	
 
+if(!search.for %in% c("offset.x","offset.y","largest","offset")) stop("'search.for' must be set to 'offset', 'offset.x','offset.y', or 'largest')")	
 
 trial <- gsub("\\.[^.]*$", "", basename(images[1]))	
 
@@ -212,7 +232,7 @@ for(im in images){
   
   frame <- which(im==images)-1	
   
-  img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"	
+  img <- EBImage::readImage(im,all=FALSE) #if don't add package, others use "display"	
   
   img.dim <- dim(img)[1:2]	
   
@@ -240,7 +260,7 @@ for(im in images){
   
   c.roi <-  which(per>=size.min) #candidate rois, filtered by size of of pixel field	
   
-  names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])	
+  names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = TRUE)])	
   
   z.l <- list()	
   out.l <- list()	
@@ -259,8 +279,8 @@ for(im in images){
     wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)	
     
     r.out <- Out(EBImage::ocontour(z.m))	
-    if(wall ) edge <- T	
-    if(!wall) edge <- F	
+    if(wall ) edge <- TRUE	
+    if(!wall) edge <- FALSE	
     r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)	
     out.l[[r.name]] <- r.out	
     rois[c.roi[r.name]]	
@@ -281,7 +301,7 @@ for(im in images){
   
   classes.l[[paste0(frame)]] <- data.table(frame=frame,classes)	
   
-  if(edges==F){ classes <- classes[edge==F]	
+  if(edges==FALSE){ classes <- classes[edge==FALSE]	
   if(nrow(classes)==0) stop("no ROI found that is not on edge")	
   }	
   
@@ -405,7 +425,7 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' @param smooth numeric; if \code{smoothing} is set to 'loess', passed to 'span' parameter of \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' parameter of \code{\link{smooth.spline}}
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.
-#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.
+#' @param out.dir character, the directory to which outputted images should be saved. 
 #' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
 #' @param flip logical, indicating if binary image should be flipped.
@@ -464,64 +484,81 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' @importFrom EBImage bwlabel otsu
 #' 
 #' @examples
-#' # produce a classic midline waveform plot of swimming fish 
-#' # searching a image field with a two fish-like ROIs
-#' \dontrun{
-#' require(wesanderson)
-#'
-#' #download example images and place in 'example' subdirectory
-#' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"
-
-#' download.file(f, "temp.zip")
-#' unzip("temp.zip")
-#' unlink("temp.zip")
-#'
-#' fr <-1:50
-#' #extract midline and other data
-#' kin <- kin.simple(image.dir ="example",
-#'       smoothing = "loess",frames=fr,show.prog =F,thr = "otsu",
-#'       image.type="bin",smooth=0.4)
-#'
-#' ### plot instantaneous amplitude of tail (last/rightmost point) over frames 
-#' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
-#' print(p)
+#' #### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+#' ##A very long example.
+#' \dontrun{	
+#'	
+#' #download example images and place in 'example' subdirectory	
+#' f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"	
 #' 
-#' ### midline plot
-#' ml <- kin$midline
-#' #leftmost x starts at 0
-#' ml <- ml[,x2:=x-x[1],by=frame]
-#'
-#' ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
-#'
+#' download.file(f, paste0(tempdir(),"/temp.zip"))
+#' unzip(paste0(tempdir(),"/temp.zip"), exdir=tempdir())	
+#' unlink(paste0(tempdir(),"/temp.zip"))	
+#'	
+#' dir.create(paste0(tempdir(),"/processed_images"))
+#' kin <- kin.simple(image.dir =paste0(tempdir(),"/example"),	
+#'       smoothing = "loess",frames=1:50,
+#'       out.dir=paste0(tempdir(),"/processed_images"),
+#'       show.prog = FALSE,thr = "otsu",	
+#'       image.type="bin",smooth=0.4)	
+#'	
+#' #plot instantaneous amplitude of tail (last/rightmost point) over frames 	
+#' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
+#' print(p)	
+#' 	
+#' # midline plot	
+#' ml <- kin$midline	
+#' #leftmost x starts at 0	
+#' ml <- ml[,x2:=x-x[1],by=frame]	
+#'	
+#' ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these	
+#'	
 #' pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
-#' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
-#' p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5,alpha = 0.5)
-#' print(p)
 #' 
-#' ### Make a video of processed frames
-#'
-#' images.to.video2(image.dir="processed_images",
-#' vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)
-#' file.exists("trout_test_red.mp4")
-#'
+#' p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)	
+#' p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)	
+#' print(p)	
+#' 	
+#' #Make a video of processed frames	
+#'	
+#' images.to.video2(image.dir=paste0(tempdir(),"/processed_images"),	
+#' vid.name="trout_test",out.dir=tempdir(),frame.rate=5,qual=100,raw=FALSE)	
+#' file.exists(paste0(tempdir(),"/trout_test_red.mp4"))
+#'	
 #'}
 #'
+#' ## A very short example.
+#' 
+#' #retrieve image 
+#' i <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
+#' #create directory and write image to it
+#' t <-tempdir()
+#' dir.create(paste0(t,"/images"))
+#' EBImage::writeImage(i,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
+#' 
+#' #run kin.search and save output image to directory
+#' kin.i<- kin.simple(image.dir = paste0(t,"/images"),save = TRUE,out.dir = t)
+#' 
+#' #plot midline
+#' with(kin.i$midline,plot(x,wave.y))
+#' i2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
+#' EBImage::display(i2,method="raster")
 
 kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.2,smooth.points=200,save=TRUE,out.dir=NULL,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
   
   size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE erros or R CD check
   
-  if(save & is.null(out.dir)){
-    unlink("processed_images",recursive = T)
-    dir.create("processed_images")
-    proc.dir <- "processed_images"
-  }else{
-    if(save){
-      proc.dir <- paste0(out.dir,"/processed_images")
-      if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)
-      dir.create(proc.dir)
-    }
+  if(!file.exists(image.dir)) stop("Directory specified by 'image.dir' (", paste0(image.dir),") does not exist")	
+  
+  if(!save & !is.null(out.dir)) stop("'out.dir' specified but 'save=FALSE'. To save processed images, 'save' must be 'TRUE'")
+  
+  if(save){ 
+    if(is.null(out.dir)) stop("'out.dir' not specified")
+    if(!file.exists(out.dir)) stop("Directory specified by 'out.dir' (", paste0(out.dir),") does not exist")	
+    
   }
+  
+  proc.dir <- out.dir
   
   images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
   
@@ -544,7 +581,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
     
     frame <- which(im==images)-1
     
-    img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"
+    img <- EBImage::readImage(im,all=FALSE) #if don't add package, others use "display"
     
     img.dim <- dim(img)[1:2]
     
@@ -571,7 +608,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
     
     c.roi <-  which(per>=size.min) #candidate rois, filtered by size of of pixel field
     
-    names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
+    names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = TRUE)])
     
     z.l <- list()
     out.l <- list()
@@ -592,8 +629,8 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
       
       
       r.out <- Out(EBImage::ocontour(z.m))
-      if(wall ) edge <- T
-      if(!wall) edge <- F
+      if(wall ) edge <- TRUE
+      if(!wall) edge <- FALSE
       r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
       out.l[[r.name]] <- r.out
       rois[c.roi[r.name]]
@@ -607,9 +644,9 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
     classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),edge=roi.out2$fac$edge,size=rois[c.roi])
     
     classes.l[[paste0(frame)]] <- data.table(frame=frame,classes)
-    z.best <- z.l[[classes[edge==F,][which.max(size)]$roi]]
-    r.name <-classes[edge==F,][which.max(size)]$roi
-    best.class <- classes[edge==F,][which.max(size)]
+    z.best <- z.l[[classes[edge==FALSE,][which.max(size)]$roi]]
+    r.name <-classes[edge==FALSE,][which.max(size)]$roi
+    best.class <- classes[edge==FALSE,][which.max(size)]
     
     
     if(show.prog) {
@@ -806,8 +843,8 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' 
 #' 
 #'kin <- kin.LDA(image.dir = "example",frames=1:20,thr=0.7,
-#'               ant.per=.25,enorm=F,show.prog = F,retrain=2,
-#'               train.dat = fishshapes,after.train="LDA",edges=F, 
+#'               ant.per=.25,enorm=FALSE,show.prog = FALSE,retrain=2,
+#'               train.dat = fishshapes,after.train="LDA",edges=FALSE, 
 #'               )
 #' ml <- kin$midline
 #'  #x start at 0
@@ -834,20 +871,20 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' }
 #' 
 
-kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edges=FALSE,train.dat=NULL,rescale=FALSE,harms=15,enorm=T,retrain=5,after.train="LDA",ties="fish",size.min=0.05,show.prog=FALSE,smoothing="loess",smooth=.3,smooth.points=200,save=T,out.dir=NULL,image.type="orig",plot.pml=TRUE,flip=TRUE){
+kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edges=FALSE,train.dat=NULL,rescale=FALSE,harms=15,enorm=TRUE,retrain=5,after.train="LDA",ties="fish",size.min=0.05,show.prog=FALSE,smoothing="loess",smooth=.3,smooth.points=200,save=TRUE,out.dir=NULL,image.type="orig",plot.pml=TRUE,flip=TRUE){
   
   type <- shape <- post <- type2 <- x <- y.pred <- wave.y <- mid.pred <- roi <- index <-  NULL#to avoid NSE errors in R CMD check
   
   if(is.null(train.dat)) stop("'train.dat' must be specified") ###load training data 
   
   if(save & is.null(out.dir)){
-    unlink("processed_images",recursive = T)
+    unlink("processed_images",recursive = TRUE)
     dir.create("processed_images")
     proc.dir <- "processed_images"
   }else{
     if(save){
       proc.dir <- paste0(out.dir,"/processed_images")
-      if(dir.exists(proc.dir))  unlink(proc.dir,recursive = T)
+      if(dir.exists(proc.dir))  unlink(proc.dir,recursive = TRUE)
       dir.create(proc.dir)
     }
   }
@@ -872,7 +909,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
     
     frame <- which(im==images)-1
     
-    img <- EBImage::readImage(im,all=F) #if don't add package, others use "display"
+    img <- EBImage::readImage(im,all=FALSE) #if don't add package, others use "display"
     
     img.dim <- dim(img)[1:2]
     
@@ -896,7 +933,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
     
     c.roi <-  which(per>=size.min) #candidate rois, filtered by size of of pixel field
     
-    names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = T)])
+    names(c.roi) <- as.factor(letters[order(rois[c.roi],decreasing = TRUE)])
     
     z.l <- list()
     out.l <- list()
@@ -933,8 +970,8 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
         
         
         r.out <- Out(ocontour(z.m))
-        if(wall ) edge <- T
-        if(!wall) edge <- F
+        if(wall ) edge <- TRUE
+        if(!wall) edge <- FALSE
         r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
         out.l[[r.name]] <- r.out
         rois[c.roi[r.name]]
@@ -946,7 +983,7 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
       
       classes.l[[paste0(frame)]] <- data.table(frame=frame,classes)
       
-      if(edges==F) classes <- classes[edge==F]
+      if(edges==FALSE) classes <- classes[edge==FALSE]
       
       z.best <- z.l[[classes[which.min(size.diff)]$roi]]
       r.name <-classes[which.min(size.diff)]$roi
@@ -967,8 +1004,8 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
         wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)
         
         r.out <- Out(ocontour(z.m))
-        if(wall ) edge <- T
-        if(!wall) edge <- F
+        if(wall ) edge <- TRUE
+        if(!wall) edge <- FALSE
         r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
         out.l[[r.name]] <- r.out
         
@@ -988,9 +1025,9 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
       shapes.out <- all.outs %>% Momocs::filter(type!="roi")
       
       roi.out <- filter(all.outs,type=="roi") #shape that is roi
-      roi.f <- suppressMessages(efourier(roi.out,nb.h = harms,norm=enorm,start=F) )#ef analysis
+      roi.f <- suppressMessages(efourier(roi.out,nb.h = harms,norm=enorm,start=FALSE) )#ef analysis
       
-      shapes.f <- suppressMessages(efourier(shapes.out,nb.h = harms,norm=enorm,start = F))
+      shapes.f <- suppressMessages(efourier(shapes.out,nb.h = harms,norm=enorm,start = FALSE))
       
       shapes.p <- suppressWarnings(PCA(shapes.f))#PCA of non roi
       #why LDA wouldn't drop levels to prevent warnings is a stumper
@@ -1007,22 +1044,22 @@ kin.LDA <-function(image.dir=NULL,frames=NULL,thr=0.7,ant.per=0.20,tips=0.2,edge
       roi.lda <- suppressMessages(reLDA(roi.pca,shape.l))
       
       roi.shape<- roi.lda$class
-      roi.shape2 <- apply(roi.lda$posterior,1, function(x) names(x[order(x,decreasing = T)[2]]))
+      roi.shape2 <- apply(roi.lda$posterior,1, function(x) names(x[order(x,decreasing = TRUE)[2]]))
       
       #retrieve roi type
       roi.type <- sapply(roi.shape,function(x) unique(filter(shapes.p$fac,shape==x)$type))
       
       roi.post <- apply(roi.lda$posterior,1,max)
-      roi.post2 <- apply(roi.lda$posterior,1, function(x) x[order(x,decreasing = T)[2]])
+      roi.post2 <- apply(roi.lda$posterior,1, function(x) x[order(x,decreasing = TRUE)[2]])
       roi.type2 <- sapply(roi.shape2,function(x) unique(filter(shapes.p$fac,shape==x)$type))
       
       classes <- data.table(roi=gsub("roi-","",roi.out2$fac$shape),type=roi.type,shape=roi.shape,post=roi.post,type2=roi.type2,shape2=roi.shape2,post2= roi.post2,retrained=frame>retrain,edge=roi.out2$fac$edge,size.diff=NA)
       
       classes.l[[paste0(frame)]] <- data.table(frame=frame,classes)
       
-      if(edges==F) classes <- classes[edge==F]
+      if(edges==FALSE) classes <- classes[edge==FALSE]
       
-      if(nrow(classes[type=="fish"])<1){stop("No shape type found matching 'fish' or 'edge==F'")}
+      if(nrow(classes[type=="fish"])<1){stop("No shape type found matching 'fish' or 'edge==FALSE'")}
       
       if(nrow(classes[type=="fish"])>1){
         if(ties=="post"){
@@ -1326,12 +1363,12 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
   
   fins <- rbind(data.table(finL,fin="L"),data.table(finR,fin="R"))
   
-  #qplot(data=fins,x=x,y=y,col=fin)+geom_point(data=finPts,aes(x,y,shape=pos),inherit.aes = F)
+  #qplot(data=fins,x=x,y=y,col=fin)+geom_point(data=finPts,aes(x,y,shape=pos),inherit.aes = FALSE)
   
   ###add predicted y values according to lm from start to end of fins
   fins[,y.pred:=predict(lm(y~x,data.frame(y=c(y[which.min(x)],y[which.max(x)]),x=c(min(x),max(x)))),newdata=data.frame(x=x)),by=list(fin)]
   
-  comp <- comp2 <- merge(x.s,fins,by=c("x","y"),all.x = T)
+  comp <- comp2 <- merge(x.s,fins,by=c("x","y"),all.x = TRUE)
   setkey(comp,"x")
   comp[!is.na(y.pred),y:=y.pred]
   comp <- comp[,list(x,y)]
@@ -1348,7 +1385,7 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
   if(smoothing=="loess") mid[,ml.pred:=predict(loess(y.m~x,span = ml.smooth))]
   if(smoothing=="spline") mid[,ml.pred:=smooth.spline(x = x,y=y.m,spar=ml.smooth)$y]
   
-  bl <- mid[,list(sum(dist.2d(x,dplyr::lead(x),y.m,dplyr::lead(y.m)),na.rm=T))]$V1
+  bl <- mid[,list(sum(dist.2d(x,dplyr::lead(x),y.m,dplyr::lead(y.m)),na.rm=TRUE))]$V1
   
   amp <- finPts[,list(amp=abs(y[pos=="start"]-y[pos=="tip"]),amp.bl=abs(y[pos=="start"]-y[pos=="tip"])/bl),by=list(fin)]
   

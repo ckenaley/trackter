@@ -4,13 +4,15 @@
 \alias{images.to.video}
 \title{Stitches images into a video file}
 \usage{
-images.to.video(image.dir = NULL, vid.name = NULL, qual = 50,
-  frame.rate = 10, overwrite = FALSE, silent = TRUE)
+images.to.video(image.dir = NULL, out.dir = NULL, vid.name = NULL,
+  qual = 50, frame.rate = 10, overwrite = FALSE, silent = TRUE)
 }
 \arguments{
-\item{image.dir}{Character; directory containing images to stitch.}
+\item{image.dir}{character; directory containing images to stitch.}
 
-\item{vid.name}{character; file name or path to be given video including extension.  mp4 currently works best.}
+\item{out.dir}{character; directory in which to store video.}
+
+\item{vid.name}{character; file name given to video including extension.  mp4 currently works best.}
 
 \item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
 
@@ -32,6 +34,7 @@ Assumes images are appended with a numeric sequence.
 \examples{
 
 #make some images
+\dontrun{
 dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 
 a <- 2
@@ -47,9 +50,11 @@ for(i in seq(1,length(theta),30)) {
   }
 
 images.to.video(image.dir=paste0(tempdir(),"/images"),
-vid.name=paste0(tempdir(),"/spiral.mp4"),frame.rate=5,qual=100,silent=FALSE)
+vid.name="spiral.mp4",out.dir=tempdir(),
+frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
 
 file.exists(paste0(tempdir(),"/spiral.mp4"))
+}
 }
 \seealso{
 \code{\link{vid.to.images}}

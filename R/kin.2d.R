@@ -82,7 +82,7 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
   y.0 <- y[1]-diff(y[1:2])
   x <- c(x.0,x)
   y <- c(y.0,y)
-  added <- T
+  added <- TRUE
   }
   
   dt <- data.table(x, y)
@@ -110,7 +110,7 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
                     dplyr::lead(wave.begin) - wave.begin )  ]
   }
   if (method == "zeros") {
-    if(fit==T){
+    if(fit==TRUE){
       x.pred <- seq(first(x),last(x),length.out = dens*length(x))
       
       if(!smoothing %in% c("spline","loess")) stop("'smoothing' should be set to 'spline' or 'loess'")
@@ -145,7 +145,7 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
       wave.dat2 <- dt[, wave := NA]
     } else{
       wave.dat2 <- wave.dat[!is.na(l), list(x = x[begin.index:end.index]), by = list(wave)]
-      wave.dat2 <- merge(dt, wave.dat2, all.x = T,by="x")
+      wave.dat2 <- merge(dt, wave.dat2, all.x = TRUE,by="x")
     }
     
     pks <-wave.dat2[!is.na(wave), list(amp = y[which.max(abs(y))], pos = as.numeric(x[which.max(abs(y))])), by = wave]
@@ -279,7 +279,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
   y.0 <- y[1]-diff(y[1:2])
   x <- c(x.0,x)
   y <- c(y.0,y)
-  added <- T
+  added <- TRUE
   }
   
   dt <- data.table(x, y)
@@ -313,7 +313,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
   }
   
   if (method == "zeros") {
-    if(fit==T){
+    if(fit==TRUE){
       x.pred <- seq(first(x),last(x),length.out = dens*length(x))
       
       if(!smoothing %in% c("spline","loess")) stop("'smoothing' should be set to 'spline' or 'loess'")
@@ -349,7 +349,7 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
       wave.dat2 <- dt[, wave := NA]
     } else{
       wave.dat2 <- wave.dat[!is.na(l), list(x = x[begin.index:end.index]), by = list(wave)]
-      wave.dat2 <- merge(dt, wave.dat2, all.x = T,by="x")
+      wave.dat2 <- merge(dt, wave.dat2, all.x = TRUE,by="x")
       
     }
     

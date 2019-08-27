@@ -8,6 +8,7 @@
 ^appveyor\.yml$
 ^README\.rmd$
 ^NEWS\.Rmd$
-^README\rmd$
+^NEWS\.md$
+^README\.md$
 ^cran-comments\.md$
 ^CRAN-RELEASE$

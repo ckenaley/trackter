@@ -4,11 +4,15 @@
 \alias{vid.to.images2}
 \title{Extracts images from a video file with ffmpeg}
 \usage{
-vid.to.images2(vid.path = NULL, filt = NULL, codec = NULL,
-  silent = TRUE)
+vid.to.images2(vid.path = NULL, out.dir = NULL, overwrite = FALSE,
+  filt = NULL, codec = NULL, silent = TRUE)
 }
 \arguments{
-\item{vid.path}{Character; path of video file to be processed.}
+\item{vid.path}{character; path of video file to be processed.}
+
+\item{out.dir}{character; directory path in which to store images.}
+
+\item{overwrite}{logical; should path described by 'out.dir' be overwritten if it exhists.}
 
 \item{filt}{character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}}
 
@@ -28,6 +32,7 @@ Particularly useful for resizing images
 \examples{
 
 #make a video with animation package
+\dontrun{
 fun <- function(){
 y <- sin(1:50)
 x <- 1:50
@@ -42,12 +47,13 @@ animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0
 #notice the spaces at the beginning/end of string
 filt.red <- " -vf scale=200:-1 "
 c <- " -c:v libx264 "
-vid.to.images2(vid.path=paste0(tempdir(),"/wave.mp4"),filt=filt.red,codec=NULL)
+dir.create(paste0(tempdir(),"/images"))
+vid.to.images2(vid.path=paste0(tempdir(),"/wave.mp4"),
+out.dir=paste0(tempdir(),"/images"),filt=filt.red,codec=NULL)
 
 #see the images in the "images" directory
 list.files( paste0(tempdir(),"/images"))
-
-
+}
 }
 \seealso{
 \code{\link{images.to.video}}

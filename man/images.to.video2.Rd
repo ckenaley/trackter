@@ -4,14 +4,16 @@
 \alias{images.to.video2}
 \title{Stitches images from video file passing filters to ffmpeg}
 \usage{
-images.to.video2(image.dir = NULL, vid.name = NULL, overwrite = T,
-  qual = 50, vid.ext = ".mp4", frame.rate = 10, raw = TRUE,
-  filt = NULL, silent = TRUE)
+images.to.video2(image.dir = NULL, out.dir = NULL, vid.name = NULL,
+  overwrite = TRUE, qual = 50, vid.ext = ".mp4", frame.rate = 10,
+  raw = TRUE, filt = NULL, silent = TRUE)
 }
 \arguments{
 \item{image.dir}{character; directory containing images to stitch.}
 
-\item{vid.name}{character; file or path name to be given video (should not include file extension)}
+\item{out.dir}{character; directory in which to store video.}
+
+\item{vid.name}{character; file name to be given video (should not include file extension).}
 
 \item{overwrite}{logical; should path described by vid.name  be overwritten if it exhists.}
 
@@ -40,6 +42,7 @@ Assumes images are appended with a numeric sequence beginning with "_".
 
 #make some spiralled images and video
 
+\dontrun{
 dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 
 a <- 2
@@ -55,10 +58,11 @@ for(i in seq(1,length(theta),30)) {
   }
 
 images.to.video2(image.dir=paste0(tempdir(),"/images"),
-vid.name=paste0(tempdir(),"/spiral"),frame.rate=5,qual=100,raw=FALSE)
+vid.name="spiral",out.dir=tempdir(),
+frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
 
-"spiral_red.mp4"\%in\% list.files(tempdir())
-
+file.exists(paste0(tempdir(),"/spiral.mp4"))
+}
 }
 \seealso{
 \code{\link{vid.to.images2}}

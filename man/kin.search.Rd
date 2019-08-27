@@ -35,7 +35,7 @@ kin.search(image.dir = NULL, frames = NULL, thr = "otsu",
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
 
-\item{out.dir}{character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.}
+\item{out.dir}{character, the directory to which ouputted images should be saved.}
 
 \item{flip}{logical, indicating if binary should be flipped.}
 
@@ -127,8 +127,7 @@ A list with the following components:
 Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  	
-By default, images are outputted to the \code{image.dir} subdirectory in the working directory. Chooses ROIs based on relative ROI size or position.	
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.	
 
 Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
 
@@ -147,27 +146,31 @@ These choices will be made on ROI sets that are not on the edge of the field if 
 \code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.
 }
 \examples{
-#plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+
+#### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+##A very long example.
 \dontrun{	
 
 #download example images and place in 'example' subdirectory	
 f <- "https://github.com/ckenaley/exampledata/blob/master/example.zip?raw=true"	
 
-download.file(f, "temp.zip")	
-unzip("temp.zip")	
-unlink("temp.zip")	
+download.file(f, paste0(tempdir(),"/temp.zip"))
+unzip(paste0(tempdir(),"/temp.zip"), exdir=tempdir())	
+unlink(paste0(tempdir(),"/temp.zip"))	
 
-
-kin <- kin.search(image.dir ="example",	
+dir.create(paste0(tempdir(),"/processed_images"))
+kin <- kin.search(image.dir =paste0(tempdir(),"/example"),	
        search.for = "largest",	
-      smoothing = "loess",frames=1:50,show.prog = F,thr = "otsu",	
+      smoothing = "loess",frames=1:50,
+      out.dir=paste0(tempdir(),"/processed_images"),
+      show.prog = FALSE,thr = "otsu",	
       image.type="bin",smooth=0.4)	
 
-### plot instantaneous amplitude of tail (last/rightmost point) over frames 	
+#plot instantaneous amplitude of tail (last/rightmost point) over frames 	
 p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
 print(p)	
 	
-### midline plot	
+# midline plot	
 ml <- kin$midline	
 #leftmost x starts at 0	
 ml <- ml[,x2:=x-x[1],by=frame]	
@@ -180,15 +183,30 @@ p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(c
 p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)	
 print(p)	
 	
-### Make a video of processed frames	
+#Make a video of processed frames	
 
-images.to.video2(image.dir="processed_images",	
-vid.name="trout_test",frame.rate=5,qual=100,raw=FALSE)	
-file.exists("trout_test_red.mp4")
+images.to.video2(image.dir=paste0(tempdir(),"/processed_images"),	
+vid.name="trout_test",out.dir=tempdir(),frame.rate=5,qual=100,raw=FALSE)	
+file.exists(paste0(tempdir(),"/trout_test_red.mp4"))
 
-#delete 'example','processed_images' folders	
 }
 
+## A very short example.
+
+#retrieve image 
+i <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
+#create directory and write image to it
+t <-tempdir()
+dir.create(paste0(t,"/images"))
+EBImage::writeImage(i,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
+
+#run kin.search and save output image to directory
+kin.i<- kin.search(image.dir = paste0(t,"/images"),save = TRUE,out.dir = t)
+
+#plot midline
+with(kin.i$midline,plot(x,wave.y))
+i2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
+EBImage::display(i2,method="raster")
 }
 \seealso{
 \code{\link{kin.simple}}
