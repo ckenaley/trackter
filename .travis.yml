@@ -8,14 +8,14 @@ cache: packages
 os:
   - osx
 
+before_install:
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
+
 addons:
   apt:
     update: true
       sources:
-      - sourceline: 'ppa:opencpu/imagemagick'
+        - sourceline: 'ppa:opencpu/imagemagick'
       packages:
-      - libmagick++-dev
-
-before_install:
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
+        - libmagick++-dev
