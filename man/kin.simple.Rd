@@ -88,7 +88,7 @@ If 'save=TRUE', images are saved as binary or the original with a body midline  
 Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
 }
 \examples{
-#### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+#### plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
 ##A very long example.
 \dontrun{	
 

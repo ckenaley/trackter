@@ -484,7 +484,7 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' @importFrom EBImage bwlabel otsu
 #' 
 #' @examples
-#' #### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish	
+#' #### plot caudal amplitude and produce a classic midline waveform plot of swimming fish	
 #' ##A very long example.
 #' \dontrun{	
 #'	

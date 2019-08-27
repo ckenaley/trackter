@@ -8,7 +8,7 @@ test_that("kin.simple works fine", {
   dir.create(paste0(t,"/images"))
   dir.create(paste0(t,"/processed_images"))
   EBImage::writeImage(y,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
-  invisible(capture.output( kin.y <- kin.simple(image.dir = paste0(t,"/images"),save = T,out.dir =tp)))
+  invisible(capture.output( kin.y <- kin.simple(image.dir = paste0(t,"/images"),save = TRUE,out.dir =tp)))
   
   
   expect_length(list.files(tp),1)
@@ -33,8 +33,8 @@ test_that("kin.simple works fine", {
   expect_error(invisible(capture.output( kin.simple(image.dir =paste0(t,"/images") , thr="foo",save=FALSE))),"must be set to")
   expect_error(invisible(capture.output( kin.simple(image.dir =paste0(t,"/images") ,smoothing="foo",save=FALSE))),"must =")
   
-  unlink(paste0(t,"/images"),recursive = T)
-  unlink(tp,recursive = T)
+  unlink(paste0(t,"/images"),recursive = TRUE)
+  unlink(tp,recursive = TRUE)
   
 })
 
@@ -46,7 +46,7 @@ test_that("kin.search works fine", {
   dir.create(paste0(t,"/images"))
   dir.create(paste0(t,"/processed_images"))
   EBImage::writeImage(y,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
-  invisible(capture.output( kin.y <- kin.search(image.dir = paste0(t,"/images"),save = T,out.dir =tp)))
+  invisible(capture.output( kin.y <- kin.search(image.dir = paste0(t,"/images"),save = TRUE,out.dir =tp)))
   
  
   expect_length(list.files(tp),1)
@@ -73,8 +73,8 @@ test_that("kin.search works fine", {
   
   expect_error(invisible(capture.output( kin.search(image.dir =paste0(t,"/images") ,search.for="foo",save=FALSE))),"must be set to")
   
-  unlink(paste0(t,"/images"),recursive = T)
-  unlink(tp,recursive = T)
+  unlink(paste0(t,"/images"),recursive = TRUE)
+  unlink(tp,recursive = TRUE)
   
 })
 

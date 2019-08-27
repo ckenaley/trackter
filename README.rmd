@@ -38,7 +38,7 @@ under development.
 ## Installation
 
 
-```{r eval=F}
+```{r eval=FALSE}
     require(devtools)
     install_github("ckenaley/trackter")
     require(trackter)
@@ -50,7 +50,7 @@ under development.
 
 The core functions of *trackter* that extract shape and contour data from images ( `kin.simple` and `kin.search`) depend upon *EBImage*, available on the Bioconductor repository. The current build version of *trackter* installs this dependency. If it does not install,it can be done so easily with just a few lines of code: 
 
-```{r eval=F}
+```{r eval=FALSE}
   if (!requireNamespace("BiocManager", quietly = TRUE))
    install.packages("BiocManager")
    BiocManager::install("EBImage")
@@ -99,7 +99,7 @@ EBImage::display(y,method="raster")
 
 Here, `kin.simple` is used to extract contour and shape information.
 
-```{r results=F}
+```{r results=FALSE}
 kin.y <- kin.simple(image.dir = t,out.dir = tempdir())
 
 ```                
@@ -136,7 +136,7 @@ y2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
 EBImage::display(y2,method="raster")
 
 #clean up
-unlink(t,recursive = T)
+unlink(t,recursive = TRUE)
 
 unlink(paste0(tempdir(),"/sunfish001_000.jpg"))
 
@@ -147,7 +147,7 @@ unlink(paste0(tempdir(),"/sunfish001_000.jpg"))
 
 Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video of a swimming fish to a subdirectory named "images" and these are passed through `kin.simple`. The threshold value for segmenting is set to 0.6 and the head section ("ant.per") set to 0.2 in this case.
 
-```{r results=F}
+```{r results=FALSE}
   v <- system.file("extdata/vid", "sunfish_BCF_red.avi", package = "trackter")
   
   file.copy(v,tempdir())
@@ -160,7 +160,7 @@ Of course, the primary utility of automated tracking routines is to process many
   kin.y2 <- kin.simple(image.dir = ti,thr=0.6,ant.per = 0.2,save = FALSE)
   
   #cleanup
-  unlink(ti,recursive = T)
+  unlink(ti,recursive = TRUE)
   unlink(tv)
   
 ```

@@ -1,11 +1,11 @@
 context("ffmpeg functions")
 
 ff <-  try(system("ffmpeg -version", intern = TRUE))
-ff.status <- inherits(ff, "try-error")
+ff.status <- !inherits(ff, "try-error")
 
 test_that("vid.to.images works", {
   
-  skip_if(ff.status)
+  skip_if(!ff.status)
   
   v <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
   file.copy(v,tempdir())
@@ -21,7 +21,7 @@ test_that("vid.to.images works", {
 })
 
 test_that("images.to.video works", {
-  skip_if(ff.status)
+  skip_if(!ff.status)
   if(dir.exists(paste0(tempdir(),"/sunfish"))) unlink(paste0(tempdir(),"/sunfish"),recursive = TRUE)
   dir.create(paste0(tempdir(),"/sunfish"))
  v <- system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
@@ -56,7 +56,7 @@ images.to.video(image.dir = paste0(tempdir(),"/sunfish"),vid.name = "test.mp4",o
 
 test_that("vid.to.images2 works", {
   
-  skip_if(ff.status)
+  skip_if(!ff.status)
   v <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
   dir.create(paste0(tempdir(),"/images"))
   file.copy(v,tempdir())
@@ -82,7 +82,7 @@ test_that("vid.to.images2 works", {
 
 test_that("images.to.video2 works", {
   
-  skip_if(ff.status)
+  skip_if(!ff.status)
   if(dir.exists(paste0(tempdir(),"/sunfish"))) unlink(paste0(tempdir(),"/sunfish"),recursive = TRUE)
   dir.create(paste0(tempdir(),"/sunfish"))
   v <- system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
