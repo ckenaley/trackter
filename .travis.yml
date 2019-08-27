@@ -11,22 +11,5 @@ os:
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
 
-
-addons:
-  apt:
-    update: true
-    sources:
-      - sourceline: 'ppa:cran/imagemagick'
-    packages:
-      - libmagick++-dev
-      - librsvg2-dev
-      - libwebp-dev
-      - libpoppler-cpp-dev
-      - libtesseract-dev
-      - libleptonica-dev
-      - tesseract-ocr-eng
-      - r-cran-rgdal
-      - libfftw3-dev
-      - cargo
-      - gsfonts
