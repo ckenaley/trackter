@@ -31,7 +31,6 @@ before_test:
   - ps: $env:Path += ";C:\Program Files (x86)\FFmpeg\"
   
 build_script:
-  - travis-tool.sh install_bioc EBImage #order matters, build depends on this
   - travis-tool.sh install_deps
   
 test_script:
