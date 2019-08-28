@@ -4,7 +4,7 @@
 # *trackter*
 
 ## trackter (development version)
-  
+  -added code coverage (covr)
 
 ## trackter 0.1
 

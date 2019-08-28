@@ -34,7 +34,7 @@ build_script:
   - travis-tool.sh install_bioc EBImage #order matters, build depends on this
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc_deps
- 
+  
 test_script:
   - travis-tool.sh run_tests
 
