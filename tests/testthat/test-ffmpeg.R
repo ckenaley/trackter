@@ -1,16 +1,15 @@
 context("ffmpeg functions")
 
-ff <-  try(system("ffmpeg -version", intern = TRUE))
-ff.status <- !inherits(ff, "try-error")
 
 test_that("vid.to.images works", {
-  
-  skip_if(!ff.status)
-  
   v <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
   file.copy(v,tempdir())
   dir.create(paste0(tempdir(),"/images"))
-  vid.to.images(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),out.dir =paste0(tempdir(),"/images"))
+  
+  ff <-  inherits(try(vid.to.images(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),out.dir =paste0(tempdir(),"/images"))),what = "try-error")
+  
+  skip_if(ff)
+  
   expect_true(length(list.files(paste0(tempdir(),"/images")))==2)
   expect_error(vid.to.images(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),out.dir = NULL),"'out.dir' not specified")
   expect_error(vid.to.images(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),out.dir =paste0(tempdir(),"/foo") ),"Directory specified by 'out.dir'")
@@ -21,22 +20,21 @@ test_that("vid.to.images works", {
 })
 
 test_that("images.to.video works", {
-  skip_if(!ff.status)
+ 
   if(dir.exists(paste0(tempdir(),"/sunfish"))) unlink(paste0(tempdir(),"/sunfish"),recursive = TRUE)
-  dir.create(paste0(tempdir(),"/sunfish"))
- v <- system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
- 
-file.copy(v,paste0(tempdir(),"/sunfish/img_001.jpg"))
-file.copy(v,paste0(tempdir(),"/sunfish/img_002.jpg"))
   
-images.to.video(image.dir = paste0(tempdir(),"/sunfish"),vid.name = "test.mp4",out.dir=tempdir(),silent = TRUE)
- 
-
+  dir.create(paste0(tempdir(),"/sunfish"))
+  v <- system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+  
+  file.copy(v,paste0(tempdir(),"/sunfish/img_001.jpg"))
+  file.copy(v,paste0(tempdir(),"/sunfish/img_002.jpg"))
+  
+  ff <-  inherits(try(images.to.video(image.dir = paste0(tempdir(),"/sunfish"),vid.name = "test.mp4",out.dir=tempdir(),silent = TRUE)),what = "try-error")
+  
+  skip_if(ff)
   
   expect_true(file.exists(paste0(tempdir(),"/test.mp4")))
   expect_true(file.size(paste0(tempdir(),"/test.mp4"))>10)
-  
-
   
   
   expect_error(images.to.video(image.dir = paste0(tempdir(),"/sunfish"),out.dir = NULL),"'out.dir' not specified")
@@ -56,11 +54,15 @@ images.to.video(image.dir = paste0(tempdir(),"/sunfish"),vid.name = "test.mp4",o
 
 test_that("vid.to.images2 works", {
   
-  skip_if(!ff.status)
+ 
   v <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
   dir.create(paste0(tempdir(),"/images"))
   file.copy(v,tempdir())
-  vid.to.images2(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),out.dir =paste0(tempdir(),"/images"))
+  
+  ff <-  inherits(try(  vid.to.images2(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),out.dir =paste0(tempdir(),"/images"))),what = "try-error")
+  
+  skip_if(ff)
+  
   expect_true(length(list.files(paste0(tempdir(),"/images")))==2)
   
   expect_error(vid.to.images2(vid.path = paste0(tempdir(),"/sunfish_BCF.avi"),out.dir = NULL),"'out.dir' not specified")
@@ -82,15 +84,18 @@ test_that("vid.to.images2 works", {
 
 test_that("images.to.video2 works", {
   
-  skip_if(!ff.status)
+ 
   if(dir.exists(paste0(tempdir(),"/sunfish"))) unlink(paste0(tempdir(),"/sunfish"),recursive = TRUE)
+  
   dir.create(paste0(tempdir(),"/sunfish"))
   v <- system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
   
   file.copy(v,paste0(tempdir(),"/sunfish/img_001.jpg"))
   file.copy(v,paste0(tempdir(),"/sunfish/img_002.jpg"))
   
-  images.to.video2(image.dir = paste0(tempdir(),"/sunfish"),vid.name ="test", out.dir=tempdir(),silent = TRUE,raw = TRUE)
+  ff <-  inherits(try(images.to.video2(image.dir = paste0(tempdir(),"/sunfish"),vid.name ="test", out.dir=tempdir(),silent = TRUE,raw = TRUE)) ,what = "try-error")
+  
+  skip_if(ff)
   
   expect_true(file.exists(paste0(tempdir(),"/test.avi")))
   expect_true(file.size(paste0(tempdir(),"/test.avi"))>10)
