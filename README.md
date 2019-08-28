@@ -3,6 +3,7 @@
 Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&svg=true)](https://ci.appveyor.com/project/ckenaley/trackter)
+[![](https://www.r-pkg.org/badges/version/trackter?color=orange)](https://cran.r-project.org/package=trackter)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -183,7 +184,7 @@ EBImage::display(y2,method="raster")
 ``` r
 
 #clean up
-unlink(t,recursive = T)
+unlink(t,recursive = TRUE)
 
 unlink(paste0(tempdir(),"/sunfish001_000.jpg"))
 ```
@@ -215,7 +216,7 @@ case.
   kin.y2 <- kin.simple(image.dir = ti,thr=0.6,ant.per = 0.2,save = FALSE)
   
   #cleanup
-  unlink(ti,recursive = T)
+  unlink(ti,recursive = TRUE)
   unlink(tv)
   
 ```

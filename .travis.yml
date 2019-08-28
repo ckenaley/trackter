@@ -12,3 +12,8 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
 
+r_github_packages:
+  - r-lib/covr
+
+after_success:
+  - Rscript -e 'covr::codecov()'

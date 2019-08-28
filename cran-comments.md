@@ -17,7 +17,7 @@ This is the third submission of this package. Upon second submission, the follow
 * Ensure that your functions do not write by default or in your 
 examples/vignettes/tests in the user's home filespace. ACTION: Functions now require user input to specify where any output is written and 'tempdir()'
 used throughout tests and examples.
-* '\\dontrun' should be only used if the example really cannot be executed. ACTION: '\\dontrun' is reserved for examples of functions for which the installation of additional software (ffmpeg)  can't be assumed and for examples that run >5s. For the latter, shorter additional examples are now provided.
+* '\\dontrun' should be only used if the example really cannot be executed. ACTION: '\\donttest' is used for examples of functions for which the installation of additional software (ffmpeg)  can't be assumed and `\\dontrun` is reserved for examples that run >5s. For the latter, shorter additional examples are now provided.
 * Please always write TRUE and FALSE instead of T and F. ACTION: All instances of 'T' or 'F' spelled out.
 
 
