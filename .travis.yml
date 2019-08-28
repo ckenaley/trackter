@@ -2,7 +2,6 @@ language: r
 r:
   - oldrel
   - release
-  - bioc-devel
   
 cache: packages
 os:
