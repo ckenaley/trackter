@@ -11,7 +11,15 @@ There were no ERRORs, WARNINGs, or NOTEs.
 There are currently no downstream dependencies for this package.
 
 ## Comments
-This is the second submission of this package. Upon first submission, errors related to either tests reliant on FFmpeg external dependencies or  'flush(stde)); flush(stdout()) Error: unexpected ')' in "flush(stde))" '. The former fixed by running test only if FFmpeg is installed; the latter by removing 'unlink()' from examples. FFmpeg has been added to SystemRequirements in the DESCRIPTION.
+This is the third submission of this package. Upon second submission, the following was noted:
+
+* References describing the methods should be included in the description. ACTION: no references are included in descriptions. References to methods include only those to functions in dependencies and these are linked with 'link{function}'.
+* Ensure that your functions do not write by default or in your 
+examples/vignettes/tests in the user's home filespace. ACTION: Functions now require user input to specify where any output is written and 'tempdir()'
+used throughout tests and examples.
+* '\\dontrun' should be only used if the example really cannot be executed. ACTION: '\\dontrun' is reserved for examples of functions for which the installation of additional software (ffmpeg)  can't be assumed and for examples that run >5s. For the latter, shorter additional examples are now provided.
+* Please always write TRUE and FALSE instead of T and F. ACTION: All instances of 'T' or 'F' spelled out.
+
 
 win-builder throws one NOTE: 'Possibly mis-spelled words in DESCRIPTION:
   ROIs (5:69)

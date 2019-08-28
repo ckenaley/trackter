@@ -754,7 +754,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.
-#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.
+#' @param out.dir character, the directory to which ouputted images should be saved. If NULL, then a subdirectory 'processed_images' in the working directory.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save==FALSE'.
 #' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param flip logical, indicating if binary should be flipped.

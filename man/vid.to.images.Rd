@@ -25,7 +25,7 @@ Uses ffmpeg systems calls to extract images from a video.
 \examples{
 
 #make a video with animation package
-\dontrun{
+\donttest{
 require(animation)
 fun <- function(){
 y <- sin(1:50)

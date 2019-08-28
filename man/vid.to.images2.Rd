@@ -32,7 +32,7 @@ Particularly useful for resizing images
 \examples{
 
 #make a video with animation package
-\dontrun{
+\donttest{
 fun <- function(){
 y <- sin(1:50)
 x <- 1:50

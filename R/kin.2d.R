@@ -214,7 +214,7 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
 #' 
 #' \code{method} the method chosen to find full waves
 #' 
-#'  \code{names} a data table with columns 'x', 'y', and 'wave' describing the x and y positions of the wave and a numeric name of each wave detected, resptively. If  'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by \code{smoothing}, \code{smooth}, and \code{dens}.
+#'  \code{names} a data table with columns 'x', 'y', and 'wave' describing the x and y positions of the wave and a numeric name of each wave detected, respectively. If  'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by \code{smoothing}, \code{smooth}, and \code{dens}.
 #'  
 #' \code{dat} a data table describing each wave detected.
 #' \itemize{

@@ -34,7 +34,7 @@ Assumes images are appended with a numeric sequence.
 \examples{
 
 #make some images
-\dontrun{
+\donttest{
 dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 
 a <- 2

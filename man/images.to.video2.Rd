@@ -42,7 +42,7 @@ Assumes images are appended with a numeric sequence beginning with "_".
 
 #make some spiralled images and video
 
-\dontrun{
+\donttest{
 dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 
 a <- 2

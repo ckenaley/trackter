@@ -12,7 +12,7 @@
 #' @examples
 #'
 #' #make a video with animation package
-#' \dontrun{
+#' \donttest{
 #' require(animation)
 #' fun <- function(){
 #' y <- sin(1:50)
@@ -85,7 +85,7 @@ vid.to.images <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,qual=50)  {
 #' @examples
 #'
 #' #make some images
-#' \dontrun{
+#' \donttest{
 #' dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 #'
 #' a <- 2
@@ -175,7 +175,7 @@ images.to.video <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,qual=50,fr
 #' @examples
 #' 
 #' #make a video with animation package
-#' \dontrun{
+#' \donttest{
 #' fun <- function(){
 #' y <- sin(1:50)
 #' x <- 1:50
@@ -260,7 +260,7 @@ vid.to.images2 <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,filt=NULL,
 #'
 #' #make some spiralled images and video
 #'
-#'\dontrun{
+#'\donttest{
 #' dir.create(paste0(tempdir(),"/images")) #make a directory to store images
 #'
 #' a <- 2

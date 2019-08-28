@@ -51,7 +51,7 @@ kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
 
-\item{out.dir}{character, the directory to which ouputted images should be saved. If NULL, then a sudirectory 'processed_images' in the working directory.}
+\item{out.dir}{character, the directory to which ouputted images should be saved. If NULL, then a subdirectory 'processed_images' in the working directory.}
 
 \item{image.type}{character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save==FALSE'.}
 
