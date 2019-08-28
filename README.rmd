@@ -31,12 +31,18 @@ knitr::opts_chunk$set(echo = TRUE)
 *trackter* is an R package for semiautomated tracking and analysis of 2D kinematics from video and image data. The core functions of *trackter* automatically detect a region of interest (ROI) and compute important kinematic and shape parameters based on the ROI's contour. These functions use thresholding and segmentation to identify ROIs and, thus, moderately contrasted images are required. Below, some of *trackter*'s functionality is detailed and examples of its usage in the context of fish locomotion are presented.
 
 
-Please report any bugs or performance issues---this page is currently
-under development.
+Please report any bugs or performance issues.
 
 
 ## Installation
 
+The release version on CRAN of *trackter* can be installed with:
+
+```{r eval=FALSE}
+install.packages("trackter")
+```
+
+The current development version can be install with:
 
 ```{r eval=FALSE}
     require(devtools)
@@ -48,7 +54,7 @@ under development.
 
 ## External dependencies
 
-The core functions of *trackter* that extract shape and contour data from images ( `kin.simple` and `kin.search`) depend upon *EBImage*, available on the Bioconductor repository. The current build version of *trackter* installs this dependency. If it does not install,it can be done so easily with just a few lines of code: 
+The core functions of *trackter* that extract shape and contour data from images ( `kin.simple` and `kin.search`) depend upon *EBImage*, available on the Bioconductor repository. The current build version of *trackter* installs this dependency. If it does not install, it can be done so easily with just a few lines of code: 
 
 ```{r eval=FALSE}
   if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -128,7 +134,7 @@ qplot(data=ml,x=x,y=value)+facet_wrap(variable~.)
 
 ```
 
-When "save=TRUE" (the default), the `kin` functions write images to a "processed_images" subdirectory that include midline overlays.
+When "save=TRUE" (the default), the `kin` functions write images to a user-defined directory that include midline overlays.
 
 ```{r fig.height=4}
 

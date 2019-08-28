@@ -3,7 +3,9 @@
 Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&svg=true)](https://ci.appveyor.com/project/ckenaley/trackter)
-[![](https://www.r-pkg.org/badges/version/trackter?color=orange)](https://cran.r-project.org/package=trackter)
+[![](https://www.r-pkg.org/badges/version/trackter?color=orange)](https://cran.r-project.org/package=trackter)[![Codecov
+test
+coverage](https://codecov.io/gh/ckenaley/trackter/branch/master/graph/badge.svg)](https://codecov.io/gh/ckenaley/trackter?branch=master)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -20,10 +22,17 @@ moderately contrasted images are required. Below, some of *trackter*’s
 functionality is detailed and examples of its usage in the context of
 fish locomotion are presented.
 
-Please report any bugs or performance issues—this page is currently
-under development.
+Please report any bugs or performance issues.
 
 ## Installation
+
+The release version on CRAN of *trackter* can be installed with:
+
+``` r
+install.packages("trackter")
+```
+
+The current development version can be install with:
 
 ``` r
     require(devtools)
@@ -36,7 +45,7 @@ under development.
 The core functions of *trackter* that extract shape and contour data
 from images ( `kin.simple` and `kin.search`) depend upon *EBImage*,
 available on the Bioconductor repository. The current build version of
-*trackter* installs this dependency. If it does not install,it can be
+*trackter* installs this dependency. If it does not install, it can be
 done so easily with just a few lines of code:
 
 ``` r
@@ -100,7 +109,7 @@ EBImage::writeImage(y,paste0(t,"/sunfish001.jpg"),type = "jpeg")
 EBImage::display(y,method="raster")
 ```
 
-![An image of a swimming sunfish.](figure/unnamed-chunk-4-1.png)
+![An image of a swimming sunfish.](figure/unnamed-chunk-5-1.png)
 
 Here, `kin.simple` is used to extract contour and shape information.
 
@@ -168,7 +177,7 @@ ml <- melt(kin.y$midline[,.(x,y.m,y.pred,wave.y)],"x")
 qplot(data=ml,x=x,y=value)+facet_wrap(variable~.)
 ```
 
-![](figure/unnamed-chunk-8-1.png)<!-- -->
+![](figure/unnamed-chunk-9-1.png)<!-- -->
 
 When “save=TRUE” (the default), the `kin` functions write images to a
 “processed\_images” subdirectory that include midline overlays.
@@ -179,7 +188,7 @@ y2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
 EBImage::display(y2,method="raster")
 ```
 
-![](figure/unnamed-chunk-9-1.png)<!-- -->
+![](figure/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 
@@ -229,13 +238,13 @@ frames.
 qplot(data=kin.y2$kin.dat,x=frame,y=y) #position
 ```
 
-![](figure/unnamed-chunk-11-1.png)<!-- -->
+![](figure/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 qplot(data=kin.y2$kin.dat,x=frame,y=amp) #amplitude relative to a theoretical midline established by head
 ```
 
-![](figure/unnamed-chunk-11-2.png)<!-- -->
+![](figure/unnamed-chunk-12-2.png)<!-- -->
 
 The midline data can be accessed to assess amplitude envelope. Here,
 midline x position is standardized.
@@ -246,7 +255,7 @@ kin.y2$midline[,x2:=x-x[1],by=frame]
 qplot(data=kin.y2$midline,x=x2,y=wave.y,col=frame)
 ```
 
-![](figure/unnamed-chunk-12-1.png)<!-- -->
+![](figure/unnamed-chunk-13-1.png)<!-- -->
 
 ### Downstream analyses of kinematic data
 
@@ -293,7 +302,7 @@ output. The “names” table can be used to visualize the half wavelengths.
 qplot(data=w$names,x=x,y=y,col=wave)
 ```
 
-![](figure/unnamed-chunk-14-1.png)<!-- -->
+![](figure/unnamed-chunk-15-1.png)<!-- -->
 
 We could extend this framework using `data.table` to calculate half
 waves in each of the 11 frames from the example
@@ -311,4 +320,4 @@ video.
 qplot(data=wave.dat,x=pos,y=l)
 ```
 
-![](figure/unnamed-chunk-15-1.png)<!-- -->
+![](figure/unnamed-chunk-16-1.png)<!-- -->
