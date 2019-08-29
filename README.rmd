@@ -36,13 +36,13 @@ Please report any bugs or performance issues.
 
 ## Installation
 
-The release version on CRAN of *trackter* can be installed with:
+The release version of *trackter* can be installed with:
 
 ```{r eval=FALSE}
 install.packages("trackter")
 ```
 
-The current development version can be install with:
+The current development version can be installed with:
 
 ```{r eval=FALSE}
     require(devtools)
