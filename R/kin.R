@@ -17,10 +17,11 @@
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.	
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.	
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. 	
-#' @param out.dir character, the directory to which ouputted images should be saved.
+#' @param out.dir character, the directory to which outputted images should be saved.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.	
 #' @param search.for character, the search parameter. See Details. 	
 #' @param edges logical, should ROIs on image edges be evaluated. See Details.	
+#' @param border if \code{edges=TRUE}, size of border to add in pixels. Dee details.	
 #' 	
 #' @export	
 #' 	
@@ -40,7 +41,7 @@
 #' 	
 #' These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.	
 #' 	
-#' \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	
+#' \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	Yet, if set to 'TRUE', the \code{border} adds a black border to the image so that the intended ROI may be distinguished from the edge.
 #' 	
 #'\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.	
 #'	
@@ -180,19 +181,26 @@
 #' #retrieve image 
 #' i <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
 #' #create directory and write image to it
-#' t <-tempdir()
+#' t <- tempdir()
+#' 
+#' 
 #' dir.create(paste0(t,"/images"))
 #' EBImage::writeImage(i,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
 #' 
+#' list.files(paste0(t,"/images"))
 #' #run kin.search and save output image to directory
-#' kin.i<- kin.search(image.dir = paste0(t,"/images"),save = TRUE,out.dir = t)
+#' kin.i<- kin.search(image.dir = paste0(t,"/images"),smooth=0.7,save = TRUE,out.dir = t)
 #' 
-#' #plot midline
+#' #plot midline over original image
 #' with(kin.i$midline,plot(x,wave.y))
-#' i2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
+#' 
+#' i2 <- EBImage::readImage(paste0(t,"/sunfish001_000.jpg"))
 #' EBImage::display(i2,method="raster")
+#' 
+#' #clean up
+#' unlink(paste0(t,"/images"),recursive=TRUE)
 
-kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.2, smooth.points=200, image.type="orig",save=TRUE,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE){	
+kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.25, smooth.points=200, image.type="orig",save=TRUE,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE,border=5){	
 
 size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE errors on R CMD check	
 
@@ -232,7 +240,7 @@ for(im in images){
   
   frame <- which(im==images)-1	
   
-  img <- EBImage::readImage(im,all=FALSE) #if don't add package, others use "display"	
+  img <- EBImage::readImage(im,all=FALSE)	
   
   img.dim <- dim(img)[1:2]	
   
@@ -249,7 +257,16 @@ for(im in images){
     y[y==0] <- 1	
     y[y==5] <- 0	
   }	
-  z = EBImage::bwlabel(y)	
+  z = EBImage::bwlabel(y)
+  
+  if(edges){
+    bord <- border*2
+  
+  z1 <-EBImage::resize(z,w=dim(z)[1],h=dim(z)[2],output.dim = c(dim(z)[1]+bord,dim(z)[2]+bord),bg.col="white")
+  
+  EBImage::translate(z1,v=c(border,border),bg.col="black")
+  
+}
   
   rois <- tabulate(z)	
   
@@ -541,10 +558,13 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' 
 #' #plot midline
 #' with(kin.i$midline,plot(x,wave.y))
-#' i2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
+#' i2 <- EBImage::readImage(paste0(t,"/sunfish001_000.jpg"))
 #' EBImage::display(i2,method="raster")
+#' #clean up
+#' unlink(paste0(t,"/images"),recursive=TRUE)
 
-kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.2,smooth.points=200,save=TRUE,out.dir=NULL,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
+
+kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.25,smooth.points=200,save=TRUE,out.dir=NULL,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
   
   size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE erros or R CD check
   
@@ -628,8 +648,8 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
       wall <- any(z.c[[1]][,1]>dim(z)[1]-2 | z.c[[1]][,1]<2  |z.c[[1]][,2]>dim(z)[2]-2 | z.c[[1]][,2]<2)
       
       
-      r.out <- Out(EBImage::ocontour(z.m))
-      if(wall ) edge <- TRUE
+      r.out <- Out(list(EBImage::ocontour(z.m)))
+      if(wall ) edge <- TRUE 
       if(!wall) edge <- FALSE
       r.out$fac <- data.frame(shape=paste0("roi-",r.name),type=paste0("roi"),edge=edge)
       out.l[[r.name]] <- r.out
@@ -841,7 +861,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' 
 #' 
 
-fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bins=0.2,ml.smooth=0.2){
+fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bins=0.2,ml.smooth=0.25){
   y <- ang <- pos <- y.pred <- fin <- y.m <- ml.pred <- x.bin<- NULL # due to NSE notes in R CMD check
   
   if(is.null(fin.pos)) stop("'fin.pos' not defined")
@@ -853,7 +873,7 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
   x.m[,2] <-  x.m[,2]-max(x.m[,2])#to get positive y coords after flip
   
   #plot(x.m[,1],x.m[,2])
-  x.o <- coo_flipx(Out(x.m))
+  x.o <- coo_flipx(Out(list(x.m)))
   
   #panel(x.o)
   
@@ -868,11 +888,11 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
   
   #Left fin
   finL <- x.s[x>=fin.range[1] & x<=fin.range[2] &y<y[which.min(x)]]
-  finL.o <- Out(as.matrix(finL[,list(x,y)]))
+  finL.o <- Out(list(as.matrix(finL[,list(x,y)])))
   finL[,ang:= (coo_angle_edges(finL.o)[[1]])]
   
   finL2 <- finL[seq(1,nrow(finL),5)]
-  finL2.o <- Out(as.matrix(finL2[,list(x,y)]))
+  finL2.o <- Out(list(as.matrix(finL2[,list(x,y)])))
   finL2 <- data.table(finL2.o[[1]][[1]])
   finL2[,ang:=deg(coo_angle_edges(finL2.o)[[1]])]
   
@@ -885,12 +905,12 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
   #right fin
   
   finR <- x.s[x>=fin.range[1] & x<=fin.range[2] &y>y[which.min(x)]]
-  finR.o <- Out(as.matrix(finR[,list(x,y)]))
+  finR.o <- Out(list(as.matrix(finR[,list(x,y)])))
   finR[,ang:= (coo_angle_edges(finR.o)[[1]])]
   
   #panel(x.o)
   finR2 <- finR[seq(1,nrow(finR),5)]
-  finR2.o <- Out(as.matrix(finR2[,list(x,y)]))
+  finR2.o <- Out(list(as.matrix(finR2[,list(x,y)])))
   finR2 <- data.table(finR2.o[[1]][[1]])
   finR2[,ang:=deg(coo_angle_edges(finR2.o)[[1]])]
   

@@ -4,13 +4,31 @@
 \alias{kin.LDA}
 \title{Midline tracking over image sequences with ROI search using LDA}
 \usage{
-kin.LDA(image.dir = NULL, frames = NULL, thr = 0.7, ant.per = 0.2,
-  tips = 0.2, edges = FALSE, train.dat = NULL, rescale = FALSE,
-  harms = 15, enorm = TRUE, retrain = 5, after.train = "LDA",
-  ties = "fish", size.min = 0.05, show.prog = FALSE,
-  smoothing = "loess", smooth = 0.3, smooth.points = 200,
-  save = TRUE, out.dir = NULL, image.type = "orig",
-  plot.pml = TRUE, flip = TRUE)
+kin.LDA(
+  image.dir = NULL,
+  frames = NULL,
+  thr = 0.7,
+  ant.per = 0.2,
+  tips = 0.2,
+  edges = FALSE,
+  train.dat = NULL,
+  rescale = FALSE,
+  harms = 15,
+  enorm = TRUE,
+  retrain = 5,
+  after.train = "LDA",
+  ties = "fish",
+  size.min = 0.05,
+  show.prog = FALSE,
+  smoothing = "loess",
+  smooth = 0.3,
+  smooth.points = 200,
+  save = TRUE,
+  out.dir = NULL,
+  image.type = "orig",
+  plot.pml = TRUE,
+  flip = TRUE
+)
 }
 \arguments{
 \item{image.dir}{character, directory containing images to analyze.}

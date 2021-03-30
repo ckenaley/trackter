@@ -26,13 +26,13 @@ Please report any bugs or performance issues.
 
 ## Installation
 
-The release version on CRAN of *trackter* can be installed with:
+The release version of *trackter* can be installed with:
 
 ``` r
 install.packages("trackter")
 ```
 
-The current development version can be install with:
+The current development version can be installed with:
 
 ``` r
     require(devtools)
@@ -44,9 +44,9 @@ The current development version can be install with:
 
 The core functions of *trackter* that extract shape and contour data
 from images ( `kin.simple` and `kin.search`) depend upon *EBImage*,
-available on the Bioconductor repository. The current build version of
-*trackter* installs this dependency. If it does not install, it can be
-done so easily with just a few lines of code:
+available on the Bioconductor repository. The current build and
+development versions of *trackter* install this dependency. If it does
+not install, it can be done so easily with just a few lines of code:
 
 ``` r
   if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -180,7 +180,7 @@ qplot(data=ml,x=x,y=value)+facet_wrap(variable~.)
 ![](figure/unnamed-chunk-9-1.png)<!-- -->
 
 When “save=TRUE” (the default), the `kin` functions write images to a
-“processed\_images” subdirectory that include midline overlays.
+user-defined directory that include midline overlays.
 
 ``` r
 
