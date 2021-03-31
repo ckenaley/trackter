@@ -86,6 +86,8 @@ t <- paste0(tempdir(),"/images")
 dir.create(t)
 EBImage::writeImage(y,paste0(t,"/sunfish001.jpg"),type = "jpeg")
 EBImage::display(y,method="raster")
+
+
 ```
 
 Here, `kin.simple` is used to extract contour and shape information.
@@ -93,6 +95,8 @@ Here, `kin.simple` is used to extract contour and shape information.
 ```{r results=FALSE}
 kin.y <- kin.simple(image.dir = t,out.dir = tempdir())
 
+#clean up
+unlink(t,recursive=TRUE)
 ```                
 
 The `kin` functions in *trackter* return a list of data tables/data frames:

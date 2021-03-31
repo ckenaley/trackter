@@ -31,10 +31,10 @@
 #'
 #' #see the images in the "images" subdirectory
 #' list.files( paste0(tempdir(),"/images"))
-#' }
 #' 
 #' #clean up
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+#' }
 
 
 vid.to.images <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,qual=50)  {
@@ -111,10 +111,10 @@ vid.to.images <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,qual=50)  {
 #'frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
 #'
 #'file.exists(paste0(tempdir(),"/spiral.mp4"))
-#'}
 #'
 #' #clean up
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+#' }
 
 images.to.video <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,qual=50,frame.rate=10,overwrite=FALSE,silent=TRUE)  {
   
@@ -206,9 +206,10 @@ images.to.video <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,qual=50,fr
 #'
 #' #see the images in the "images" directory
 #' list.files( paste0(tempdir(),"/images"))
-#' }
+#' 
 #' #clean up
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+#' }
 
 vid.to.images2 <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,filt=NULL,codec=NULL,silent=TRUE)  {
   
@@ -294,10 +295,10 @@ vid.to.images2 <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,filt=NULL,
 #'frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
 #'
 #'file.exists(paste0(tempdir(),"/spiral.mp4"))
-#'}
 #'
 #' #clean up
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+#'}
 
 images.to.video2 <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,overwrite=TRUE,qual=50,vid.ext=".mp4",frame.rate=10,raw=TRUE,filt=NULL,silent=TRUE)  {
     
