@@ -207,7 +207,7 @@ images.to.video <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,qual=50,fr
 #' #see the images in the "images" directory
 #' list.files( paste0(tempdir(),"/images"))
 #' }
-#' #' #clean up
+#' #clean up
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 
 vid.to.images2 <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,filt=NULL,codec=NULL,silent=TRUE)  {
