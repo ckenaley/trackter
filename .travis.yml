@@ -4,14 +4,13 @@ r:
 osx_image: xcode12u
   
 cache: packages
+
 os:
   - osx
 
-
-before_install:
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
+addons:
+  homebrew:
+    packages: ffmpeg, imagemagick@6
 
 r_github_packages:
   - r-lib/covr
