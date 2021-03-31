@@ -1,6 +1,5 @@
 language: r
 r:
-  - oldrel
   - release
 osx_image: xcode12.2
   
