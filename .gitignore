@@ -5,3 +5,4 @@
 cranignore
 README.rmd
 NEWS.rmd
+inst/doc
