@@ -1,5 +1,3 @@
-######### kin.search	
-
 #' @title  Midline tracking over image sequences	
 
 #' @description  Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.	
@@ -425,8 +423,6 @@ cont.dat <- do.call(rbind,conts)
 return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classes.dat,dim=img.dim))	
 }
 
-#### kin.simple
-
 #' @title  Simplified midline tracking over image sequences 
 
 #' @description  Automatically retrieves the midline of a detected ROI based on size. Assumes the ROI of interest is the largest detected and not intersecting the edges of the image frame, conditions often met in kinematic studies. For each ROI of interest, finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI and outputs contours ROIs in each frame for subsequent analysis. Supported image formats are jpeg, png, and tiff.
@@ -747,8 +743,6 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
   return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classes.dat,dim=img.dim))
 }
 
-
-######### fin.kin
 
 #' @title Tracking of fin-like extensions of body contours 
 
