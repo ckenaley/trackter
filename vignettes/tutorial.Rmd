@@ -149,7 +149,10 @@ Of course, the primary utility of automated tracking routines is to process many
   print(file.exists(tv))
   dir.create(ti)
   vid.to.images(tv,out.dir=ti)  
+```
 
+  
+```{r}
   kin.y2 <- kin.simple(image.dir = ti,thr=0.6,ant.per = 0.2,save = FALSE)
   
   #cleanup

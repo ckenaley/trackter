@@ -50,14 +50,13 @@
 #' \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.	
 #' \itemize{	
 #' \item the frame number	
-#'	
 #' \item 'x' and ''y': the position of the tail (rightmost or posteriormost)	
 #' \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)	
 #' \item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}	
 #' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)	
-#'\item 'roi': a character indicating the ROI ranked by size ('a' being the largest)	
-#'\item 'edge': indicating whether ROI was on the edge of the image field	
-#'\item 'size': size of the ROI in pixels^2	
+#' \item 'roi': a character indicating the ROI ranked by size ('a' being the largest)	
+#' \item 'edge': indicating whether ROI was on the edge of the image field	
+#' \item 'size': size of the ROI in pixels^2	
 #' \item 'offset.x': ROI distance from horizontal center	
 #' \item 'offset.y': ROI distance from vertical center	
 #' \item 'offset': linear distance of ROI's centroid to image center	
@@ -152,7 +151,7 @@
 #'       image.type="bin",smooth=0.4)	
 #'	
 #' #plot instantaneous amplitude of tail (last/rightmost point) over frames 	
-#' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
+#' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
 #' print(p)	
 #' 	
 #' # midline plot	
@@ -199,6 +198,7 @@
 #' 
 #' #clean up
 #' unlink(paste0(t,"/images"),recursive=TRUE)
+#' 
 
 kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.25, smooth.points=200, image.type="orig",save=TRUE,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE,border=5){	
 
