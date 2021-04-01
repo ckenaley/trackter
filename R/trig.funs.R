@@ -1,4 +1,3 @@
-
 #' @title Computes distance between two points in Cartesian space.
 #'
 #' @description Computes distance between two points in Cartesian space using simple trigonometry functions

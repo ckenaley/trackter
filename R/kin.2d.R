@@ -1,8 +1,6 @@
-# halfwave
 #' @title Compute half wavelengths from a sine-like waveform
 #' @description Computes half wavelengths and their positions and amplitude from a sine-like waveform based on either peak-to-trough or internodal distance.
 #'
-
 #' @param x Numeric; x position
 #' @param y numeric; y position
 #' @param method character; how half waves should be found and classified, where it crosses zero/the internodal length ("zeros") or peak to trough/trough to peak ("p2t"). See Details. 
@@ -68,6 +66,7 @@
 #'
 #'
 #' @export
+#' 
 halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.1,smoothing="loess") {
   
   wave.begin <- zeros <- l <- begin.index <- end.index <- NULL #to avoid NSE notes in R CMD check
@@ -89,7 +88,6 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
   
   
   #find peaks and then lengths
-  
   
   if (method == "p2t") {
     
@@ -193,7 +191,6 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
   ))
 }
 
-# wave
 #' @title Compute wavelengths from a sine-like waveform
 #' @description Computes full wavelengths and their positions and amplitude from a sine-like waveform based on either peak-to-peak, trough-to-trough, or internodal distance.
 #'
@@ -397,7 +394,6 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
   ))
 }
 
-#amp.freq
 #' @title Computes amplitude and frequency of wave-like data
 #' @description Computes amplitude(s) and wavelength(s) of a wave form, amongst other things, based on a sampling frequency
 #'
