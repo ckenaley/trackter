@@ -201,7 +201,7 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
 #' @param fit logical; if 'method="zeros"', should zeros be detected by a fitting operation. See Details.
 #' @param smoothing character; the smoothing method when 'fit=TRUE', either 'loess' or 'spline'. See Details.
 #' @param dens numeric; factor by which to increase the sample density used in fitting when 'method="zeros"'. See Details.
-#'@param smooth numeric; if \code{smoothing} is set to 'loess', 'span' parameter value for \code{\link{loess}}. If \code{smoothing} is set to 'spline' 'spar' parameter value for \code{\link{smooth.spline}}
+#' @param smooth numeric; if \code{smoothing} is set to 'loess', 'span' parameter value for \code{\link{loess}}. If \code{smoothing} is set to 'spline' 'spar' parameter value for \code{\link{smooth.spline}}
 #'
 #' @details If 'method="p2p"' or 'method="t2t"', full waves are found using critical points (i.e., local maxima, the peaks or minima, the troughs) with \code{\link{features}}.
 #' 
@@ -259,9 +259,10 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
 #'#trough-to-trough method
 #' w.p <- wave(x,y,method="t2t")
 #' 
-#'qplot(data=w.p$names,x=x,y=y,col=wave)
+#' qplot(data=w.p$names,x=x,y=y,col=wave)
 #'
 #' @export
+#' 
 wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.1,smoothing="loess") {
   
   wave.begin <- zeros <- l <- begin.index <- end.index <- NULL# to avoid NSE erros on R CMD check

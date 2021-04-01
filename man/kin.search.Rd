@@ -68,7 +68,6 @@ A list with the following components:
 \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.	
 \itemize{	
 \item the frame number	
-
 \item 'x' and ''y': the position of the tail (rightmost or posteriormost)	
 \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)	
 \item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}	
@@ -184,7 +183,7 @@ kin <- kin.search(image.dir =paste0(tempdir(),"/example"),
       image.type="bin",smooth=0.4)	
 
 #plot instantaneous amplitude of tail (last/rightmost point) over frames 	
-p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)	
+p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
 print(p)	
 	
 # midline plot	
@@ -231,6 +230,7 @@ EBImage::display(i2,method="raster")
 
 #clean up
 unlink(paste0(t,"/images"),recursive=TRUE)
+
 }
 \seealso{
 \code{\link{kin.simple}}

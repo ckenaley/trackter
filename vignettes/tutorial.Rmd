@@ -138,7 +138,7 @@ unlink(paste0(tempdir(),"/sunfish001_000.jpg"))
 
 ### Analyzing a video and multiple images
 
-Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video of a swimming fish to a subdirectory named "images" and these are passed through `kin.simple`. The threshold value for segmenting is set to 0.6 and the head section ("ant.per") set to 0.2 in this case.
+Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video of a swimming fish to a subdirectory named "images". 
 
 ```{r results=FALSE}
   v <- system.file("extdata/vid", "sunfish_BCF_red.avi", package = "trackter")
@@ -151,7 +151,8 @@ Of course, the primary utility of automated tracking routines is to process many
   vid.to.images(tv,out.dir=ti)  
 ```
 
-  
+The images are then passed through `kin.simple`. The threshold value for segmenting is set to 0.6 and the head section ("ant.per") set to 0.2 in this case.
+
 ```{r}
   kin.y2 <- kin.simple(image.dir = ti,thr=0.6,ant.per = 0.2,save = FALSE)
   

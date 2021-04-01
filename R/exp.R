@@ -1,6 +1,3 @@
-
-######### kin.LDA
-
 #' @title  Midline tracking over image sequences with ROI search using LDA
 
 #' @description  Experimental and untested (in the unit-testing sense). Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation. Chose a fish-like ROI class detected through linear discriminate  analysis (LDA) of PCA on elliptical Fourier described shapes. Initial training of ROIs is user defined or with the 'fishshapes' data set loaded with \code{trackter} (see details). For each detected ROI, \code{kin.LDA} finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.

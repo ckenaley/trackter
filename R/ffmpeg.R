@@ -113,6 +113,7 @@ vid.to.images <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,qual=50)  {
 #'file.exists(paste0(tempdir(),"/spiral.mp4"))
 #'
 #' #clean up
+#' unlink(paste0(tempdir(),"/spiral.mp4"))
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 #' }
 
