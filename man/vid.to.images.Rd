@@ -43,10 +43,10 @@ out.dir= paste0(tempdir(),"/images"),qual=100)
 
 #see the images in the "images" subdirectory
 list.files( paste0(tempdir(),"/images"))
-}
 
 #clean up
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+}
 }
 \seealso{
 \code{\link{images.to.video}}

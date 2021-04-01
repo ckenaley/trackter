@@ -61,10 +61,10 @@ vid.name="spiral.mp4",out.dir=tempdir(),
 frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
 
 file.exists(paste0(tempdir(),"/spiral.mp4"))
-}
 
 #clean up
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+}
 }
 \seealso{
 \code{\link{vid.to.images}}
