@@ -263,9 +263,10 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
 #'
 #' @export
 #' 
+
 wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.1,smoothing="loess") {
   
-  wave.begin <- zeros <- l <- begin.index <- end.index <- NULL# to avoid NSE erros on R CMD check
+  wave.begin <- zeros <- l <- begin.index <- end.index <- NULL# to avoid NSE errors on R CMD check
   
   if (!method %in% c("p2p", "zeros","t2t"))  stop("method must be set to 'p2p' , 't2t', or 'zeros' (the default)")
   x = c(unlist(x))

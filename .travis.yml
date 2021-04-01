@@ -8,6 +8,10 @@ cache: packages
 os:
   - osx
 
+env:
+  global:
+    - _R_CHECK_DONTTEST_EXAMPLES_=FALSE
+    
 addons:
   homebrew:
     packages: 
