@@ -14,12 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(trackter)
-library(ggplot2)
-library(data.table)
-```
-
 ## Installation
 
 The release version of *trackter* can be installed with:
@@ -76,27 +70,32 @@ __Other miscellaneous, low-level tools for kinematic analysis__
 
 ## Examples
 
+```{r setup}
+library(trackter)
+library(ggplot2)
+library(data.table)
+```
+
+
 ### Analyzing a single image
 
-*trackter* was developed to analyze image data from videos of swimming fishes, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish from *trackter*'s system data, reading it, writing it to a local subdirectory, and displaying it.
+*trackter* was developed to analyze image data from videos of swimming fishes, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish included with this vignette in a directory named "img" and displaying it.
 
 ```{r,fig.height=2.5}
-y <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
-t <- paste0(tempdir(),"/images")
-dir.create(t)
-EBImage::writeImage(y,paste0(t,"/sunfish001.jpg"),type = "jpeg")
+y <- EBImage::readImage("img/sunfish_BCF.jpg")
+
 EBImage::display(y,method="raster")
 
 
 ```
 
-Here, `kin.simple` is used to extract contour and shape information.
+Here, `kin.simple` is used to extract contour and shape information from the image above. An image with a midline overlay is saved to the working directory (see below).
 
 ```{r results=FALSE}
-kin.y <- kin.simple(image.dir = t,out.dir = tempdir())
 
-#clean up
-unlink(t,recursive=TRUE)
+kin.y <- kin.simple(image.dir = "img",out.dir = getwd())
+
+
 ```                
 
 The `kin` functions in *trackter* return a list of data tables/data frames:
@@ -125,40 +124,36 @@ When "save=TRUE" (the default), the `kin` functions write images to a user-defin
 
 ```{r fig.pos="center",dev="svg",fig.width=5}
 
-y2 <- EBImage::readImage(paste0(tempdir(),"/sunfish001_000.jpg"))
+y2 <- EBImage::readImage("sunfish_BCF_000.jpg")
 EBImage::display(y2,method="raster")
 
 #clean up
-unlink(t,recursive = TRUE)
-
-unlink(paste0(tempdir(),"/sunfish001_000.jpg"))
+unlink("sunfish_BCF_000.jpg")
 
 ```
 
 
 ### Analyzing a video and multiple images
 
-Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video of a swimming fish to a subdirectory named "images". 
+Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video in the "vid" directory of a swimming fish to a directory named "images". 
 
-```{r results=FALSE}
-  v <- system.file("extdata/vid", "sunfish_BCF_red.avi", package = "trackter")
-  
-  file.copy(v,tempdir())
-  ti <- paste0(tempdir(),"/images")
-  tv <- paste0(tempdir(),"/sunfish_BCF_red.avi")
-  print(file.exists(tv))
-  dir.create(ti)
-  vid.to.images(tv,out.dir=ti)  
+```{r,results=FALSE}
+
+#creat and "images" directory.
+t <- paste0(getwd(),"/images")
+dir.create(t)
+#extract images from video and output to new "images" directory
+vid.to.images("vid/sunfish_BCF_red.avi",out.dir=t)  
 ```
 
 The images are then passed through `kin.simple`. The threshold value for segmenting is set to 0.6 and the head section ("ant.per") set to 0.2 in this case.
 
 ```{r}
-  kin.y2 <- kin.simple(image.dir = ti,thr=0.6,ant.per = 0.2,save = FALSE)
+  kin.y2 <- kin.simple(image.dir = t,thr=0.6,ant.per = 0.2,save = FALSE)
   
-  #cleanup
-  unlink(ti,recursive = TRUE)
-  unlink(tv)
+  #cleanup images directory
+  unlink(t,recursive = TRUE)
+
   
 ```
 

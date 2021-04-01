@@ -407,14 +407,14 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
 #' @import features
 #' @seealso \code{\link{features}}
 #' @examples
-#'\dontrun{
+#'
 #' #Compute waveform patterns
 #' x <- seq(0,pi,0.1)
 #' y <- sin(x^1.3*pi)
 #' plot(x,y)
 #'
 #' amp.freq(x=x,y=y)
-#' }
+#' 
 
 amp.freq <- function(x = NULL, y, sf = 100) {
   s <- 1 / sf
@@ -429,12 +429,12 @@ amp.freq <- function(x = NULL, y, sf = 100) {
   names(snr) <- NULL
   freq <-
     1 / (s * diff(amp.n$cpts[seq(1, length(amp.n$cpts), 2)])) #peak to peak or trough to trough freq
-  tail.dat <-
+ dat <-
     list(a = amp,
          f = freq,
          a.f = amp.f,
-         snr = snr)#a.f is amp according to function
+         snr = snr) #a.f is amp according to function
   
-  return(tail.dat)
+  return(dat)
 }
 
