@@ -215,7 +215,7 @@ if(!save & !is.null(out.dir)) stop("'out.dir' specified but 'save=FALSE'. To sav
 proc.dir <- out.dir
 
 
-images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r	
+images <- list.files(image.dir,full.names = TRUE)
 
 if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")	
 if(!is.null(frames)) images <- images[frames]	
@@ -576,7 +576,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
   
   proc.dir <- out.dir
   
-  images <- paste0(image.dir,"/",list.files(image.dir)[!grepl("Icon\r",list.files(image.dir))]) #remove pesky Icon\r
+  images <- list.files(image.dir,full.names = TRUE)
   
   if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")
   if(!is.null(frames)) images <- images[frames]

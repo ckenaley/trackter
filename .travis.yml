@@ -11,7 +11,6 @@ os:
 env:
   global:
     - _R_CHECK_DONTTEST_EXAMPLES_=FALSE
-    - R_CHECK_ARGS="--as-cran --no-manual --no-build-vignettes"
     
 addons:
   homebrew:
