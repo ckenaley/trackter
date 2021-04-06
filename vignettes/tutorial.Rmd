@@ -150,7 +150,7 @@ The images are then passed through `kin.simple`. The threshold value for segment
 #clean up
 
 f <- list.files("img2",full.names = T)
-sapply(f,unlink)
+sapply(f[grepl(".jpg",f)],unlink)
 ```
 
 
