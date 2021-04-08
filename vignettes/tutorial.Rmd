@@ -79,12 +79,12 @@ library(data.table)
 
 ### Analyzing a single image
 
-*trackter* was developed to analyze image data from videos of swimming fishes, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish included with this vignette in a directory named "img" and displaying it.
+*trackter* was developed to analyze image data from videos of swimming fishes, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish included with the package in a directory named "img" and displaying it.
 
 ```{r,fig.height=2.5}
 
-
-y <- EBImage::readImage("img/sunfish_BCF.jpg")
+i <- system.file("extdata/img","sunfish_BCF.jpg",package="trackter")
+y <- EBImage::readImage(i)
 
 
 EBImage::display(y,method="raster")
@@ -92,11 +92,13 @@ EBImage::display(y,method="raster")
 
 ```
 
-Here, `kin.simple` is used to extract contour and shape information from the image above. An image with a midline overlay is saved to the working directory (see below).
+Here, `kin.simple` is used to extract contour and shape information from the image above by refering to the directory that contains it. An image with a midline overlay is saved to the working directory (see below).
 
 ```{r results=FALSE}
 
-kin.y <- kin.simple(image.dir = "img",out.dir = getwd())
+dir <- system.file("extdata","img",package="trackter")
+
+kin.y <- kin.simple(image.dir = dir,out.dir = getwd())
 
 
 ```                
@@ -138,27 +140,29 @@ unlink("sunfish_BCF_000.jpg")
 
 ### Analyzing a video and multiple images
 
-Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video in the "vid" directory of a swimming fish to an existing directory named "img2". 
+Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video in the package's "vid" directory of a swimming fish to a new directory named "img2". 
 
 ```{r,results=FALSE}
-v <- "vid/sunfish_BCF_red.avi"
-#extract images from video and output to new "images" directory
-vid.to.images(v,out.dir="img2")  
+
+#construct video file path
+v <- system.file("extdata/vid","sunfish_BCF_red.avi",package="trackter")
+
+#create new directory to store images
+dir.create(paste0(getwd(),"/img2"))
+
+#extract images from video and output to new "img2" directory
+vid.to.images(v,out.dir=paste0(getwd(),"/img2"))  
 ```
 
 The images are then passed through `kin.simple`. The threshold value for segmenting is set to 0.6 and the head section ("ant.per") set to 0.2 in this case.
 
 ```{r}
-  kin.y2 <- kin.simple(image.dir ="img2",thr=0.6,ant.per = 0.2,save = FALSE)
+  kin.y2 <- kin.simple(image.dir =paste0(getwd(),"/img2"),thr=0.6,ant.per = 0.2,save = FALSE)
 
 #clean up
-
-f <- list.files("img2",full.names = TRUE)
-unlink(f)
+unlink(paste0(getwd(),"/img2"),recursive = TRUE)
 
 ```
-
-
 
 
 Now we can have a look at trailing-edge position and amplitude (relative to the head path) across the frames. 

@@ -1,0 +1,14 @@
+---
+output:
+  github_document:
+    html_preview: true
+---
+
+# Notes for build
+
+  * don't run `devtools::build_vignettes`
+  * use full path descriptions rather than relative paths in vignettes, e.g, `paste0(getwd(),"/img2")` not `"img2"`
+
+# Notes for testing
+
+  * use Rhub for suggested test OS: [see this](https://blog.r-hub.io/2019/03/26/why-care/)

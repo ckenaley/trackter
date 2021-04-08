@@ -15,3 +15,5 @@
 ^codecov\.yml$
 ^Meta$
 ^doc$
+^buildnotes\.rmd$
+^buildnotes\.md$
