@@ -84,9 +84,8 @@ library(data.table)
 ```{r,fig.height=2.5}
 
 
+y <- EBImage::readImage("img/sunfish_BCF.jpg")
 
-y <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
-#y <- EBImage::readImage("img/sunfish_BCF.jpg")
 
 EBImage::display(y,method="raster")
 
@@ -97,9 +96,7 @@ Here, `kin.simple` is used to extract contour and shape information from the ima
 
 ```{r results=FALSE}
 
-i <- system.file("extdata", "img", package = "trackter")
-
-kin.y <- kin.simple(image.dir = i,out.dir = getwd())
+kin.y <- kin.simple(image.dir = "img",out.dir = getwd())
 
 
 ```                
@@ -144,10 +141,7 @@ unlink("sunfish_BCF_000.jpg")
 Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video in the "vid" directory of a swimming fish to an existing directory named "img2". 
 
 ```{r,results=FALSE}
-
-dir.create("img2")
-
-v <- system.file("extdata/vid", "sunfish_BCF_red.avi", package = "trackter")
+v <- "vid/sunfish_BCF_red.avi"
 #extract images from video and output to new "images" directory
 vid.to.images(v,out.dir="img2")  
 ```
@@ -159,8 +153,11 @@ The images are then passed through `kin.simple`. The threshold value for segment
 
 #clean up
 
-unlink("img2",recursive = T)
+f <- list.files("img2",full.names = TRUE)
+unlink(f)
+
 ```
+
 
 
 

@@ -1,6 +1,9 @@
 language: r
 r:
   - release
+  
+r_check_args: --as-cran
+
 osx_image: xcode12u
   
 cache: packages

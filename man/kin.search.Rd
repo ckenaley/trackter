@@ -147,6 +147,8 @@ The algorithm assumes a left-right orientation, i.e., the head of the ROI is pos
 
 Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
 
+If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
+
 \code{search.for} determines how ROIs are chosen: 	
 \itemize{	
 \item "offset", the ROI with a centroid that is the shortest linear distance to the center of the field	

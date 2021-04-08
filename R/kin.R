@@ -28,6 +28,8 @@
 #'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.	
 #'	
 #'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
+#'
+#'If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
 #'	
 #' \code{search.for} determines how ROIs are chosen: 	
 #' \itemize{	
@@ -214,8 +216,9 @@ if(!save & !is.null(out.dir)) stop("'out.dir' specified but 'save=FALSE'. To sav
 
 proc.dir <- out.dir
 
-
 images <- list.files(image.dir,full.names = TRUE)
+
+if(!length(images)>0) stop("no images in image.dir")	
 
 if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")	
 if(!is.null(frames)) images <- images[frames]	
@@ -230,7 +233,7 @@ classes.l <- list()
 lms <- list()	
 conts <- list()	
 
-pb = txtProgressBar(min = 0, max = length(images), initial = 0,style=3)	
+
 
 roi.outs <- list() #store the rois for each image	
 
@@ -412,7 +415,7 @@ for(im in images){
     
     dev.off()	
   }	
-  setTxtProgressBar(pb,which(images==im))	
+
 }	
 
 classes.dat <- do.call(rbind,classes.l)	
@@ -578,6 +581,8 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
   
   images <- list.files(image.dir,full.names = TRUE)
   
+  if(!length(images)>0) stop("no images in image.dir")	
+  
   if(any(frames>length(images))) stop("variable 'frames' out of range of image sequence")
   if(!is.null(frames)) images <- images[frames]
   
@@ -589,7 +594,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
   classes.l <- list()
   lms <- list()
   conts <- list()
-  pb = txtProgressBar(min = 0, max = length(images), initial = 0,style=3)
+
   
   
   roi.outs <- list() #store the rois for each image
@@ -732,7 +737,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
       
       dev.off()
     }
-    setTxtProgressBar(pb,which(images==im))
+    
   }
   
   classes.dat <- do.call(rbind,classes.l)

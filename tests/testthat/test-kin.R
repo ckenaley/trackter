@@ -23,6 +23,14 @@ test_that("kin.simple works fine", {
   expect_error(invisible(capture.output( kin.y <- kin.simple(image.dir = paste0(t,"/test_images"),out.dir=tp,save = FALSE))),"To save processed images")
   
   
+  expect_error(invisible(capture.output( kin.y <- kin.simple(image.dir = paste0(t,"/test_images"),out.dir=tp,save = FALSE))),"To save processed images")
+  
+ dir.create(paste0(t,"/test_images2"))
+  
+  expect_error(invisible(capture.output( kin.simple(image.dir = paste0(t,"/test_images2"),save=FALSE))),"no images in image.dir")
+  
+  unlink(paste0(t,"/test_images2"),recursive = TRUE)
+  
   expect_error(invisible(capture.output( kin.simple(image.dir = paste0(t,"/foo"),out.dir=tp,save=TRUE))),"does not exist")
   expect_error(invisible(capture.output( kin.simple(image.dir = paste0(t,"/test_images"),out.dir="foo",save=TRUE))),"does not exist")
   
@@ -35,6 +43,7 @@ test_that("kin.simple works fine", {
   
   unlink(paste0(t,"/test_images"),recursive = TRUE)
   unlink(tp,recursive = TRUE)
+  unlink(paste0(t,"/test_images"),recursive = TRUE)
   
 })
 
@@ -73,8 +82,15 @@ test_that("kin.search works fine", {
   
   expect_error(invisible(capture.output( kin.search(image.dir =paste0(t,"/test_images") ,search.for="foo",save=FALSE))),"must be set to")
   
+  dir.create(paste0(t,"/test_images2"))
+  
+  expect_error(invisible(capture.output( kin.search(image.dir = paste0(t,"/test_images2"),save=FALSE))),"no images in image.dir")
+  
+  unlink(paste0(t,"/test_images2"),recursive = TRUE)
+  
   unlink(paste0(t,"/test_images"),recursive = TRUE)
   unlink(tp,recursive = TRUE)
+
   
 })
 
