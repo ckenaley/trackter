@@ -4,7 +4,6 @@
 ^\.travis\.yml$
 ^notes$
 ^\_config\.yml$
-^figure$
 ^appveyor\.yml$
 ^README\.rmd$
 ^NEWS\.Rmd$
@@ -14,6 +13,7 @@
 ^CRAN-RELEASE$
 ^codecov\.yml$
 ^Meta$
-^doc$
 ^buildnotes\.rmd$
 ^buildnotes\.md$
+^tutorial\.Rmd\.orig$
+^doc$
