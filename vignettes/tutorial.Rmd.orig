@@ -109,7 +109,7 @@ The `kin` functions in *trackter* return a list of data tables/data frames:
 print(sapply(kin.y,class))
 ```
 
-Most will be interested in the "kin.dat" and "midline" data for the calculation of body shape and position parameters (e.g., amplitude, wavelength, etc.). For example, "kin.dat" table includes, among other things, frame-specific trailing-edge (rightmost) amplitude ("x", "y"), head (leftmost) position ("head.x", "head.y") which may be used to calculated position and trailing-edge amplitude.
+Most will be interested in the "kin.dat" and "midline" data for the calculation of body shape and position parameters (e.g., amplitude, wavelength, etc.). For example, the "kin.dat" table includes, among other things, frame-specific trailing-edge (rightmost) amplitude ("x", "y"), head (leftmost) position ("head.x", "head.y") which may be used to calculate position and trailing-edge amplitude.
 
 ```{r kinykindat}
 print(kin.y$kin.dat)
