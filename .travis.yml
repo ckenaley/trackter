@@ -1,6 +1,7 @@
 language: r
 r:
   - release
+  - devel
   
 r_check_args: --as-cran
 
@@ -27,6 +28,9 @@ dist: xenial
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y ffmpeg; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y imagemagick; fi
+  
+ 
 
 # removed, went to addons instead -> before_install: - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
 

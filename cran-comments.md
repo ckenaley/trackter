@@ -1,6 +1,9 @@
 # Submission of 0.1.1
 
-This is an update of a trackter 0.1.0 that was archived on 2019-12-18 due to the following issue that was unaddressed:
+This is an update of a trackter 0.1.0 that was archived on 2019-12-21 due to the following issue that was unaddressed:
+
+There was a fail in testings due to a change in `Momocs:::Out.array()` in latest version of the package which now requires a list of matrices. Lists now used and checks/tests pass.
+
 
 
 ## Test environments
