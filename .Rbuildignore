@@ -17,3 +17,7 @@
 ^buildnotes\.md$
 ^tutorial\.Rmd\.orig$
 ^doc$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
