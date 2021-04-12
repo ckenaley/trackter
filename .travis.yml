@@ -24,23 +24,30 @@ addons:
     - imagemagick@6
   apt:
     update: true
-      sources:
-        - sourceline: 'ppa:opencpu/imagemagick'
-      packages:
-        - libmagick++-dev
-        - libfftw3-dev
+    packages:
+      - libmagick++-dev
+      - libfftw3-dev
     
 sudo: required
 dist: xenial
 
-  
- 
-
-# removed, went  to addons instead -> before_install: - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
+#removed, went to addons instead -> before_install: - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
 
 r_github_packages:
   - r-lib/covr
 
 after_success:
   - Rscript -e 'covr::codecov()'
+  - Rscript -e 'pkgdown::build_site()'
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_PAT
+  keep-history: true
+  local-dir: docs
+  on:
+    branch: master
+
+
   
