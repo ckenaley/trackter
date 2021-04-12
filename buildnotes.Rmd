@@ -26,11 +26,11 @@ f2 <- gsub("./","./vignettes/",f)
 file.copy(f,f2)
 sapply(f,unlink)
 ``` 
-# Notes for testing
+# Notes for testing/CI
 
-    
     * follow these pointers for `pkgdown` site build with CI on Travis
-# Notes for gitting
+    * check travis.yaml with https://config.travis-ci.com/explore
+# Notes for gitting/sit
 
   * `usethis::use_pkgdown()` for `pkgdown`
   * `pkgdown::build_site()` to build site

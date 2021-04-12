@@ -16,6 +16,7 @@ os:
 env:
   global:
     - _R_CHECK_DONTTEST_EXAMPLES_=FALSE
+    - _R_CHECK_FORCE_SUGGESTS_=FALSE
     
 addons:
   homebrew:
