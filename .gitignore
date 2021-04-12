@@ -6,7 +6,5 @@ cranignore
 README.rmd
 NEWS.rmd
 inst/doc
-doc
-docs/*
 Meta
 
