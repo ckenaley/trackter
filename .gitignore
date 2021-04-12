@@ -7,5 +7,6 @@ README.rmd
 NEWS.rmd
 inst/doc
 doc
+docs/*
 Meta
-docs
+

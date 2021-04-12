@@ -29,6 +29,7 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    animation
+    animation,
+    pkgdown
 SystemRequirements: FFmpeg
 VignetteBuilder: knitr

@@ -28,6 +28,15 @@ sapply(f,unlink)
 ``` 
 # Notes for testing
 
+    
+    * follow these pointers for `pkgdown` site build with CI on Travis
+# Notes for gitting
+
+  * `usethis::use_pkgdown()` for `pkgdown`
+  * `pkgdown::build_site()` to build site
+  * see: https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html
+  
+
 
 
  
