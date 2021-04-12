@@ -36,6 +36,7 @@ dist: xenial
 
 r_github_packages:
   - r-lib/covr
+  - r-lib/pkgdown
 
 after_success:
   - Rscript -e 'covr::codecov()'

@@ -22,14 +22,13 @@ Imports:
   ggplot2,
   graphics,
   stats,
-  utils,
-  pkgdown
+  utils
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 3.0.1),
     covr,
     knitr,
     rmarkdown,
-    animation
+    animation,
 SystemRequirements: FFmpeg
 VignetteBuilder: knitr
