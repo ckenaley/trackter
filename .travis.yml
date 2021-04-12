@@ -33,7 +33,7 @@ addons:
 sudo: required
 dist: xenial
 
-#removed, went  to addons instead -> before_install: - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
+#removed, went to addons instead -> before_install: - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install imagemagick@6; fi
 
 r_github_packages:
   - r-lib/covr
