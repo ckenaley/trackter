@@ -2,7 +2,9 @@ language: r
 r:
   - release
   - devel
-  
+
+before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
+
 r_check_args: --as-cran
 
 osx_image: xcode12u
@@ -36,7 +38,6 @@ dist: xenial
 
 r_github_packages:
   - r-lib/covr
-  - r-lib/pkgdown
 
 after_success:
   - Rscript -e 'covr::codecov()'
