@@ -30,7 +30,7 @@ sapply(f,unlink)
 
     * follow these pointers for `pkgdown` site build with CI on Travis
     * check travis.yaml with https://config.travis-ci.com/explore
-    * imagemagick requirements related to ubuntu/linuz https://srvanderplas.netlify.app/post/2019-05-07-travis-tricks/
+    * imagemagick requirements related to ubuntu/linux https://srvanderplas.netlify.app/post/2019-05-07-travis-tricks/
     
 # Notes for gitting/site
 
