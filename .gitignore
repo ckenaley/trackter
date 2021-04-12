@@ -7,4 +7,6 @@ README.rmd
 NEWS.rmd
 inst/doc
 Meta
-
+docs/*
+vignettes/*.R
+vignettes/*.html
