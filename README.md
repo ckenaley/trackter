@@ -18,11 +18,15 @@ kinematics from video and image data. The core functions of *trackter*
 automatically detect a region of interest (ROI) and compute important
 kinematic and shape parameters based on the ROI’s contour. These
 functions use thresholding and segmentation to identify ROIs and, thus,
-moderately contrasted images are required. Below, some of *trackter*’s
-functionality is detailed and examples of its usage in the context of
-fish locomotion are presented.
+moderately contrasted images are required. Prsented below is some of
+*trackter*’s functionality in the context of fish locomotion.
 
 Please report any bugs or performance issues.
+
+## Getting started
+
+Please check out `trackter`’s [github
+page](https://ckenaley.github.io/trackter/)
 
 ## Installation
 
