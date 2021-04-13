@@ -28,14 +28,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Description
 
-*trackter* is an R package for semiautomated tracking and analysis of 2D kinematics from video and image data. The core functions of *trackter* automatically detect a region of interest (ROI) and compute important kinematic and shape parameters based on the ROI's contour. These functions use thresholding and segmentation to identify ROIs and, thus, moderately contrasted images are required. Prsented below is some of *trackter*'s functionality in the context of fish locomotion.
+*trackter* is an R package for semiautomated tracking and analysis of 2D kinematics from video and image data. The core functions of *trackter* automatically detect a region of interest (ROI) and compute important kinematic and shape parameters based on the ROI's contour. These functions use thresholding and segmentation to identify ROIs and, thus, moderately contrasted images are required. Presented below is some of *trackter*'s functionality in the context of fish locomotion.
 
 
 Please report any bugs or performance issues.
 
 ## Getting started
 
-Please check out `trackter`'s [github page](https://ckenaley.github.io/trackter/)
+Please check out *trackter*'s [github page](https://ckenaley.github.io/trackter/)
 
 
 ## Installation

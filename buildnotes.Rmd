@@ -35,6 +35,7 @@ sapply(f,unlink)
 # Notes for gitting/site
 
   * `usethis::use_pkgdown()` for `pkgdown`
+  * `pkgdown::build_articles` and `pkgdown::build_site`
   * see: https://www.datacamp.com/community/tutorials/cd-package-docs-pkgdown-travis
   * see: https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html
   
