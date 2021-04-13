@@ -12,4 +12,3 @@
   - otsu thresholding for `kin` functions
   - universal edge parameter for `kin` functions
 
-## trackter 0.1.1
