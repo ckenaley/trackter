@@ -196,9 +196,8 @@
   <span class='op'>}</span>
 <span class='op'>}</span>
 <span class='fu'>animation</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/animation/man/saveVideo.html'>saveVideo</a></span><span class='op'>(</span><span class='fu'>fun</span><span class='op'>(</span><span class='op'>)</span>,video.name<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='st'>"/wave.mp4"</span><span class='op'>)</span>,interval <span class='op'>=</span> <span class='fl'>0.2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Executing: 'ffmpeg' -y -framerate 5 -i Rplot%d.png -pix_fmt yuv420p wave.mp4</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>Video has been created at: /private/var/folders/z3/_825pg0s3jvf0hb_q8kzmg5h0000gn/T/Rtmps2Jdnx/wave.mp4</span></div><div class='input'>
+</div><div class='output co'>#&gt; Error in system(paste(ffmpeg, "-version"), intern = TRUE) : 
+#&gt;   error in running command</div><div class='output co'>#&gt; <span class='warning'>Warning: The command "'ffmpeg'" is not available in your system. Please install FFmpeg or avconv first: http://ffmpeg.org/download.html</span></div><div class='output co'>#&gt; NULL</div><div class='input'>
 <span class='co'>#reduce the image images to 200 px wide maintaining aspect ratio</span>
 <span class='co'>#notice the spaces at the beginning/end of string</span>
 <span class='va'>filt.red</span> <span class='op'>&lt;-</span> <span class='st'>" -vf scale=200:-1 "</span>
@@ -206,26 +205,11 @@
 <span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='st'>"/images"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'>vid.to.images2</span><span class='op'>(</span>vid.path<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='st'>"/wave.mp4"</span><span class='op'>)</span>,
 out.dir<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='st'>"/images"</span><span class='op'>)</span>,filt<span class='op'>=</span><span class='va'>filt.red</span>,codec<span class='op'>=</span><span class='cn'>NULL</span><span class='op'>)</span>
-
+</div><div class='output co'>#&gt; Error in system("ffmpeg -version", intern = TRUE) : 
+#&gt;   error in running command</div><div class='output co'>#&gt; <span class='warning'>Warning: The command 'ffmpeg' is not available in your system. Please install FFmpeg first:http://ffmpeg.org/download.html</span></div><div class='output co'>#&gt; NULL</div><div class='input'>
 <span class='co'>#see the images in the "images" directory</span>
 <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='st'>"/images"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "wave.mp4_00001.jpg" "wave.mp4_00002.jpg" "wave.mp4_00003.jpg"
-#&gt;  [4] "wave.mp4_00004.jpg" "wave.mp4_00005.jpg" "wave.mp4_00006.jpg"
-#&gt;  [7] "wave.mp4_00007.jpg" "wave.mp4_00008.jpg" "wave.mp4_00009.jpg"
-#&gt; [10] "wave.mp4_00010.jpg" "wave.mp4_00011.jpg" "wave.mp4_00012.jpg"
-#&gt; [13] "wave.mp4_00013.jpg" "wave.mp4_00014.jpg" "wave.mp4_00015.jpg"
-#&gt; [16] "wave.mp4_00016.jpg" "wave.mp4_00017.jpg" "wave.mp4_00018.jpg"
-#&gt; [19] "wave.mp4_00019.jpg" "wave.mp4_00020.jpg" "wave.mp4_00021.jpg"
-#&gt; [22] "wave.mp4_00022.jpg" "wave.mp4_00023.jpg" "wave.mp4_00024.jpg"
-#&gt; [25] "wave.mp4_00025.jpg" "wave.mp4_00026.jpg" "wave.mp4_00027.jpg"
-#&gt; [28] "wave.mp4_00028.jpg" "wave.mp4_00029.jpg" "wave.mp4_00030.jpg"
-#&gt; [31] "wave.mp4_00031.jpg" "wave.mp4_00032.jpg" "wave.mp4_00033.jpg"
-#&gt; [34] "wave.mp4_00034.jpg" "wave.mp4_00035.jpg" "wave.mp4_00036.jpg"
-#&gt; [37] "wave.mp4_00037.jpg" "wave.mp4_00038.jpg" "wave.mp4_00039.jpg"
-#&gt; [40] "wave.mp4_00040.jpg" "wave.mp4_00041.jpg" "wave.mp4_00042.jpg"
-#&gt; [43] "wave.mp4_00043.jpg" "wave.mp4_00044.jpg" "wave.mp4_00045.jpg"
-#&gt; [46] "wave.mp4_00046.jpg" "wave.mp4_00047.jpg" "wave.mp4_00048.jpg"
-#&gt; [49] "wave.mp4_00049.jpg" "wave.mp4_00050.jpg"</div><div class='input'>
+</div><div class='output co'>#&gt; character(0)</div><div class='input'>
 <span class='co'>#clean up</span>
 <span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='st'>"/images"</span><span class='op'>)</span>,recursive<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='co'># }</span>
