@@ -35,7 +35,6 @@ sapply(f,unlink)
 # Notes for gitting/site
 
   * `usethis::use_pkgdown()` for `pkgdown`
-  * `pkgdown::build_site()` to build site
   * see: https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html
   
 
