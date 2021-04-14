@@ -28,9 +28,9 @@ sapply(f,unlink)
 ``` 
 # Notes for testing/CI
 
-    * follow these pointers for `pkgdown` site build with CI on Travis
-    * check travis.yaml with https://config.travis-ci.com/explore
-    * imagemagick requirements related to ubuntu/linux https://srvanderplas.netlify.app/post/2019-05-07-travis-tricks/
+  * follow these pointers for `pkgdown` site build with CI on Travis
+  * check travis.yaml with https://config.travis-ci.com/explore
+  * imagemagick requirements related to ubuntu/linux https://srvanderplas.netlify.app/post/2019-05-07-travis-tricks/
     
 # Notes for gitting/site
 
@@ -38,7 +38,7 @@ sapply(f,unlink)
   * `pkgdown::build_articles` and `pkgdown::build_site`
   * see: https://www.datacamp.com/community/tutorials/cd-package-docs-pkgdown-travis
   * see: https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html
-  * abandoned deploy, no going with static, but often builds of site locally with push to git [a la](https://sahirbhatnagar.com/blog/2020/03/03/creating-a-website-for-your-r-package/)
+  * abandoned deploy, now going with static, but often builds of site locally with push to git [a la](https://sahirbhatnagar.com/blog/2020/03/03/creating-a-website-for-your-r-package/)
     - `use_travis_deploy()` broken with:
     
 ```
