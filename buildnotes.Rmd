@@ -38,7 +38,16 @@ sapply(f,unlink)
   * `pkgdown::build_articles` and `pkgdown::build_site`
   * see: https://www.datacamp.com/community/tutorials/cd-package-docs-pkgdown-travis
   * see: https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html
+  * abandoned deploy, no going with static, but often builds of site locally with push to git [a la](https://sahirbhatnagar.com/blog/2020/03/03/creating-a-website-for-your-r-package/)
+    - `use_travis_deploy()` broken with:
+    
+```
+Error: `github_token()` was deprecated in usethis 2.0.0 and is now defunct.
+Call `gh::gh_token()` to retrieve a GitHub personal access token
+Call `gh_token_help()` if you need help getting or configuring your token
+```
   
+
 
 
 
