@@ -115,3 +115,33 @@ test_that("fin.kin works fine", {
 })
 
 
+test_that("thr.check works fine", {
+  
+  y <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+ 
+ tc <- thr.check(y)
+ expect_is(tc,"numeric")
+ expect_true(length(tc)==1)
+ expect_message(invisible(capture.output(thr.check(y,min=0.2,max=0.3))),"Otsu value is outside defined threshold range")
+ expect_error(invisible(capture.output(thr.check(y,min=0.4,max=0.3))),"'min' must be < 'max'")
+ expect_error(invisible(capture.output(thr.check(y,min=0.4,max=0.4))),"'min' must be value different from 'max'")
+ 
+ expect_error(invisible(capture.output(thr.check(y,min=NULL,max=0.3))),"both 'min' and 'max' must have value=NULL or numeric 0-1")
+ 
+ expect_true(length(thr.check(y,otsu=FALSE))==0)
+ 
+
+ png("rplot.png") 
+ thr.check(y,otsu=FALSE)
+ dev.off() 
+ 
+ expect_true(file.exists("rplot.png"))
+ 
+ expect_true(file.size("rplot.png")>100)
+ 
+ unlink("rplot.png")
+
+ 
+})
+
+

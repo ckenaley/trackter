@@ -29,6 +29,7 @@
 #' @param flip logical, indicating if binary should be flipped.
 #' 
 #' @export
+#' 
 #'
 #' @details
 #'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. ffmpeg operations or even imageJ can rotate images not in this orientation. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position.  

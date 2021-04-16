@@ -86,7 +86,7 @@ require(ggplot2)
 f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
 download.file(f,"sunfish.avi")
 
-#extract images with ffmpeg opereations and reduce them to 600 px wide with a filter
+#extract images with ffmpeg operations and reduce them to 600 px wide with a filter
 filt.red <- " -vf scale=600:-1 " #filter
 vid.to.images2(vid.path="sunfish.avi",filt = filt.red) #extract
 

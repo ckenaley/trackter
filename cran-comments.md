@@ -2,7 +2,7 @@
 
 ## Test environments
 * local OS X install, R 4.0.2
-* OS X (on travis-ci, devel and  release)
+* OS X and linux (on travis-ci, devel and  release)
 * win-builder (on appveyor-ci, devel and release)
 * win-builder (devel and release)
 

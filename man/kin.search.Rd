@@ -145,8 +145,7 @@ Automatically retrieves the midline of a detected ROI in each image of a sequenc
 \details{
 The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.	
 
-Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
-
+Thresholding operations can be performed with an arbitrary (user defined) numeric value or w;
 If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
 
 \code{search.for} determines how ROIs are chosen: 	

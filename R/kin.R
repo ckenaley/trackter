@@ -22,13 +22,13 @@
 #' @param border if \code{edges=TRUE}, size of border to add in pixels. Dee details.	
 #' 	
 #' @export	
-#' 	
+#'
+#' 
 #'	
 #' @details	
 #'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.	
 #'	
-#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.	
-#'
+#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or w;
 #'If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
 #'	
 #' \code{search.for} determines how ROIs are chosen: 	
@@ -827,7 +827,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
 #' download.file(f,"sunfish.avi")
 #' 
-#' #extract images with ffmpeg opereations and reduce them to 600 px wide with a filter
+#' #extract images with ffmpeg operations and reduce them to 600 px wide with a filter
 #' filt.red <- " -vf scale=600:-1 " #filter
 #' vid.to.images2(vid.path="sunfish.avi",filt = filt.red) #extract
 #' 
@@ -950,4 +950,87 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
   amp <- finPts[,list(amp=abs(y[pos=="start"]-y[pos=="tip"]),amp.bl=abs(y[pos=="start"]-y[pos=="tip"])/bl),by=list(fin)]
   
   return(list(body=x.s,fin=fins,fin.pts=finPts,comp=comp,midline=mid,bl=bl,amp=amp))
+}
+
+
+#' @title Evaluate a range of threshold values for creating binary images
+
+#' @description Converts an image to grayscale, applies a user defined threshold range to segment the binary the image, and then plots segmented images that reflect 9 discrete values in the range.  
+#'
+#' @param img character, a path to an image file.
+#' @param min numeric, the minimum threshold value (0-1).
+#' @param max numeric, the maximum threshold value (0-1).
+#' @param otsu logical, should the automatically determined threshold value be printed. See Details.
+#' 
+#' @export
+#' 
+#' @importFrom graphics text
+#'
+#' @details
+#' Displays a grid of 9 images as an R raster graphic, each the result of 9 discrete values within the range describe by \code{min} and \code{max}. If both \code{min} and \code{max} are \code{NULL}, then the threshold range is defined by the default \code{seq(0.1,0.9,.1)}. This function should help users refine threshold values for detecting ROIs with \code{kin.search} and \code{kin.simple} if automatic thresholding using Otsu's method is not satisfactory.
+#'
+#' @return If 'otsu=TRUE', a single automated threshold value is returned using Otsu's method. See \code{\link{otsu}}.	
+#'
+#' @seealso \code{\link{kin.simple}}, \code{\link{kin.LDA}}, \code{\link{kin.search}}, \code{\link{efourier}}, \code{\link{otsu}}
+#' 
+#' @export
+#' 
+#'
+#' @examples
+#' 
+#'
+#' #download example image video
+#'  y <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+#' 
+#' # default values
+#' thr.check(y)
+#' 
+#' #custom values
+#' thr.check(y,min=0.2,max=1.5)
+#' 
+#' 
+
+thr.check <- function(img,min=NULL,max=NULL,otsu=TRUE){
+  
+  if(!grepl(".jpeg|.jpg|.png|.tiff",img,ignore.case = TRUE)) stop("file in file path doesn't appear to be an image.")
+  
+  x <- EBImage::readImage(img,all=FALSE)
+  EBImage::colorMode(x)=EBImage::Grayscale
+  
+  ot <- EBImage::otsu(x)[1]
+
+  if(all(sapply(list(min,max),is.null))) thr <- seq(0.1,0.9,.1) #sequence of threshold values
+  
+  if(length(which(sapply(list(min,max),is.null)==F))==1) stop("both 'min' and 'max' must have value=NULL or numeric 0-1")
+  
+  if(all(!sapply(list(min,max),is.null))&& min>max) stop("'min' must be < 'max'")
+  
+  if(all(!sapply(list(min,max),is.null))&& min==max) stop("'min' must be value different from 'max'")
+  
+  if(all(!sapply(list(min,max),is.null))) thr <- seq(min,max,length.out = 9)
+  
+  img.l <- list()
+  for(i in thr){
+    y <- x > i #threshold the image using value i
+    img.l[[paste(i)]] <- EBImage::getFrame(y,1)  
+  }
+  
+  img.t <-   EBImage::combine(img.l)
+  
+  nx <- ny <-  3
+  width <- dim(x)[1]
+  height <-  dim(x)[2]
+  x_offset <-  y_offset <-  20
+  n <- EBImage::numberOfFrames(img.t, 'render')
+  
+  EBImage::display(img.t,method="raster",all=TRUE,nx=nx)
+  text(x = rep(seq(from = 0, by = width, length.out = nx), ny) + x_offset,
+       y = rep(seq(from = 0, by = height, length.out = ny), each = nx) + y_offset,
+       label = thr, 
+       adj = c(0,1), col = "red", cex = 1.5)
+  
+  if(all(!sapply(list(min,max),is.null))){if(ot>max|ot<min) message("Otsu value is outside defined threshold range")}
+  
+  if(otsu) return(ot)
+  
 }
