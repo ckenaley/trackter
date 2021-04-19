@@ -15,7 +15,7 @@
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.	
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.	
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. 	
-#' @param out.qual, numeric, a value between 0-1 representing the quality of outputted images. Ignored is \code{save=FALSE}
+#' @param out.qual, numeric, a value between 0-1 representing the quality of outputted images. Ignored if \code{save=FALSE}.
 #' @param out.dir character, the directory to which outputted images should be saved.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.	
 #' @param search.for character, the search parameter. See Details. 	
@@ -201,11 +201,13 @@
 #' unlink(paste0(t,"/images"),recursive=TRUE)
 #' 
 
-kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.25, smooth.points=200, image.type="orig",save=TRUE,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE,border=5){	
+kin.search <-function(image.dir=NULL,frames=NULL,thr="otsu",plot.pml=TRUE, show.prog=FALSE,ant.per=0.10,tips=0.02,smoothing="loess",smooth=0.25, smooth.points=200, image.type="orig",save=TRUE,out.qual=1,out.dir=NULL,flip=TRUE,size.min=0.02,search.for="largest",edges=FALSE,border=5){	
 
 size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE errors on R CMD check	
 
 if(!file.exists(image.dir)) stop("Directory specified by 'image.dir' (", paste0(image.dir),") does not exist")	
+
+if(!data.table::between(out.qual,0,1)) stop("'out.qual' must be >=0 and <=1")
 
 if(!save & !is.null(out.dir)) stop("'out.dir' specified but 'save=FALSE'. To save processed images, 'save' must be 'TRUE'")
   
@@ -442,7 +444,7 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' @param smooth numeric; if \code{smoothing} is set to 'loess', passed to 'span' parameter of \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' parameter of \code{\link{smooth.spline}}
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.
-#' @param out.qual, numeric, a value between 0-1 representing the quality of outputted images.
+#' @param out.qual, numeric, a value between 0-1 representing the quality of outputted images. Ignored if \code{save=FALSE}.
 #' @param out.dir character, the directory to which outputted images should be saved. 
 #' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
@@ -565,13 +567,15 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' unlink(paste0(t,"/images"),recursive=TRUE)
 
 
-kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.25,smooth.points=200,save=TRUE,out.dir=NULL,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
+kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0.20,tips=0.02,smoothing="loess",smooth=0.25,smooth.points=200,save=TRUE,out.qual=1,out.dir=NULL,plot.pml=TRUE,image.type="orig",flip=TRUE,show.prog=FALSE){
   
   size <- x <- y.pred <- wave.y <- mid.pred <- roi <- NULL # to avoid NSE erros or R CD check
-  
+
   if(!file.exists(image.dir)) stop("Directory specified by 'image.dir' (", paste0(image.dir),") does not exist")	
   
   if(!save & !is.null(out.dir)) stop("'out.dir' specified but 'save=FALSE'. To save processed images, 'save' must be 'TRUE'")
+  
+  if(!data.table::between(out.qual,0,1)) stop("'out.qual' must be >=0 and <=1")
   
   if(save){ 
     if(is.null(out.dir)) stop("'out.dir' not specified")

@@ -15,6 +15,7 @@ kin.simple(
   smooth = 0.25,
   smooth.points = 200,
   save = TRUE,
+  out.qual = 1,
   out.dir = NULL,
   plot.pml = TRUE,
   image.type = "orig",
@@ -42,6 +43,8 @@ kin.simple(
 \item{smooth.points}{numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.}
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.}
+
+\item{out.qual, }{numeric, a value between 0-1 representing the quality of outputted images. Ignored if \code{save=FALSE}.}
 
 \item{out.dir}{character, the directory to which outputted images should be saved.}
 

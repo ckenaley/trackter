@@ -41,6 +41,8 @@ test_that("kin.simple works fine", {
   expect_error(invisible(capture.output( kin.simple(image.dir =paste0(t,"/test_images") , thr="foo",save=FALSE))),"must be set to")
   expect_error(invisible(capture.output( kin.simple(image.dir =paste0(t,"/test_images") ,smoothing="foo",save=FALSE))),"must =")
   
+  expect_error(invisible(capture.output( kin.simple(image.dir =paste0(t,"/test_images"),save=TRUE,out.qual=1.1,paste0(t,"/test_images")))),"'out.qual' must be >=0 and <=1")
+  
   unlink(paste0(t,"/test_images"),recursive = TRUE)
   unlink(tp,recursive = TRUE)
   unlink(paste0(t,"/test_images"),recursive = TRUE)
@@ -81,6 +83,9 @@ test_that("kin.search works fine", {
   expect_error(invisible(capture.output( kin.search(image.dir =paste0(t,"/test_images") ,smoothing="foo",save=FALSE))),"must =")
   
   expect_error(invisible(capture.output( kin.search(image.dir =paste0(t,"/test_images") ,search.for="foo",save=FALSE))),"must be set to")
+  
+  expect_error(invisible(capture.output( kin.search(image.dir =paste0(t,"/test_images"),save=TRUE,out.qual=1.1,paste0(t,"/test_images")))),"'out.qual' must be >=0 and <=1")
+  
   
   dir.create(paste0(t,"/test_images2"))
   

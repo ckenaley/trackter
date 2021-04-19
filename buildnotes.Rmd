@@ -47,6 +47,9 @@ Call `gh::gh_token()` to retrieve a GitHub personal access token
 Call `gh_token_help()` if you need help getting or configuring your token
 ```
   
+# Versioning
+
+  * Follow: https://yihui.org/en/2013/06/r-package-versioning/
 
 
 

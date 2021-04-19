@@ -17,6 +17,7 @@ kin.search(
   smooth.points = 200,
   image.type = "orig",
   save = TRUE,
+  out.qual = 1,
   out.dir = NULL,
   flip = TRUE,
   size.min = 0.02,
@@ -49,6 +50,8 @@ kin.search(
 \item{image.type}{character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.}
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
+
+\item{out.qual, }{numeric, a value between 0-1 representing the quality of outputted images. Ignored if \code{save=FALSE}.}
 
 \item{out.dir}{character, the directory to which outputted images should be saved.}
 
