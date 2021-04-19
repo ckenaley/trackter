@@ -1,6 +1,6 @@
 Package: trackter
 Title: Automated Kinematic Analysis of Image Data
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: person(given="Christopher", family="Kenaley", email = "cpkenaley@gmail.com", role = c("aut", "cre"))
 Description: Analysis of shape and contours in regions of interest (ROIs) in image sequences and extracting midline and other kinematic data. 
 License: GPL (>= 2)

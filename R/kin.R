@@ -15,6 +15,7 @@
 #' @param show.prog logical value indicating if outputted image should be displayed during analysis.	
 #' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.	
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images. 	
+#' @param out.qual, numeric, a value between 0-1 representing the quality of outputted images. Ignored is \code{save=FALSE}
 #' @param out.dir character, the directory to which outputted images should be saved.
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.	
 #' @param search.for character, the search parameter. See Details. 	
@@ -404,7 +405,7 @@ for(im in images){
   
   if(save){	
     
-    jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)	
+    jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = out.qual)	
     if(image.type=="bin") suppressMessages( EBImage::display(z,method = "raster"))	
     if(image.type=="orig") suppressMessages( EBImage:: display(img,method = "raster"))	
     
@@ -441,6 +442,7 @@ return(list(kin.dat=kin.dat,midline=midline.dat,cont=cont.dat,all.classes=classe
 #' @param smooth numeric; if \code{smoothing} is set to 'loess', passed to 'span' parameter of \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' parameter of \code{\link{smooth.spline}}
 #' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{lm()} predictions from \code{ant.per}overlaying original or binary images.
+#' @param out.qual, numeric, a value between 0-1 representing the quality of outputted images.
 #' @param out.dir character, the directory to which outputted images should be saved. 
 #' @param plot.pml logical, value indicating if outputted images should include the predicted midline (in blue) and the points according to \code{ant.per} used to construct the predicted midline (in green).
 #' @param image.type character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.
@@ -726,7 +728,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
     
     if(save){
       
-      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = 0.5)
+      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = out.qual)
       if(image.type=="bin")EBImage::display(z,method = "raster")
       if(image.type=="orig")EBImage:: display(img,method = "raster")
       
