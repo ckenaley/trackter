@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">trackter</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -147,9 +147,41 @@
 <span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span><span class="va">f</span>,<span class="va">f2</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="va">f</span>,<span class="va">unlink</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="notes-for-testing" class="section level1">
+<div id="notes-for-testingci" class="section level1">
 <h1 class="hasAnchor">
-<a href="#notes-for-testing" class="anchor"></a>Notes for testing</h1>
+<a href="#notes-for-testingci" class="anchor"></a>Notes for testing/CI</h1>
+<ul>
+<li>follow these pointers for <code>pkgdown</code> site build with CI on Travis</li>
+<li>check travis.yaml with <a href="https://config.travis-ci.com/explore" class="uri">https://config.travis-ci.com/explore</a>
+</li>
+<li>imagemagick requirements related to ubuntu/linux <a href="https://srvanderplas.netlify.app/post/2019-05-07-travis-tricks/" class="uri">https://srvanderplas.netlify.app/post/2019-05-07-travis-tricks/</a>
+</li>
+</ul>
+</div>
+<div id="notes-for-gittingsite" class="section level1">
+<h1 class="hasAnchor">
+<a href="#notes-for-gittingsite" class="anchor"></a>Notes for gitting/site</h1>
+<ul>
+<li>
+<code><a href="https://usethis.r-lib.org/reference/use_pkgdown.html">usethis::use_pkgdown()</a></code> for <code>pkgdown</code>
+</li>
+<li>
+<code><a href="https://pkgdown.r-lib.org/reference/build_articles.html">pkgdown::build_articles</a></code> and <code><a href="https://pkgdown.r-lib.org/reference/build_site.html">pkgdown::build_site</a></code>
+</li>
+<li>see: <a href="https://www.datacamp.com/community/tutorials/cd-package-docs-pkgdown-travis" class="uri">https://www.datacamp.com/community/tutorials/cd-package-docs-pkgdown-travis</a>
+</li>
+<li>see: <a href="https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html" class="uri">https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html</a>
+</li>
+<li>abandoned deploy, now going with static, but often builds of site locally with push to git <a href="https://sahirbhatnagar.com/blog/2020/03/03/creating-a-website-for-your-r-package/">a la</a>
+<ul>
+<li>
+<code>use_travis_deploy()</code> broken with:</li>
+</ul>
+</li>
+</ul>
+<!-- end list --><div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>Error<span class="op">:</span><span class="st"> `</span><span class="dt">github_token()</span><span class="st">`</span> was deprecated <span class="cf">in</span> usethis <span class="dv">2</span>.<span class="fl">0.0</span> and is now defunct.</span>
+<span id="cb3-2"><a href="#cb3-2"></a>Call <span class="st">`</span><span class="dt">gh::gh_token()</span><span class="st">`</span> to retrieve a GitHub personal access token</span>
+<span id="cb3-3"><a href="#cb3-3"></a>Call <span class="st">`</span><span class="dt">gh_token_help()</span><span class="st">`</span> <span class="cf">if</span> you need help getting or configuring your token</span></code></pre></div>
 </div>
 
 

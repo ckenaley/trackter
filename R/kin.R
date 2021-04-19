@@ -407,7 +407,7 @@ for(im in images){
   
   if(save){	
     
-    jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = out.qual)	
+    jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = out.qual*100,width=w,height=h)	
     if(image.type=="bin") suppressMessages( EBImage::display(z,method = "raster"))	
     if(image.type=="orig") suppressMessages( EBImage:: display(img,method = "raster"))	
     
@@ -732,7 +732,7 @@ kin.simple <-function(image.dir=NULL,frames=NULL,thr=0.7,size.min=0.05,ant.per=0
     
     if(save){
       
-      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = out.qual)
+      jpeg(paste0(proc.dir,"/",trial,"_",sprintf("%03d",frame),".jpg"),quality = out.qual*100,width=w,height=h)
       if(image.type=="bin")EBImage::display(z,method = "raster")
       if(image.type=="orig")EBImage:: display(img,method = "raster")
       

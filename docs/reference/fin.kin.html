@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trackter</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -219,7 +219,7 @@
 <span class='va'>f</span> <span class='op'>&lt;-</span> <span class='st'>"https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='st'>"sunfish.avi"</span><span class='op'>)</span>
 
-<span class='co'>#extract images with ffmpeg opereations and reduce them to 600 px wide with a filter</span>
+<span class='co'>#extract images with ffmpeg operations and reduce them to 600 px wide with a filter</span>
 <span class='va'>filt.red</span> <span class='op'>&lt;-</span> <span class='st'>" -vf scale=600:-1 "</span> <span class='co'>#filter</span>
 <span class='fu'><a href='vid.to.images2.html'>vid.to.images2</a></span><span class='op'>(</span>vid.path<span class='op'>=</span><span class='st'>"sunfish.avi"</span>,filt <span class='op'>=</span> <span class='va'>filt.red</span><span class='op'>)</span> <span class='co'>#extract</span>
 

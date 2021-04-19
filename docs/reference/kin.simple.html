@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trackter</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -138,6 +138,7 @@
   smooth <span class='op'>=</span> <span class='fl'>0.25</span>,
   smooth.points <span class='op'>=</span> <span class='fl'>200</span>,
   save <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  out.qual <span class='op'>=</span> <span class='fl'>1</span>,
   out.dir <span class='op'>=</span> <span class='cn'>NULL</span>,
   plot.pml <span class='op'>=</span> <span class='cn'>TRUE</span>,
   image.type <span class='op'>=</span> <span class='st'>"orig"</span>,
@@ -187,6 +188,10 @@
     <tr>
       <th>save</th>
       <td><p>logical, value indicating if images should be outputted with midline and predicted midline based on the <code><a href='https://rdrr.io/r/stats/lm.html'>lm()</a></code> predictions from <code>ant.per</code>overlaying original or binary images.</p></td>
+    </tr>
+    <tr>
+      <th>out.qual, </th>
+      <td><p>numeric, a value between 0-1 representing the quality of outputted images. Ignored if <code>save=FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>out.dir</th>

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trackter</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -140,6 +140,7 @@
   smooth.points <span class='op'>=</span> <span class='fl'>200</span>,
   image.type <span class='op'>=</span> <span class='st'>"orig"</span>,
   save <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  out.qual <span class='op'>=</span> <span class='fl'>1</span>,
   out.dir <span class='op'>=</span> <span class='cn'>NULL</span>,
   flip <span class='op'>=</span> <span class='cn'>TRUE</span>,
   size.min <span class='op'>=</span> <span class='fl'>0.02</span>,
@@ -198,6 +199,10 @@
     <tr>
       <th>save</th>
       <td><p>logical, value indicating if images should be outputted with midline and predicted midline based on the <code>ant.per</code> <code><a href='https://rdrr.io/r/stats/lm.html'>lm()</a></code> overlaying original or binary images.</p></td>
+    </tr>
+    <tr>
+      <th>out.qual, </th>
+      <td><p>numeric, a value between 0-1 representing the quality of outputted images. Ignored if <code>save=FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>out.dir</th>
@@ -298,8 +303,8 @@
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The <code>ant.per</code> value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.</p>
-<p>Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See <code><a href='https://rdrr.io/pkg/EBImage/man/otsu.html'>otsu</a></code>.</p>
-<p>If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.</p>
+<p>Thresholding operations can be performed with an arbitrary (user defined) numeric value or w;
+If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.</p>
 <p><code>search.for</code> determines how ROIs are chosen:</p><ul>
 <li><p>"offset", the ROI with a centroid that is the shortest linear distance to the center of the field</p></li>
 <li><p>"offset.x", the ROI with a centroid x position that is closest to the x position of the center of the field</p></li>
