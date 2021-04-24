@@ -967,6 +967,7 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
 #' @param min numeric, the minimum threshold value (0-1).
 #' @param max numeric, the maximum threshold value (0-1).
 #' @param otsu logical, should the automatically determined threshold value be printed. See Details.
+#' @param plot.grid logical, should the grid of images be plotted.
 #' 
 #' @export
 #' 
@@ -996,7 +997,7 @@ fin.kin <- function(x,fin.pos=NULL,smooth.n=50,tip.ang=10,smoothing="loess",x.bi
 #' 
 #' 
 
-thr.check <- function(img,min=NULL,max=NULL,otsu=TRUE){
+thr.check <- function(img,min=NULL,max=NULL,otsu=TRUE,plot.grid=TRUE){
   
   if(!grepl(".jpeg|.jpg|.png|.tiff",img,ignore.case = TRUE)) stop("file in file path doesn't appear to be an image.")
   
@@ -1004,6 +1005,8 @@ thr.check <- function(img,min=NULL,max=NULL,otsu=TRUE){
   EBImage::colorMode(x)=EBImage::Grayscale
   
   ot <- EBImage::otsu(x)[1]
+  
+  if(plot.grid){
 
   if(all(sapply(list(min,max),is.null))) thr <- seq(0.1,0.9,.1) #sequence of threshold values
   
@@ -1034,7 +1037,7 @@ thr.check <- function(img,min=NULL,max=NULL,otsu=TRUE){
        y = rep(seq(from = 0, by = height, length.out = ny), each = nx) + y_offset,
        label = thr, 
        adj = c(0,1), col = "red", cex = 1.5)
-  
+  }
   if(all(!sapply(list(min,max),is.null))){if(ot>max|ot<min) message("Otsu value is outside defined threshold range")}
   
   if(otsu) return(ot)
