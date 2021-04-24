@@ -4,7 +4,7 @@
 \alias{thr.check}
 \title{Evaluate a range of threshold values for creating binary images}
 \usage{
-thr.check(img, min = NULL, max = NULL, otsu = TRUE)
+thr.check(img, min = NULL, max = NULL, otsu = TRUE, plot.grid = TRUE)
 }
 \arguments{
 \item{img}{character, a path to an image file.}
@@ -14,6 +14,8 @@ thr.check(img, min = NULL, max = NULL, otsu = TRUE)
 \item{max}{numeric, the maximum threshold value (0-1).}
 
 \item{otsu}{logical, should the automatically determined threshold value be printed. See Details.}
+
+\item{plot.grid}{logical, should the grid of images be plotted.}
 }
 \value{
 If 'otsu=TRUE', a single automated threshold value is returned using Otsu's method. See \code{\link{otsu}}.

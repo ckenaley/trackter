@@ -39,6 +39,7 @@ sapply(f,unlink)
   * see: https://www.datacamp.com/community/tutorials/cd-package-docs-pkgdown-travis
   * see: https://cran.r-project.org/web/packages/pkgdown/vignettes/pkgdown.html
   * abandoned deploy, now going with static, but often builds of site locally with push to git [a la](https://sahirbhatnagar.com/blog/2020/03/03/creating-a-website-for-your-r-package/)
+    - `pkgdown::build_site()` for build
     - `use_travis_deploy()` broken with:
     
 ```
