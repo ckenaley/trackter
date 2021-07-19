@@ -100,7 +100,17 @@ Here, `kin.simple` is used to extract contour and shape information from the ima
 
 dir <- system.file("extdata","img",package="trackter")
 
-kin.y <- kin.simple(image.dir = dir,out.dir = getwd())
+im <- list.files(system.file("extdata/img", package = "trackter"),full.names = TRUE)
+im<- im[grepl("sun",im)]
+im.dir <-paste0(getwd(),"/images")
+dir.create(im.dir)
+
+file.copy(im,paste0(im.dir,"/",basename(im)))
+
+kin.y <- kin.simple(image.dir = im.dir,out.dir = getwd())
+
+#clean up
+unlink(im.dir,recursive=TRUE)
 
 ```
 

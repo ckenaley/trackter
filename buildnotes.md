@@ -7,7 +7,8 @@
       - knit tutorial with `knitr::knit("vignettes/tutorial.Rmd.orig",
         output = "vignettes/tutorial.Rmd")`
       - add \*.Rmd.orig to Rbuildignore
-      - update and reknit on new submission/commit/release -set knit to
+      - update and reknit on new submission/commit/release 
+      -set knit to
         `fig.path=""`
       - manually move figures from trackter root to vignette with code
         below

@@ -41,7 +41,7 @@ A list with the following components:
 
 \item 'ang': the angle formed by each coordinate and its adjacent points.
 \item 'fin': fin side, 'L' or 'R'
-\item 'y.pred': predicted y values according to \code{lm()} from start to end of fins. 
+\item 'y.pred': predicted y values according to \code{lm()} from start to end of fins.
 }
 
 \code{fin.pts} a data table describing fin position consisting of the following:
@@ -57,7 +57,7 @@ A list with the following components:
 \item  x,y coordinates of the body except the range of x values within \code{fin.pos}. These values take on a straight line described by the prediction of \code{lm()} based on the start and end of the fin. See Details.
 }
 
-\code{midline} a data table describing the estimated 
+\code{midline} a data table describing the estimated
 \itemize{
 \item 'x': the mean x position within the bin.
 \item 'x.bin': the x bin in \code{\link{cut}} notation.
@@ -71,10 +71,10 @@ Estimates the amplitudes of regions along a body contour that are protruding. Us
 \details{
 The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with \code{\link{coo_flipx}} and \code{\link{coo_flipy}} after converting contour to class \code{coo}.
 
- \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} ($<$5) should be avoided if the contour is jagged, perhaps due to digitization.
- 
-In addition to fin amplitude and contour extraction, also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by \code{smoothing} and number of points indicated by \code{x.bins}. 
- 
+ \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} (<5) should be avoided if the contour is jagged, perhaps due to digitization.
+
+In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by \code{smoothing} and number of points indicated by \code{x.bins}.
+
  \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculated from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
 }
 \examples{
@@ -106,7 +106,7 @@ print(p)
 cont <- data.frame(x=kin$cont[frame==2,list(x,y)]$x,y=kin$cont[frame==2,list(y)]$y)
 fins <- fin.kin(cont,fin.pos =fin.pos,x.bins=100)
 
-#plot body contour and fins 
+#plot body contour and fins
 p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
 p+geom_point(data=fins$fin.pts,aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 

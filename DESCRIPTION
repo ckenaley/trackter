@@ -22,7 +22,10 @@ Imports:
   ggplot2,
   graphics,
   stats,
-  utils
+  utils,
+  smoothr,
+  foreach,
+  doParallel
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 3.0.1),

@@ -152,13 +152,23 @@
 
 
 <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="va">y</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
-<p><img src="sunfishimage-1.png" width="50%"></p>
+<p><img src="sunfishimage-1.png" title="plot of chunk sunfishimage" alt="plot of chunk sunfishimage" width="50%"></p>
 <p>Here, <code>kin.simple</code> is used to extract contour and shape information from the image above by refering to the directory that contains it. An image with a midline overlay is saved to the working directory (see below).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,<span class="st">"img"</span>,package<span class="op">=</span><span class="st">"trackter"</span><span class="op">)</span>
 
-<span class="va">kin.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.simple.html">kin.simple</a></span><span class="op">(</span>image.dir <span class="op">=</span> <span class="va">dir</span>,out.dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">im</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/img"</span>, package <span class="op">=</span> <span class="st">"trackter"</span><span class="op">)</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">im</span><span class="op">&lt;-</span> <span class="va">im</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"sun"</span>,<span class="va">im</span><span class="op">)</span><span class="op">]</span>
+<span class="va">im.dir</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/images"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="va">im.dir</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span><span class="va">im</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">im.dir</span>,<span class="st">"/"</span>,<span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span><span class="op">(</span><span class="va">im</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">kin.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.simple.html">kin.simple</a></span><span class="op">(</span>image.dir <span class="op">=</span> <span class="va">im.dir</span>,out.dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co">#clean up</span>
+<span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span><span class="op">(</span><span class="va">im.dir</span>,recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>The <code>kin</code> functions in <em>trackter</em> return a list of data tables/data frames:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="va">kin.y</span>,<span class="va">class</span><span class="op">)</span><span class="op">)</span>
@@ -176,36 +186,22 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $dim</span>
 <span class="co">#&gt; [1] "integer"</span></code></pre></div>
-<p>Most will be interested in the “kin.dat” and “midline” data for the calculation of body shape and position parameters (e.g., amplitude, wavelength, etc.). For example, “kin.dat” table includes, among other things, frame-specific trailing-edge (rightmost) amplitude (“x”, “y”), head (leftmost) position (“head.x”, “head.y”) which may be used to calculated position and trailing-edge amplitude.</p>
+<p>Most will be interested in the “kin.dat” and “midline” data for the calculation of body shape and position parameters (e.g., amplitude, wavelength, etc.). For example, the “kin.dat” table includes, among other things, frame-specific trailing-edge (rightmost) amplitude (“x”, “y”), head (leftmost) position (“head.x”, “head.y”) which may be used to calculate position and trailing-edge amplitude.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">kin.dat</span><span class="op">)</span>
-<span class="co">#&gt;    frame   x        y head.x   head.y      amp head.pval roi  edge   size</span>
-<span class="co">#&gt; 1:     0 756 176.0573     22 132.2365 42.62656 0.1306207   a FALSE 169710</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">kin.dat</span><span class="op">)</span></code></pre></div>
 <p>The “midline” table is composed of frame-specific midline data, including, among other things, calculated midline position (“y.m”), smoothed midline position (“y.pred”) and midline position relative to the head (“wave.y”). Here we see the difference between them.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">)</span>
-<span class="co">#&gt;      frame   x y.min y.max      y.m   y.pred mid.pred      wave.y roi</span>
-<span class="co">#&gt;   1:     0  15   126   135 130.5000 132.3461 132.5498 -0.20372689   a</span>
-<span class="co">#&gt;   2:     0  18   120   143 131.5000 132.3691 132.5529 -0.18381828   a</span>
-<span class="co">#&gt;   3:     0  22   115   150 138.0000 132.4017 132.5571 -0.15542465   a</span>
-<span class="co">#&gt;   4:     0  26   110   154 132.0000 132.4348 132.5613 -0.12656612   a</span>
-<span class="co">#&gt;   5:     0  30   107   157 132.0000 132.4665 132.5655 -0.09904049   a</span>
-<span class="co">#&gt;  ---                                                                 </span>
-<span class="co">#&gt; 196:     0 747   153   178 168.5000 167.6151 133.3169 34.29822631   a</span>
-<span class="co">#&gt; 197:     0 751   154   180 165.4545 169.6958 133.3211 36.37466631   a</span>
-<span class="co">#&gt; 198:     0 755   178   181 179.5000 171.7898 133.3253 38.46451082   a</span>
-<span class="co">#&gt; 199:     0 759   179   181 180.0000 173.8828 133.3295 40.55329642   a</span>
-<span class="co">#&gt; 200:     0 763   180   181 180.5000 175.9602 133.3337 42.62655968   a</span>
 <span class="va">ml</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html">melt</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>,<span class="fu">.</span><span class="op">(</span><span class="va">x</span>,<span class="va">y.m</span>,<span class="va">y.pred</span>,<span class="va">wave.y</span><span class="op">)</span><span class="op">]</span>,<span class="st">"x"</span><span class="op">)</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">ml</span>,x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">value</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="va">variable</span><span class="op">~</span><span class="va">.</span><span class="op">)</span></code></pre></div>
-<p><img src="midline-1.png" width="50%"></p>
+<p><img src="midline-1.png" title="plot of chunk midline" alt="plot of chunk midline" width="50%"></p>
 <p>When “save=TRUE” (the default), the <code>kin</code> functions write images to a user-defined directory that include midline overlays.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="st">"sunfish_BCF_000.jpg"</span><span class="op">)</span>
 <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="va">y2</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
-<p><img src="sunfishoverlay-1.png" width="50%"></p>
+<p><img src="sunfishoverlay-1.png" title="plot of chunk sunfishoverlay" alt="plot of chunk sunfishoverlay" width="50%"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co">#clean up</span>
@@ -234,17 +230,17 @@
 <p>Now we can have a look at trailing-edge position and amplitude (relative to the head path) across the frames.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">kin.y2</span><span class="op">$</span><span class="va">kin.dat</span>,x<span class="op">=</span><span class="va">frame</span>,y<span class="op">=</span><span class="va">y</span><span class="op">)</span> <span class="co">#position</span></code></pre></div>
-<p><img src="posamp-1.png" width="50%"></p>
+<p><img src="posamp-1.png" title="plot of chunk posamp" alt="plot of chunk posamp" width="50%"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">kin.y2</span><span class="op">$</span><span class="va">kin.dat</span>,x<span class="op">=</span><span class="va">frame</span>,y<span class="op">=</span><span class="va">amp</span><span class="op">)</span> <span class="co">#amplitude relative to a theoretical midline established by head</span></code></pre></div>
-<p><img src="posamp-2.png" width="50%"></p>
+<p><img src="posamp-2.png" title="plot of chunk posamp" alt="plot of chunk posamp" width="50%"></p>
 <p>The midline data can be accessed to assess the waveform. Here, midline x position is standardized.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">kin.y2</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>,<span class="va">x2</span><span class="op">:=</span><span class="va">x</span><span class="op">-</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,by<span class="op">=</span><span class="va">frame</span><span class="op">]</span>
 
 <span class="co">#wave form plot</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">kin.y2</span><span class="op">$</span><span class="va">midline</span>,x<span class="op">=</span><span class="va">x2</span>,y<span class="op">=</span><span class="va">wave.y</span>,col<span class="op">=</span><span class="va">frame</span><span class="op">)</span></code></pre></div>
-<p><img src="midline2-1.png" width="50%"></p>
+<p><img src="midline2-1.png" title="plot of chunk midline2" alt="plot of chunk midline2" width="50%"></p>
 </div>
 <div id="downstream-analyses-of-kinematic-data" class="section level3">
 <h3 class="hasAnchor">
@@ -257,30 +253,12 @@
 <span class="co">#&gt; [1] "zeros"</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $names</span>
-<span class="co">#&gt;               x             y wave</span>
-<span class="co">#&gt;    1:  47.55428  0.0004361881    1</span>
-<span class="co">#&gt;    2:  47.92846  0.0023318403    1</span>
-<span class="co">#&gt;    3:  48.30265  0.0042170273    1</span>
-<span class="co">#&gt;    4:  48.67684  0.0060985870    1</span>
-<span class="co">#&gt;    5:  49.05103  0.0079761220    1</span>
-<span class="co">#&gt;   ---                             </span>
-<span class="co">#&gt; 1681: 676.18859 -0.6984951756    2</span>
-<span class="co">#&gt; 1682: 676.56278 -0.5275296899    2</span>
-<span class="co">#&gt; 1683: 676.93697 -0.3560497970    2</span>
-<span class="co">#&gt; 1684: 677.31116 -0.1840936920    2</span>
-<span class="co">#&gt; 1685: 677.68534 -0.0116995699    2</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; $dat</span>
-<span class="co">#&gt;    wave zeros wave.begin wave.end begin.index end.index         l       amp1</span>
-<span class="co">#&gt; 1:    1    88   47.55428 129.2496          88       308  82.69535  0.1416087</span>
-<span class="co">#&gt; 2:    2   309  130.24962 677.0595         309      1772 547.80990 23.9667273</span>
-<span class="co">#&gt;    amp2     pos1 pos2</span>
-<span class="co">#&gt; 1:   NA 100.6888   NA</span>
-<span class="co">#&gt; 2:   NA 548.9650   NA</span></code></pre></div>
+<span class="co">#&gt; $dat</span></code></pre></div>
 <p>Using a “zeros” method, <code>half.wave</code> determines two half waves from the ROI in the single image above, described in the “dat” table from the output. The “names” table can be used to visualize the half wavelengths.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">w</span><span class="op">$</span><span class="va">names</span>,x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,col<span class="op">=</span><span class="va">wave</span><span class="op">)</span></code></pre></div>
-<p><img src="wavenumber-1.png" width="50%"></p>
+<p><img src="wavenumber-1.png" title="plot of chunk wavenumber" alt="plot of chunk wavenumber" width="50%"></p>
 <p>We could extend this framework using <code>data.table</code> to calculate half waves in each of the 11 frames from the example video.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"> <span class="va">wave.dat</span> <span class="op">&lt;-</span> <span class="va">kin.y2</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>, <span class="op">{</span> <span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/halfwave.html">halfwave</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">wave.y</span>,method<span class="op">=</span><span class="st">"zeros"</span><span class="op">)</span><span class="op">$</span><span class="va">dat</span>;
@@ -292,7 +270,7 @@
      by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">frame</span><span class="op">)</span><span class="op">]</span>
 
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">wave.dat</span>,x<span class="op">=</span><span class="va">pos</span>,y<span class="op">=</span><span class="va">l</span><span class="op">)</span></code></pre></div>
-<p><img src="wavelengthplot-1.png" width="50%"></p>
+<p><img src="wavelengthplot-1.png" title="plot of chunk wavelengthplot" alt="plot of chunk wavelengthplot" width="50%"></p>
 </div>
 </div>
   </div>

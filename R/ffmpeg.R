@@ -330,7 +330,7 @@ images.to.video2 <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,overwrite
   if(file.exists(vid.path2) & overwrite==FALSE) stop("video with name 'vid.name'  exist in 'out.dir' directory. To save file of this name in this location, 'overwrite' must be 'TRUE'")
   
 
-  if(file.exists(vid.path2) & overwrite==TRUE) unlink(vid.path2,recursive = T)
+  if(file.exists(vid.path2) & overwrite==TRUE) unlink(vid.path2,recursive = FALSE)
 
   
   images <- paste0(image.dir,"/",list.files(image.dir,pattern="jpg|png|tiff|jpeg|bmp",ignore.case = T))

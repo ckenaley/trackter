@@ -10,3 +10,4 @@ Meta
 vignettes/*.R
 vignettes/*.html
 .DS_Store
+docs
