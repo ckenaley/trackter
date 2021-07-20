@@ -7,6 +7,12 @@ before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
 
 r_check_args: --as-cran
 
+before_install:
+  - sudo add-apt-repository ppa:ubuntugis/ppa --yes
+  - sudo apt-get --yes --force-yes update -qq
+  - sudo apt-get install --yes libudunits2-dev libproj-dev libgeos-dev libgdal-dev
+  - R -e 'install.packages("rgdal", repos="http://R-Forge.R-project.org")'
+
 osx_image: xcode12u
   
 cache: packages

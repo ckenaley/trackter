@@ -14,7 +14,6 @@ Imports:
   dplyr,
   Momocs,
   raster,
-  zoo,
   plyr,
   pastecs,
   features,
@@ -32,6 +31,6 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    animation,
+    animation
 SystemRequirements: FFmpeg
 VignetteBuilder: knitr
