@@ -1,6 +1,5 @@
 
-[![Build
-Status](https://travis-ci.com/ckenaley/trackter.svg?branch=master)](https://travis-ci.com/ckenaley/trackter)
+[![R-CMD-check](https://github.com/ckenaley/trackter/workflows/R-CMD-check/badge.svg)](https://github.com/ckenaley/trackter/actions)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&svg=true)](https://ci.appveyor.com/project/ckenaley/trackter)
 [![](https://www.r-pkg.org/badges/version/trackter?color=orange)](https://cran.r-project.org/package=trackter)[![Codecov
@@ -18,14 +17,14 @@ kinematics from video and image data. The core functions of *trackter*
 automatically detect a region of interest (ROI) and compute important
 kinematic and shape parameters based on the ROI’s contour. These
 functions use thresholding and segmentation to identify ROIs and, thus,
-moderately contrasted images are required. Prsented below is some of
+moderately contrasted images are required. Presented below is some of
 *trackter*’s functionality in the context of fish locomotion.
 
 Please report any bugs or performance issues.
 
 ## Getting started
 
-Please check out `trackter`’s [github
+Please check out *trackter*’s [github
 page](https://ckenaley.github.io/trackter/)
 
 ## Installation

@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^cranignore$
-^\.travis\.yml$
 ^notes$
 ^\_config\.yml$
 ^appveyor\.yml$
