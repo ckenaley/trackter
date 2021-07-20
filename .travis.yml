@@ -15,7 +15,8 @@ before_install:
 
 osx_image: xcode12u
   
-cache: packages
+cache:
+  - packages: true
 
 os:
   - osx
