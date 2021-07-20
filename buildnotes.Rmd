@@ -31,6 +31,14 @@ sapply(f,unlink)
   * follow these pointers for `pkgdown` site build with CI on Travis
   * check travis.yaml with https://config.travis-ci.com/explore
   * imagemagick requirements related to ubuntu/linux https://srvanderplas.netlify.app/post/2019-05-07-travis-tricks/
+  * **Jul '21** migrate away from Travis to GH actions: https://deanattali.com/blog/migrating-travis-to-github/ 
+  * for GH actions :  `usethis::use_github_action_check_standard()`
+  * then copy badges
+  * delete `- {os: windows-latest, r: 'release'}` from yaml file under '.github\workflows'
+  * this last step assumes appveyor is running the Windows build with `ffmpeg` install
+  * added `- {os: macOS-latest, r: 'devel'}` for macOS devel build
+  * see also: https://www.rostrum.blog/2020/08/09/ghactions-pkgs/
+  
     
 # Notes for gitting/site
 
