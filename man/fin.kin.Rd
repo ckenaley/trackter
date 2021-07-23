@@ -5,29 +5,24 @@
 \title{Tracking of fin-like extensions of body contours}
 \usage{
 fin.kin(
-  x,
+  out,
   fin.pos = NULL,
   smooth.n = 50,
-  tip.ang = 10,
-  smoothing = "loess",
   x.bins = 0.2,
-  ml.smooth = 0.25
+  ml.smooth = 0.9,
+  red = NULL
 )
 }
 \arguments{
-\item{x}{a data frame or matrix with 'x' and 'y' data as columns.}
+\item{out}{a data frame or matrix with 'x' and 'y' data as columns.}
 
 \item{fin.pos}{numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the body length.}
 
-\item{smooth.n}{numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'.}
+\item{smooth.n}{numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'. See Details.}
 
-\item{tip.ang}{the minimum angle, in degrees, that defines tip of each fin. See Details.}
+\item{ml.smooth}{numeric (0-1), the smoothing value for the midline. See details.}
 
-\item{smoothing}{character, the midline smoothing method, either 'loess' or 'spline'.}
-
-\item{x.bins}{numeric, when less than or equal to 1, the proportion of contour coordinates to sample for midline estimation. If greater than 1, the absolute number of equally spaced x values from which to compute the midline. See Details.}
-
-\item{ml.smooth}{numeric the smoothing value for the midline. If \code{smoothing} is set to 'loess', passed to 'span' value for \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' value for \code{\link{smooth.spline}}}
+\item{red}{numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up fin position and midline estimations. If 'NULL', the full conour in \code{out} will be used See Details.}
 }
 \value{
 A list with the following components:
@@ -37,45 +32,49 @@ A list with the following components:
 \code{fin} a data table describing the contour of the fins consisting of the following:
 
 \itemize{
+\item 'side': fin side, 'a' or 'b'
 \item x,y coordinates within the range of \code{fin.pos}
 
-\item 'ang': the angle formed by each coordinate and its adjacent points.
-\item 'fin': fin side, 'L' or 'R'
-\item 'y.pred': predicted y values according to \code{lm()} from start to end of fins.
 }
 
 \code{fin.pts} a data table describing fin position consisting of the following:
 
 \itemize{
+\item 'side': fin side, 'a' or 'b'
+\item 'n': The index matching that of the body contour coordinates 
 \item  x,y coordinates of the fin tips, start, and end within the range of \code{fin.pos}.
-\item 'ang': the angle formed by the coordinates and their adjacent points.
-\item 'pos': description  of the coordinates' positions, 'start', 'end' or 'tip'.
+\item 'n': The index matching that of the body contour coordinates 
+\item 'pos': description  of the coordinates' positions, 'start', 'end' or 'tip' or 'tip2'.
 }
 
 \code{comp} a data table describing the composite contour of the body minus the fins.
 \itemize{
+\item 'n': The index matching that of the body contour coordinates 
 \item  x,y coordinates of the body except the range of x values within \code{fin.pos}. These values take on a straight line described by the prediction of \code{lm()} based on the start and end of the fin. See Details.
 }
 
-\code{midline} a data table describing the estimated
-\itemize{
-\item 'x': the mean x position within the bin.
-\item 'x.bin': the x bin in \code{\link{cut}} notation.
-\item 'y.m': the y midpoint at the bind and mean x value.
-\item 'ml.pred': the y midline value according to the smoothing parameters.
-}
+\code{midline} a data table describing the estimated midline, 'x.sm', 'y.sm', the smooth x and y positions, respectively
+
+\code{bl} the body lenght in pixels
+
+\code{amp} a data table describing the estimated fin amplitudes based on each method of finding the fin tip. 'amp1', the amplitude of the fin positions based on the maximum euclidean distance from the fin base and 'amp2', the distance of the fin points (based on distance inflections) from the fin base.
 }
 \description{
 Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  \link{kin.simple} and \link{kin.search}. Also computes a smoothed midline based on the body outline with the fin region removed.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with \code{\link{coo_flipx}} and \code{\link{coo_flipy}} after converting contour to class \code{coo}.
+If \code{red} is specified, the contour \code{out} is sampled with \code{\link{coo_interpolate}} from the \code{Momocs} package. The number of points sampled (n) equals \code{red} times the number of points in \code{out}
 
- \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} (<5) should be avoided if the contour is jagged, perhaps due to digitization.
+To establish the contour positions that are within \code{fin.pos}, a midline is estimated using \code{\link{free.ml}}. These midline points are indexed by position along the body length by calculating the cumulative distance between midline coordinates in pixels.  
 
-In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by \code{smoothing} and number of points indicated by \code{x.bins}.
+The positions of the tip of the fin appendages is estimated in two ways. The first is simply the point in each appendage that is farthest from the base of the fin. The base is estimated as a straight line between the contour coordinates that match \code{fin.pos}.  The second is a little more complicated and starts with calculation the distance between each fin contours coordinates and the midpoint of the fin base. \code{\link{features}} from the \code{features} package is then use to calculate an inflection in this distance and the point of this inflection is used to estimate the fin position. Amplitudes of each method are caculated based on the orthogonal euclidean distance from the fin bases.
 
- \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculated from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
+In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}, that is, the fin bases. The result is a straight line between the start and end of each fin. 
+
+From this composite body contour, a midline prediction is made based on the  \code{ml.smooth}. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value
+
+
+For midline smoothing, \code{\link{smooth_spline}} from the \code{smoothr} package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times \code{1-smooth}.
 }
 \examples{
 ###plot pectoral-fin amplitudes of a swimming sunfish
@@ -85,40 +84,49 @@ require(ggplot2)
 #download example avi video
 f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
 download.file(f,"sunfish.avi")
+f <- "/Users/biology/Google Drive/trout/manuscript/trackter.ms/trackterMS/sunfish_pect.avi"
+ ti <-paste0(tempdir(),"/images")
+ dir.create(ti)
 
 #extract images with ffmpeg operations and reduce them to 600 px wide with a filter
 filt.red <- " -vf scale=600:-1 " #filter
-vid.to.images2(vid.path="sunfish.avi",filt = filt.red) #extract
+ vid.to.images2(vid.path="sunfish.avi",filt = filt.red,out.dir=ti) #extract
+ vid.to.images2(vid.path=f,filt = filt.red,out.dir=ti) #extract
 
 #number of frames
-fr <- length(list.files("images"))
+fr <- list.files(ti,full.names=TRUE)
+thr.check(fr[1])
+
 #extract contours and other data
-kin <- kin.simple(image.dir = "images",frames=c(1:fr),thr=0.9,ant.per = 0.25)
+kin <- kin.free(image.dir = ti,par=F,frames=1:10,thr=0.9,ant.per = 0.25,save=FALSE,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
 #fin amplitudes by frame with data.table
+ out <- read.csv("frame8.csv")
+qplot(d=kin$cont.sm,x,y,col=frame)+geom_point(d=kin$midline,aes(x.sm,y.sm))+facet_wrap(frame~.)+geom_point(d=kin$cont,col="red",size=0.5)
+
+fin.kin(kin$cont[frame==8,list(x,y)],fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95)
 fin.pos <- c(0.25,.5)
-fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos);
-list(amp=f$amp$amp,fin=f$amp$fin,amp.bl=f$amp$amp.bl)},by=list(frame)]
-p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=fin))+geom_line()+theme_classic(15)
+fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
 print(p)
 
 
-## plot body and fin contours of frame 1
-cont <- data.frame(x=kin$cont[frame==2,list(x,y)]$x,y=kin$cont[frame==2,list(y)]$y)
-fins <- fin.kin(cont,fin.pos =fin.pos,x.bins=100)
+## plot body and fin contours of frame 8
+cont <- data.frame(x=kin$cont[frame==8,list(x,y)]$x,y=kin$cont[frame==8,list(y)]$y)
+fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=2)
 
 #plot body contour and fins
 p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
 p+geom_point(data=fins$fin.pts,aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 
 #plot body contour minus fins and the body midline
-p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x,ml.pred),col="red",size=2)
+p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x.sm,y.sm),col="red",size=2)
 p+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 
+unlink(ti,recursive=TRUE)
 }
-
 
 
 }
 \seealso{
-\code{\link{kin.simple}}, \code{\link{kin.LDA}}, \code{\link{kin.search}}, \code{\link{efourier}}, \code{\link{coo_angle_edges}}, \code{\link{coo_smooth}}, \code{\link{loess}}, \code{\link{smooth.spline}}
+\code{\link{kin.simple}}, \code{\link{kin.search}}, \code{\link{kin.free}}, \code{\link{coo_sample}}, \code{\link{coo_smooth}}, \code{\link{smooth_spline}}
 }

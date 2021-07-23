@@ -4,12 +4,14 @@
 \alias{free.ml}
 \title{Midline estimations for closed contours}
 \usage{
-free.ml(out = NULL, smooth.n = NULL)
+free.ml(out = NULL, smooth.n = NULL, red = NULL)
 }
 \arguments{
 \item{out}{a matrix of named x,y values describing a closed outline (contour)}
 
-\item{smooth.n}{the number of smoothing iterations. See Detail}
+\item{smooth.n}{the number of smoothing iterations. See Details}
+
+\item{red}{numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up midline estimations. If 'NULL', the full contour in \code{out} will be used See Details.}
 }
 \value{
 A list with the following components:
@@ -24,14 +26,15 @@ Internal function used in \code{kin} functions for calculating a midline spannin
 \details{
 The midline is determine by first finding the tips of the contour (i.e., the two coordinates in the outline that are farthest from one another) with \code{\link{coo_truss}} and therefore assumes the contour is elongate. The function then bisects the contour across this axis using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
 
-'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average.
+'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average. Users should be careful not to oversmooth. If the input contour has few points (say just a 100 or so extracted from \code{kin} functions run on low resolution images), much detail will be lost. In general, \code{smooth.n} should be <5.
 }
 \examples{
+# a lateral midline, but a midline nonetheless
 require(Momocs)
 o <- Momocs::nsfishes$coo[[136]]
 colnames(o) <- c("x","y")
 plot(o[,1],o[,2])
-fml <- free.ml(o,smooth.n=0)
+fml <- free.ml(o,smooth.n=0,red=0.95)
 points(fml$ml$x,fml$ml$y,col="red")
 #note the difference
 fml2 <- free.ml(o,smooth.n=10)

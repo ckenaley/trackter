@@ -29,7 +29,8 @@
 #' @details
 #'The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.
 #'
-#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or w;
+#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#'
 #'If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
 #'
 #' \code{search.for} determines how ROIs are chosen:
@@ -996,28 +997,24 @@ kin.simple <-
 
 #' @title  Midline tracking of free-moving ROI over image sequences
 
-#' @description  Automatically retrieves the midline of a detected ROI that is free to move in the spatial field of an image sequence. Does so through thresholding and segmentation; finds the y-value midpoint along the between two x values from each half of the ROI sharing the same index then calculates a smoothed midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Support parallel processing of frames.
+#' @description  Automatically retrieves the midline of a detected ROI that is free to move in the spatial field of an image sequence. Does so through threshholding and segmentation; finds the midpoint coordinates from each half of the ROI sharing the same index then calculates a smoothed midline according to a chosen smoothing method (loess or smooth spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Supports parallel processing of frames.
 #' 
-#'
-#'
 #' @param image.dir character, directory containing images to analyze.
-#' @param frames numeric, vector indicating which images to process.
+#' @param frames numeric, vector indicating which images to process. Must be >1. See Details.
 #' @param par logical, should the frames be processed in parallel using \code{cores.n}.
 #' @param cores.n numeric, the number of CPU cores to use if \code{par=TRUE}. If \code{cores.n=NULL} (the default), the total number of cores minus 1 are used.
-#' @param thr numeric or character ('otsu') threshold to determine binary image. See Details.
-#' @param ant.per numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.
+#' @param thr numeric or character ('otsu'); the threshold to determine binary image. See Details.
+#' @param ant.per numeric; anterior percentage of ROI that establishes the reference for the midline displacement.
 #' @param tips, numeric, the proportion the the midline data to use in calculation of the head and tail position.
-#' @param smooth.what, character of length 1 or 2, either "ml", "cont", or both.
-#' @param smooth.n, numeric, the number of contour smoothing interations. See Details.
-#' @param smoothing character, the midline smoothing method, either 'loess' or "spline".See Details.
-#' @param smooth numeric; if \code{smoothing} is set to 'loess', smoothing parameter value for plotted midline. If \code{smooth='spline'} then this value must be less than 1. See Details.
-#' @param smooth.points numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.
-#' @param flip logical, indicating if binary should be flipped.
-#' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.
+#' @param smooth.n, numeric, the number of contour smoothing iterations. See Details.
+#' @param red numeric, between 0-1 the proportion of contour coordinates to sample for midline estimates. Will speed up midline estimations. If 'NULL', the full contour retrieved from the ROI will be passed to \code{\link{free.ml}}.
+#' @param ml.smooth a list of length two with unnamed components including a character string specifying the midline smoothing method, either 'loess' or "spline", and a numeric value specifying the amount of smoothing. See Details.
 #' @param save logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm} overlaying original or binary images.
 #' @param out.qual, numeric, a value between 0-1 representing the quality of outputted images. Ignored if \code{save=FALSE}.
 #' @param out.dir character, the directory to which outputted images should be saved.
 #' @param plot.pml logical, value indicating if outputted images should include an overlay of the midline, head region and theoretical midline based on \code{ant.per}.
+#' @param flip logical, indicating if binary image should be flipped.
+#' @param size.min numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.
 #' @param search.for character, the search parameter. See Details.
 #' @param edges logical, should ROIs on image edges be evaluated. See Details.
 #' @param border if \code{edges=TRUE}, size of border to add in pixels. Dee details.
@@ -1025,11 +1022,14 @@ kin.simple <-
 #' @export
 #'
 #' @details
-#' The midline is calculated as the midpoints between the extrema of the coordinates describing the each ROIs contour (i.e, the coordinates spanning the longest euclidean distance). Chooses ROIs based on relative ROI size or position.
+#' The midline is calculated as the midpoint coodinates between the extrema of the coordinates describing each ROIs contour (i.e, the coordinates spanning the longest euclidean distance). Chooses ROIs based on relative ROI size or position.
 #'
-#' The midline is determine by first finding the tips of the ROI (i.e., the two coordinates in the outline that are farthest from one another) with \code{\link{free.ml}}and therefore assumes the ROI is elongate and moving along this long axis. Using \code{\link{free.ml}}, the function bisects the ROI contour at the tips, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
+#' The position of the anterior of the ROI (that which is moving forward in the field) is determined by the displacement of the ROI between the first two frames. Thus, \code{frames} must be >1.
+#' 
+#' The midline is determine by first finding the tips of the ROI (i.e., the two coordinates in the outline that are farthest from one another) with \code{\link{free.ml}} and therefore assumes the ROI is elongate and moving along this long axis. Using \code{\link{free.ml}}, the function bisects the ROI contour at the tips, giving it two sides with coordinates of equal length. The midline coordinates are calculated as the midpoints defined between all pairs of coordinates with the same index value.
 #'
-#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or w;
+#'Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#'
 #'If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
 #'
 #' \code{search.for} determines how ROIs are chosen:
@@ -1044,9 +1044,9 @@ kin.simple <-
 #'
 #' \code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	Yet, if set to 'TRUE', the \code{border} adds a black border to the image so that the intended ROI may be distinguished from the edge.
 #'
-#' For midline smoothing, if \code{smoothing='spline'} (the default), \code{\link{smooth_spline}} from the \code{smoothr} package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinatate times \code{1-smooth}. If \code{smoothing='loess'}, \code{stats::loess} is used to fit a polynomial surface. For contours that have a complicated midline with non-unique x values, loess smoothing can produce poor results. Thus, spline smoothing is usually the advisable option. 
+#' For midline smoothing, if \code{ml.smooth} contains 'spline' (the default), \code{\link{smooth_spline}} from the \code{smoothr} package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times numeric value of the list in \code{ml.smooth}. If \code{ml.smooth} contains 'loess', \code{loess} is used to fit a polynomial surface. For contours that have a complicated midline with non-unique x values, loess smoothing can produce poor results. Thus, spline smoothing is usually the advisable option. 
 #' 
-#' For contour smoothing 'smooth.n' is passed to the 'n' parameter of \code{\link{free.ml}}, which smooths coordinates using a simple moving average. Users should be wary of oversmoothing by smoothing both the contour (from which the midline is calculated) and the midline.
+#' For contour smoothing \code{smooth.n} is passed to the \code{n} parameter of \code{\link{free.ml}}, which smooths coordinates using a simple moving average. Users should be wary of oversmoothing by smoothing both the contour (from which the midline is calculated) and the midline.
 #'
 #' @return A list with the following components:
 #'
@@ -1147,38 +1147,39 @@ kin.simple <-
 #' download.file(f, paste0(tempdir(),"/ropefish.avi"))
 #'
 #' dir.create(paste0(tempdir(),"/images"))
-#' 
+#' dir.create(paste0(tempdir(),"/out"))
 #' 
 #' vid.to.images(paste0(tempdir(),"/ropefish.avi"), out.dir = paste0(tempdir(),"/images"))
 #' 
 #' kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
 #'       par=FALSE,
-#'       save=FALSE,
-#'       smooth.what=c("ml","cont"),
+#'       save=T,
+#'       out.dir=paste0(tempdir(),"/out"),
+#'       ml.smooth=list("spline",0.9),
 #'       thr = "otsu",
-#'       smoothing="spline",
-#'       smooth=0.92,
 #'       size.min=0.01,
-#'       frame=1:2
+#'       frame=1:20,
+#'       red=0.5
 #'       )
 #'
+#' fi <- list.files(paste0(tempdir(),"/out"),full.names=T)
+#' EBImage::display(EBImage::readImage(fi[1]))
 #' #plot instantaneous amplitude of tail (last/rightmost point) over frames
 #' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
 #' print(p)
 #'
 #' # midline plot
 #' ml <- kin$midline
-#' p <- ggplot(dat=ml,aes(x=x.sm,y=y.sm,col=wave.y))+theme_classic(15)
-#' p <- p+geom_point(aes(group=frame), size = 1.5)+facet_wrap(frame~.)
+#' p <- ggplot(dat=ml,aes(x=x.sm,y=y.sm,col=frame))+geom_point()+theme_classic(15)
 #' print(p)
 #'
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+#' unlink(paste0(tempdir(),"/out"),recursive=TRUE)
 #'}
 #'
 
 kin.free <-
-  function(image.dir = NULL,frames=NULL,par=FALSE,cores.n=NULL,thr = "otsu",ant.per = 0.10,tips = 0.02,smooth.what="ml",smooth.n=5,smoothing = "spline",smooth = 0.25, smooth.points = 200,save = TRUE,out.qual = 1,out.dir = NULL,plot.pml = TRUE,flip = TRUE,size.min = 0.02,search.for = "largest",edges = FALSE,border = 5) {
-    
+  function(image.dir = NULL,frames=NULL,par=FALSE,cores.n=NULL,thr = "otsu",ant.per = 0.10,tips = 0.02,smooth.n=5,red=NULL,ml.smooth = list("spline",0.25),save = TRUE,out.qual = 1,out.dir = NULL,plot.pml = TRUE,flip = TRUE,size.min = 0.02,search.for = "largest",edges = FALSE,border = 5) {
     
     #to prevent NSE warnings and NSB notes
     size <-
@@ -1244,9 +1245,13 @@ kin.free <-
     
     if (!search.for %in% c("offset.x", "offset.y", "largest", "offset"))
       stop("'search.for' must be set to 'offset', 'offset.x','offset.y', or 'largest')")
+  
     
-    if (!all(smooth.what %in% c("ml", "cont")))
-      stop("'smooth.what' must be set to 'ml', 'cont', or 'c('ml','cont')'")
+    if(!is.null(ml.smooth)){
+      if(!any(sapply(ml.smooth,class)=="character") | !any(sapply(ml.smooth,class)=="numeric") | !is.list(ml.smooth) ) stop("'ml.smooth' must be a list of length 2 consisting of a character and numeric value")}
+    
+    smoothing <- unlist(ml.smooth[which(sapply(ml.smooth,class)=="character")])
+    smooth <- unlist(ml.smooth[which(sapply(ml.smooth,class)=="numeric")])
     
     
     trial <- gsub("\\.[^.]*$", "", basename(images[1]))
@@ -1431,40 +1436,33 @@ kin.free <-
         
         
         ##using free.ml
-        if ("cont" %in% smooth.what)
-          n <- smooth.n
-        else
-          n <- 0
-        fml <- free.ml(out = as.matrix(best.cont), smooth.n = n)
+
+        
+        fml <- free.ml(out = as.matrix(best.cont), smooth.n = smooth.n,red=red)
         
         cont.sm <- data.table(frame = frame, fml$cont.sm)
-        y.df <- fml$ml
-        #EBImage::display(z,"raster")
-        #with(y.df,points(x,y,col="blue",cex=0.1))
+     
+        ml<- fml$ml
         
-        ends <- ceiling(nrow(y.df) * tips)
+        #EBImage::display(z,"raster")
+        #with(ml,points(x,y,col="blue",cex=0.1))
+        
+        ends <- ceiling(nrow(ml) * tips)
         tip.y <-
-          mean(tail(y.df$y[!is.na(y.df$y)], ends))#tip is mean y.m of last tips per pixels
+          mean(tail(ml$y[!is.na(ml$y)], ends))
         tip.x <-
-          mean(tail(y.df$x[!is.na(y.df$y)], ends))
+          mean(tail(ml$x[!is.na(ml$y)], ends))
         
         head.y <-
-          mean(head(y.df$y[!is.na(y.df$y)], ends))
+          mean(head(ml$y[!is.na(ml$y)], ends))
         head.x <-
-          mean(head(y.df$x[!is.na(y.df$y)], ends))
+          mean(head(ml$x[!is.na(ml$y)], ends))
         
-        #n midline points
-        if (is.null(smooth.points))
-          smooth.points <- nrow(y.df)
-        midline <-
-          y.df[seq(1, nrow(y.df), length.out = smooth.points), ] #two hundred points on midline
+        ml <- data.table(frame, ml)
         
-        midline <- midline[complete.cases(midline)]
-        midline <- data.table(frame, midline)
-        
-        midline <- midline[complete.cases(midline), ]
-        
-        midline[, roi := r.name]
+      #with(data.table(head.x,head.y),points(head.x,head.y,col="red"))
+        #with(data.table(tip.x,tip.y),points(tip.x,tip.y,col="red"))
+        ml[, roi := r.name]
         
         kin.im <-
           data.table(
@@ -1480,7 +1478,7 @@ kin.free <-
         
         par.res <- list(
           kin = kin.im,
-          mid = midline,
+          mid = ml,
           cont = cont.im,
           cont.sm = cont.sm,
           class = classes,
@@ -1502,6 +1500,8 @@ kin.free <-
       x$mid))
     cont.dat <- do.call(rbind, lapply(kin.res, function(x)
       x$cont))
+    cont.sm.dat <- do.call(rbind, lapply(kin.res, function(x)
+      x$cont.sm))
     class.dat <- do.call(rbind, lapply(kin.res, function(x)
       x$class))
     dim <-  do.call(rbind, lapply(kin.res, function(x)
@@ -1558,21 +1558,26 @@ kin.free <-
     
     setkeyv(midline.dat2, c("frame", "n"))
     
+   #qplot(d=cont.dat[frame==0],x,y)+geom_point(d=midline.dat2[frame==0],aes(x,y),col="red")
     #centroid in next frame
+    
+    keep.n <- midline.dat2[,list(max.n=round(max(n)*ant.per)),by=frame]
+    midline.dat2 <- midline.dat2[keep.n, on="frame"] 
+    
     cent <-
-      midline.dat2[n %in% 1:(ant.per * smooth.points), ][n %in% c(min(n), max(n))][, list(x.c =
+      midline.dat2[n <=max.n, ][n %in% c(min(n), max(n))][, list(x.c =
                                                                                             mean(x), y.c = mean(y)), by = frame][, c("x.c", "y.c") := list(dplyr::lead(x.c), dplyr::lead(y.c))]
     cent.ref <-
-      midline.dat2[n %in% 1:(ant.per * smooth.points), ][n %in% c(min(n), max(n)) &
+      midline.dat2[n <=max.n, ][n %in% c(min(n), max(n)) &
                                                            frame == 0][, list(x.c = mean(x), y.c = mean(y)), by = frame][frame == 0, ]
 
     #head centroid in first frame  
     cent.ref <-
-      midline.dat2[cent.ref, on = "frame"][n %in% 1:(ant.per * smooth.points), ][n %in%
+      midline.dat2[cent.ref, on = "frame"][n <=max.n, ][n %in%
                                                                                    c(min(n), max(n)) &
                                                                                    frame == 0][, or.dist := dist.2d(x.c, x, y.c, y), by = frame]
     ends3 <-
-      midline.dat2[cent, on = "frame"][n %in% 1:(ant.per * smooth.points), ][n %in%
+      midline.dat2[cent, on = "frame"][n <=max.n, ][n %in%
                                                                                c(min(n), max(n))]
     ends3[, dist := dist.2d(x.c, x, y.c, y), by = frame]
     ends3 <-
@@ -1589,18 +1594,17 @@ kin.free <-
     #rerun kin, head, and ml calculations with new data
     
     ####which type of lines to be fitted, spline or loess
-    if ("ml" %in% smooth.what &
-        !any(c("spline", "loess") == smoothing))
-      stop("'smooth.cont==F' and smoothing' must = 'loess' or 'spline'")
+    if (!any(c("spline", "loess") == smoothing))
+      stop("'ml.smooth' must contain 'loess' or 'spline'")
     
-    if ("ml" %in% smooth.what & smoothing == "loess")
+    if (smoothing == "loess")
       midline.dat2[, y.pred :=
                      fitted(loess(y ~ x,
                                   span = smooth,
                                   degree = 0)), by = list(frame)]
     
     
-    if ("ml" %in% smooth.what & smoothing == "spline") {
+    if (smoothing == "spline") {
       if (smooth >= 1)
         stop("'smooth' must <1")
       
@@ -1618,14 +1622,14 @@ kin.free <-
                                                                      y), sm = smooth), by = frame]
     }
     
-    if (!"ml" %in% smooth.what)
+    if (is.null(ml.smooth))
       midline.dat2[, c("x.sm", "y.sm") := list(x, y)]
     
     
     setkeyv(midline.dat2, c("frame", "n"))
     
     head.dat <-
-      copy(midline.dat2[n %in% 1:(ant.per * smooth.points)])
+      copy(midline.dat2[n <=max.n, ])
     
     head.l <- list()
     for (h in unique(head.dat$frame))
@@ -1653,7 +1657,7 @@ kin.free <-
     setkeyv(midline.dat2, c("frame", "n"))
     
     x.range <-
-      midline.dat2[, list(x.sm, frame)][, list(
+      midline.dat2[n <=max.n, ][, list(x.sm, frame)][, list(
         min.x = dplyr::first(x.sm),
         max.x = dplyr::last(x.sm),
         range.x = diff(range(x.sm))
@@ -1681,6 +1685,7 @@ kin.free <-
     mid.pred2 <- mid.pred2[keep == TRUE, ]
     
   
+    #qplot(d=cont.dat[frame==0],x,y)+geom_point(d=midline.dat2[frame==0],aes(x,y),col="red")+geom_point(d=mid.pred2[frame==0],aes(x,mid.pred))
     #add head.p to kin.dat
     
     kin.dat[, head.pval := head.p]
@@ -1731,7 +1736,7 @@ kin.free <-
           ))
           with(midline.dat2[frame == (frame2 - 1)], lines(y.sm ~ x.sm, col = "red", lwd =
                                                             4))
-          with(midline.dat2[frame == (frame2 - 1)][1:ceiling(ant.per * smooth.points),],
+          with(midline.dat2[frame == (frame2 - 1)][n<=max.n,],
                points(
                  x,
                  y.sm,
@@ -1749,6 +1754,7 @@ kin.free <-
         kin.dat = kin.dat,
         midline = midline.dat2,
         cont = cont.dat,
+        cont.sm = cont.sm.dat,
         all.classes = class.dat,
         mid.pred = mid.pred2[, list(frame, x, mid.pred)],
         dim = dim
@@ -1763,7 +1769,8 @@ kin.free <-
 #' @description Internal function used in \code{kin} functions for calculating a midline spanning a closed contour. 
 #'
 #' @param out a matrix of named x,y values describing a closed outline (contour)
-#' @param smooth.n the number of smoothing iterations. See Detail
+#' @param smooth.n the number of smoothing iterations. See Details
+#' @param red numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up midline estimations. If 'NULL', the full contour in \code{out} will be used See Details.
 #' 
 #' 
 #' @return A list with the following components:
@@ -1776,28 +1783,40 @@ kin.free <-
 #' @details
 #' The midline is determine by first finding the tips of the contour (i.e., the two coordinates in the outline that are farthest from one another) with \code{\link{coo_truss}} and therefore assumes the contour is elongate. The function then bisects the contour across this axis using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
 #' 
-#' 'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average.
+#' 'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average. Users should be careful not to oversmooth. If the input contour has few points (say just a 100 or so extracted from \code{kin} functions run on low resolution images), much detail will be lost. In general, \code{smooth.n} should be <5.
 #' @export
 #' 
 #' @seealso \code{\link{coo_smooth}}, \code{\link{coo_slice}},\code{\link{coo_slide}}, \code{\link{coo_truss}}, \code{\link{kin.free}}
 #' 
 #' @examples
+#' # a lateral midline, but a midline nonetheless
 #' require(Momocs)
 #' o <- Momocs::nsfishes$coo[[136]]
 #' colnames(o) <- c("x","y")
 #' plot(o[,1],o[,2])
-#' fml <- free.ml(o,smooth.n=0)
+#' fml <- free.ml(o,smooth.n=0,red=0.95)
 #' points(fml$ml$x,fml$ml$y,col="red")
 #' #note the difference
 #' fml2 <- free.ml(o,smooth.n=10)
 #' points(fml2$ml$x,fml2$ml$y,col="blue")
 
-free.ml <- function(out = NULL,smooth.n=NULL) {
+#out=o
+free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
   
   if(!"matrix" %in% class(out)) stop("'out' must be a matrix")
   n <- side <- x <- y <- NULL
   
+  if (!is.null(red) ){
+    if(!is.numeric(red)) stop("'red' must be numeric and 0-1")
+    if (red<0 | red>1 )
+      stop("'red' must be numeric and 0-1")
+  }
+  
+  if(!is.null(red)) red.n <- round(red*(nrow(out)/2),0)
+  
   coo <- Momocs::coo_close(out)
+  if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
+  colnames(coo) <- c("x","y")
   coo <- Momocs::coo_smooth(coo,smooth.n)
   #coo <-  Momocs::coo_slide(coo, id=10)
   tr <-  Momocs::coo_truss(coo)
@@ -1828,7 +1847,7 @@ free.ml <- function(out = NULL,smooth.n=NULL) {
   coo.ml <- coo.dist[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
 
   
-  return(list(ml = coo.ml,cont.sm=data.table(coo)))
+  return(list(ml = coo.ml,cont.sm=data.table(coo),cont.sides=coo.dist))
 }
 
 
@@ -1836,28 +1855,31 @@ free.ml <- function(out = NULL,smooth.n=NULL) {
 
 #' @description  Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  \link{kin.simple} and \link{kin.search}. Also computes a smoothed midline based on the body outline with the fin region removed.
 #'
-#' @param x a data frame or matrix with 'x' and 'y' data as columns.
+#' @param out a data frame or matrix with 'x' and 'y' data as columns.
 #' @param fin.pos numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the body length.
-#' @param smooth.n numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'.
-#' @param tip.ang the minimum angle, in degrees, that defines tip of each fin. See Details.
-#' @param x.bins numeric, when less than or equal to 1, the proportion of contour coordinates to sample for midline estimation. If greater than 1, the absolute number of equally spaced x values from which to compute the midline. See Details.
-#' @param smoothing character, the midline smoothing method, either 'loess' or 'spline'.
-#' @param ml.smooth numeric the smoothing value for the midline. If \code{smoothing} is set to 'loess', passed to 'span' value for \code{\link{loess}}. If \code{smoothing} is set to 'spline', passed to 'spar' value for \code{\link{smooth.spline}}
-#'
+#' @param smooth.n numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'. See Details.
+#' @param ml.smooth numeric (0-1), the smoothing value for the midline. See details. 
+#' @param red numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up fin position and midline estimations. If 'NULL', the full conour in \code{out} will be used See Details.
 #' @export
 #' @importFrom graphics lines
 #' @importFrom stats complete.cases fitted lm loess  predict smooth.spline
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #'
 #' @details
-#'The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with \code{\link{coo_flipx}} and \code{\link{coo_flipy}} after converting contour to class \code{coo}.
+#' If \code{red} is specified, the contour \code{out} is sampled with \code{\link{coo_interpolate}} from the \code{Momocs} package. The number of points sampled (n) equals \code{red} times the number of points in \code{out}
 #'
-#'  \code{tip.angle} is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by \code{fin.pos}. Low values of \code{smooth.n} (<5) should be avoided if the contour is jagged, perhaps due to digitization.
+#' To establish the contour positions that are within \code{fin.pos}, a midline is estimated using \code{\link{free.ml}}. These midline points are indexed by position along the body length by calculating the cumulative distance between midline coordinates in pixels.  
+#' 
+#' The positions of the tip of the fin appendages is estimated in two ways. The first is simply the point in each appendage that is farthest from the base of the fin. The base is estimated as a straight line between the contour coordinates that match \code{fin.pos}.  The second is a little more complicated and starts with calculation the distance between each fin contours coordinates and the midpoint of the fin base. \code{\link{features}} from the \code{features} package is then use to calculate an inflection in this distance and the point of this inflection is used to estimate the fin position. Amplitudes of each method are caculated based on the orthogonal euclidean distance from the fin bases.
 #'
-#'In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by \code{smoothing} and number of points indicated by \code{x.bins}.
+#'In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by \code{fin.pos}. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by \code{fin.pos}, that is, the fin bases. The result is a straight line between the start and end of each fin. 
 #'
-#'  \code{x.bins} controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculated from the mid point of y. When less then 1, \code{x.bins} values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher \code{smooth.n} values will also result in a more robust midline estimation (but also a loss of contour information).
+#'From this composite body contour, a midline prediction is made based on the  \code{ml.smooth}. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value
 #'
+# 'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average. Users should be careful not to oversmooth. If the input contour has few points (say just a 100 or so extracted from \code{kin} functions run on low resolution images), much detail will be lost. In general, \code{smooth.n} should be <5.
+#'
+#' For midline smoothing, \code{\link{smooth_spline}} from the \code{smoothr} package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times \code{1-smooth}. 
+#' 
 #'
 #' @return A list with the following components:
 #'
@@ -1866,35 +1888,34 @@ free.ml <- function(out = NULL,smooth.n=NULL) {
 #' \code{fin} a data table describing the contour of the fins consisting of the following:
 #'
 #' \itemize{
+#' \item 'side': fin side, 'a' or 'b'
 #' \item x,y coordinates within the range of \code{fin.pos}
 #'
-#' \item 'ang': the angle formed by each coordinate and its adjacent points.
-#' \item 'fin': fin side, 'L' or 'R'
-#' \item 'y.pred': predicted y values according to \code{lm()} from start to end of fins.
 #' }
 #'
 #' \code{fin.pts} a data table describing fin position consisting of the following:
 #'
 #' \itemize{
+#' \item 'side': fin side, 'a' or 'b'
+#' \item 'n': The index matching that of the body contour coordinates 
 #' \item  x,y coordinates of the fin tips, start, and end within the range of \code{fin.pos}.
-#' \item 'ang': the angle formed by the coordinates and their adjacent points.
-#' \item 'pos': description  of the coordinates' positions, 'start', 'end' or 'tip'.
+#' \item 'n': The index matching that of the body contour coordinates 
+#' \item 'pos': description  of the coordinates' positions, 'start', 'end' or 'tip' or 'tip2'.
 #' }
 #'
 #' \code{comp} a data table describing the composite contour of the body minus the fins.
 #' \itemize{
+#' \item 'n': The index matching that of the body contour coordinates 
 #' \item  x,y coordinates of the body except the range of x values within \code{fin.pos}. These values take on a straight line described by the prediction of \code{lm()} based on the start and end of the fin. See Details.
 #' }
 #'
-#' \code{midline} a data table describing the estimated
-#' \itemize{
-#' \item 'x': the mean x position within the bin.
-#' \item 'x.bin': the x bin in \code{\link{cut}} notation.
-#' \item 'y.m': the y midpoint at the bind and mean x value.
-#' \item 'ml.pred': the y midline value according to the smoothing parameters.
-#' }
+#' \code{midline} a data table describing the estimated midline, 'x.sm', 'y.sm', the smooth x and y positions, respectively
+#' 
+#' \code{bl} the body lenght in pixels
+#' 
+#' \code{amp} a data table describing the estimated fin amplitudes based on each method of finding the fin tip. 'amp1', the amplitude of the fin positions based on the maximum euclidean distance from the fin base and 'amp2', the distance of the fin points (based on distance inflections) from the fin base.
 #'
-#' @seealso \code{\link{kin.simple}}, \code{\link{kin.LDA}}, \code{\link{kin.search}}, \code{\link{efourier}}, \code{\link{coo_angle_edges}}, \code{\link{coo_smooth}}, \code{\link{loess}}, \code{\link{smooth.spline}}
+#' @seealso \code{\link{kin.simple}}, \code{\link{kin.search}}, \code{\link{kin.free}}, \code{\link{coo_sample}}, \code{\link{coo_smooth}}, \code{\link{smooth_spline}}
 #' @export
 #'
 #' @importFrom graphics lines
@@ -1909,163 +1930,206 @@ free.ml <- function(out = NULL,smooth.n=NULL) {
 #' #download example avi video
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
 #' download.file(f,"sunfish.avi")
+#' f <- "/Users/biology/Google Drive/trout/manuscript/trackter.ms/trackterMS/sunfish_pect.avi"
+#'  ti <-paste0(tempdir(),"/images")
+#'  dir.create(ti)
 #'
 #' #extract images with ffmpeg operations and reduce them to 600 px wide with a filter
 #' filt.red <- " -vf scale=600:-1 " #filter
-#' vid.to.images2(vid.path="sunfish.avi",filt = filt.red) #extract
+#'  vid.to.images2(vid.path="sunfish.avi",filt = filt.red,out.dir=ti) #extract
+#'  vid.to.images2(vid.path=f,filt = filt.red,out.dir=ti) #extract
 #'
 #' #number of frames
-#' fr <- length(list.files("images"))
+#' fr <- list.files(ti,full.names=TRUE)
+#' thr.check(fr[1])
+#' 
 #' #extract contours and other data
-#' kin <- kin.simple(image.dir = "images",frames=c(1:fr),thr=0.9,ant.per = 0.25)
+#' kin <- kin.free(image.dir = ti,par=F,frames=1:10,thr=0.9,ant.per = 0.25,save=FALSE,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
 #' #fin amplitudes by frame with data.table
+#'  out <- read.csv("frame8.csv")
+#' qplot(d=kin$cont.sm,x,y,col=frame)+geom_point(d=kin$midline,aes(x.sm,y.sm))+facet_wrap(frame~.)+geom_point(d=kin$cont,col="red",size=0.5)
+#' 
+#' fin.kin(kin$cont[frame==8,list(x,y)],fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95)
 #' fin.pos <- c(0.25,.5)
-#' fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos);
-#' list(amp=f$amp$amp,fin=f$amp$fin,amp.bl=f$amp$amp.bl)},by=list(frame)]
-#' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=fin))+geom_line()+theme_classic(15)
+#' fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+#' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
 #'print(p)
 #'
 #'
-#' ## plot body and fin contours of frame 1
-#' cont <- data.frame(x=kin$cont[frame==2,list(x,y)]$x,y=kin$cont[frame==2,list(y)]$y)
-#' fins <- fin.kin(cont,fin.pos =fin.pos,x.bins=100)
+#' ## plot body and fin contours of frame 8
+#' cont <- data.frame(x=kin$cont[frame==8,list(x,y)]$x,y=kin$cont[frame==8,list(y)]$y)
+#' fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=2)
 #'
 #' #plot body contour and fins
 #' p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
 #' p+geom_point(data=fins$fin.pts,aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 #'
 #' #plot body contour minus fins and the body midline
-#' p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x,ml.pred),col="red",size=2)
+#' p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x.sm,y.sm),col="red",size=2)
 #' p+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 #'
+#'unlink(ti,recursive=TRUE)
 #' }
 #'
 #'
-#'
+#
 
+#out <- kin$cont[frame==8]
 fin.kin <-
-  function(x,
+  function(out,
            fin.pos = NULL,
            smooth.n = 50,
-           tip.ang = 10,
-           smoothing = "loess",
            x.bins = 0.2,
-           ml.smooth = 0.25) {
+           ml.smooth = 0.9,
+           red=NULL) {
     y <-
       ang <-
       pos <-
       y.pred <-
-      fin <-
+     side<-
       y.m <- ml.pred <- x.bin <- NULL # due to NSE notes in R CMD check
+      
     
-    if (is.null(fin.pos))
+   
+    if (is.null(fin.pos))               
       stop("'fin.pos' not defined")
+  
+
+    
     if (length(fin.pos) != 2)
       stop("length of 'fin.pos' argument must be 2")
-    if (!is.matrix(x))
-      x.m <- as.matrix(x)
-    if (is.null(colnames(x.m)))
-      colnames(x.m) <- c("x", "y")
-    #
+    if (!is.matrix(out))
+     out<- as.matrix(out)
+    if (is.null(colnames(out)))
+      colnames(out) <- c("x", "y")
     
-    x.m[, 2] <-
-      x.m[, 2] - max(x.m[, 2])#to get positive y coords after flip
     
-    #plot(x.m[,1],x.m[,2])
-    x.o <- coo_flipx(Out(list(x.m)))
+    # x.m[, 2] <-
+    #   x.m[, 2] - max(x.m[, 2])#to get positive y coords after flip
+    # 
+    # #plot(x.m[,1],x.m[,2])
+    # x.o <- Momocs::coo_flipx(x.m)
+    # 
+    # #with(x.o,plot(x,y))
+    # 
+    # #with(x.o,plot(x,y))
+    # x.s <- data.table(coo_smooth(x.m, n = smooth.n))
+    # colnames(x.s) <- c("x", "y")
     
-    #panel(x.o)
+    fml <- free.ml(out=as.matrix(out),smooth.n =smooth.n,red=red)
     
-    #with(x.o,plot(x,y))
-    x.s <- data.table(coo_smooth(x.o, n = smooth.n)[[1]][[1]])
-    colnames(x.s) <- c("x", "y")
+ 
+    
+    #with(fml$cont.sides,plot(x,y))
+    sm.spline <- function(x, sm = 0.5) {
+      s <-  round(seq(1, nrow(x), length.out = nrow(x) * (1 - sm)), 0)
+      x <- as.matrix(x)
+      d <- data.table(smoothr::smooth_spline(x[s, ], n = nrow(x)))
+      colnames(d) <- c("x.sm", "y.sm")
+      return(d)
+    }
+    
+    ml2 <- sm.spline(x=as.matrix(fml$ml[,list(x,y)]),sm=.98)[,bl:=cumsum(dist.2d(x.sm,dplyr::lead(x.sm),y.sm,dplyr::lead(y.sm)))][,bl:=bl/max(bl,na.rm = TRUE)][,bl:=c(0,bl[!is.na(bl)])][,n:=1:.N]
+    
+    bl <- max(copy(ml2)[,bl:=cumsum(dist.2d(x.sm,dplyr::lead(x.sm),y.sm,dplyr::lead(y.sm)))]$bl,na.rm = TRUE)
+    
+    #fin.range <- min(x) + fin.pos * bl
+    fin.range <- ml2[data.table::between(bl,fin.pos[1],fin.pos[2])]$n
+    
+    #qplot(data=fml$cont.sides[n%in%fin.range],x=x,y=y,col=side)+geom_point(data=ml2,aes(x=x.sm,y=y.sm),inherit.aes = FALSE)
+    
+    setkeyv(fml$cont.sides,c("side","n"))
+    
+    fins <- fml$cont.sides[n%in%fin.range]
+    
+    dist.2d.line <- function(x, y, slope, intercept) {
+      b = c(1, intercept + slope)
+      c = c(-intercept / slope, 0)
+      a = c(x, y)
+      v1 <- b - c
+      v2 <- a - b
+      m <- cbind(v1, v2)
+      return(abs(det(m)) / sqrt(sum(v1 * v1)))
+    }
+    
+    lm.coefs <- fins[n%in%c(min(n),max(n))][,{l <- lm(y~x);list(b=coef(l)[1],m=coef(l)[2])},by=side]
+    
+    cents <- fins[n%in%c(min(n),max(n)),list(x.c=mean(x),y.c=mean(y)),by=side]
+    fins <- fins[lm.coefs,on="side"][cents,on="side"][,dist:=dist.2d.line(x,y,m,b),by=list(side,n)][,dist2:=dist.2d(x,x.c,y,y.c),by=side]
+    
+    
+    fins[,tip1:=dist==dist[which.max(dist)],by=side]
+    
+    
+    fins[tip1==T,tip1:=dist2==max(dist2),by=side]
+    cp.a <- with(fins[side=='a'],features(n,dist2,smoother = "smooth.spline",spar=0.3))
+    cp.an <- round(cp.a$cpts,0)
+    cp.b <- with(fins[side=='b'],features(n,dist2,smoother = "smooth.spline",spar=0.3))
+    cp.bn <- round(cp.b$cpts,0)
+    
+    
+    cp.bn <- fins[side=='b'][n%in%cp.bn,][which.max(dist2),]$n
+    cp.an <- fins[side=='a'][n%in%cp.an,][which.max(dist2),]$n
+    
+    if(length(cp.an)==0) cp.an <- fins[side=='a'][which.min(dist2)]$n
+    if(length(cp.bn)==0) cp.an <- fins[side=='b'][which.min(dist2)]$n
+    cp <- data.table(side=c("a","b"),n=c(cp.an,cp.bn),tip2=TRUE)
+    
+    
+    #qplot(d=fins[side=="b"],n,dist2)
+    
+    fins <- cp[fins,on=c("side","n")]
     
 
-    bl <- diff(range(x$x))
     
-    fin.range <- min(x) + fin.pos * bl
+    #qplot(data= fml$cont.sides,x=x,y=y)+geom_point(dat=fins,aes(x,y,col=side))+geom_point(data=ml2,aes(x=x.sm,y=y.sm),inherit.aes = FALSE)+geom_point(data=fins[tip1==TRUE],aes(x,y),size=3,col="black")+geom_point(d=cents,aes(x.c,y.c),col="blue")+geom_point(d= ml.comp.s,aes(x.sm,y.sm))
     
-    #Left fin
-    finL <- x.s[x >= fin.range[1] &
-                  x <= fin.range[2] & y < y[which.min(x)]]
-    finL.o <- Out(list(as.matrix(finL[, list(x, y)])))
-    finL[, ang := (coo_angle_edges(finL.o)[[1]])]
     
-    finL2 <- finL[seq(1, nrow(finL), 5)]
-    finL2.o <- Out(list(as.matrix(finL2[, list(x, y)])))
-    finL2 <- data.table(finL2.o[[1]][[1]])
-    finL2[, ang := deg(coo_angle_edges(finL2.o)[[1]])]
     
-    ptsL <- finL2[order(abs(ang)), ][1:15]
-    ptsL[which.min(x), pos := "start"]
-    ptsL[which.max(x), pos := "end"]
-    ptsL[ang < tip.ang, ][which.min(y)]$pos <- "tip"
-    ptsL <- ptsL[!is.na(pos)]
     
-    #right fin
+    lms <- list()
+    for(i in c("a","b")){
+      lms[[i]] <- lm(y~x,fins[n%in%c(min(n),max(n)) & side==i])
+    }
     
-    finR <- x.s[x >= fin.range[1] &
-                  x <= fin.range[2] & y > y[which.min(x)]]
-    finR.o <- Out(list(as.matrix(finR[, list(x, y)])))
-    finR[, ang := (coo_angle_edges(finR.o)[[1]])]
+    fins[, y.pred := predict(lms[[side]], newdata = data.frame(x = x)), by = list(side)]
     
-    #panel(x.o)
-    finR2 <- finR[seq(1, nrow(finR), 5)]
-    finR2.o <- Out(list(as.matrix(finR2[, list(x, y)])))
-    finR2 <- data.table(finR2.o[[1]][[1]])
-    finR2[, ang := deg(coo_angle_edges(finR2.o)[[1]])]
-    
-    ptsR <- finR2[order(abs(ang)), ][1:15]
-    ptsR[which.min(x), pos := "start"]
-    ptsR[which.max(x), pos := "end"]
-    ptsR[ang < tip.ang, ][which.max(y)]$pos <- "tip"
-    ptsR <- ptsR[!is.na(pos)]
-    
-    finPts <- rbind(data.table(ptsL, fin = "L"), data.table(ptsR, fin = "R"))
-    
-    fins <- rbind(data.table(finL, fin = "L"), data.table(finR, fin = "R"))
-    
-    fins[, y.pred := predict(lm(y ~ x, data.frame(
-      y = c(y[which.min(x)], y[which.max(x)]), x = c(min(x), max(x))
-    )), newdata = data.frame(x = x)), by = list(fin)]
-    
-    comp <- comp2 <- merge(x.s, fins, by = c("x", "y"), all.x = TRUE)
-    setkey(comp, "x")
+    comp <- comp2 <- merge(fml$cont.sides, fins[,list(x,y,y.pred)], by = c("x", "y"), all.x = TRUE)
+    setkey(comp, "n")
     comp[!is.na(y.pred), y := y.pred]
-    comp <- comp[, list(x, y)]
+    comp <- comp[, list(n,x, y)]
     
+    #with(comp,plot(x,y))
     setkey(comp2, "x")
     
-    if (x.bins > 1)
-      comp2[, x.bin := cut(x, x.bins)]
-    if (x.bins <= 1)
-      comp2[, x.bin := cut(x, nrow(comp) * x.bins)]
+    fins2 <- copy(fins)
+    fins2[, `:=`(pos, "pt"),by=side]
     
-    comp2 <- comp2[, list(x = mean(x), y = range(y)), by = list(x.bin)]
     
-    mid <- comp2[, list(y.m = mean(y)), by = list(x, x.bin)]
+    fins2[, `:=`(pos, ifelse(n==min(n),"start",pos)),by=side]
+    fins2[, `:=`(pos, ifelse(n==max(n),"end",pos)),by=side]
+    fins2[tip1==TRUE,pos:="tip1"]
+    fins2[tip2==TRUE,pos:="tip2"]
     
-    if (smoothing == "loess")
-      mid[, ml.pred := predict(loess(y.m ~ x, span = ml.smooth))]
-    if (smoothing == "spline")
-      mid[, ml.pred := smooth.spline(x = x, y = y.m, spar = ml.smooth)$y]
     
-    bl <-
-      mid[, list(sum(dist.2d(
-        x, dplyr::lead(x), y.m, dplyr::lead(y.m)
-      ), na.rm = TRUE))]$V1
     
-    amp <-
-      finPts[, list(amp = abs(y[pos == "start"] - y[pos == "tip"]), amp.bl =
-                      abs(y[pos == "start"] - y[pos == "tip"]) / bl), by = list(fin)]
+    finPts <- fins2[pos!="pt",list(side,n,x,y,pos)]
+    
+    amp <- fins2[!is.na(pos)&tip1|tip2,][,method:=pos][,list(amp1=dist[tip1],amp2=dist[tip2]),by=side][!is.na(amp2)]
+    
+
+    
+    ml.comp <- comp[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
+    
+    ml.comp.s <- sm.spline(x=as.matrix(ml.comp[,list(x,y)]),sm=ml.smooth)
     
     return(list(
-      body = x.s,
-      fin = fins,
+      body = fml$cont.sm, #smoothed contour
+      fin = fins[,list(side,x,y)],
       fin.pts = finPts,
       comp = comp,
-      midline = mid,
-      bl = bl,
+      midline = ml.comp.s,
+      bl = bl ,
       amp = amp
     ))
   }

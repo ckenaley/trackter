@@ -38,6 +38,7 @@ sapply(f,unlink)
   * this last step assumes appveyor is running the Windows build with `ffmpeg` install
   * added `- {os: macOS-latest, r: 'devel'}` for macOS devel build
   * see also: https://www.rostrum.blog/2020/08/09/ghactions-pkgs/
+  * for code coverage with gh action: `usethis::use_github_action("test-coverage")`
   
     
 # Notes for gitting/site
