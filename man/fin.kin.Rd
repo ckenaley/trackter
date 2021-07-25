@@ -84,14 +84,14 @@ require(ggplot2)
 #download example avi video
 f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
 download.file(f,"sunfish.avi")
-f <- "/Users/biology/Google Drive/trout/manuscript/trackter.ms/trackterMS/sunfish_pect.avi"
+
+#create directories
  ti <-paste0(tempdir(),"/images")
  dir.create(ti)
 
 #extract images with ffmpeg operations and reduce them to 600 px wide with a filter
 filt.red <- " -vf scale=600:-1 " #filter
- vid.to.images2(vid.path="sunfish.avi",filt = filt.red,out.dir=ti) #extract
- vid.to.images2(vid.path=f,filt = filt.red,out.dir=ti) #extract
+vid.to.images2(vid.path="sunfish.avi",filt = filt.red,out.dir=ti) #extract
 
 #number of frames
 fr <- list.files(ti,full.names=TRUE)
@@ -99,20 +99,18 @@ thr.check(fr[1])
 
 #extract contours and other data
 kin <- kin.free(image.dir = ti,par=F,frames=1:10,thr=0.9,ant.per = 0.25,save=FALSE,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
-#fin amplitudes by frame with data.table
- out <- read.csv("frame8.csv")
-qplot(d=kin$cont.sm,x,y,col=frame)+geom_point(d=kin$midline,aes(x.sm,y.sm))+facet_wrap(frame~.)+geom_point(d=kin$cont,col="red",size=0.5)
 
-fin.kin(kin$cont[frame==8,list(x,y)],fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95)
+#fin amplitudes by frame with data.table
 fin.pos <- c(0.25,.5)
 fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+
 p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
 print(p)
 
 
 ## plot body and fin contours of frame 8
-cont <- data.frame(x=kin$cont[frame==8,list(x,y)]$x,y=kin$cont[frame==8,list(y)]$y)
-fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=2)
+cont <- kin$cont[frame==8,list(x,y)]
+fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=1,ml.smooth=0.95)
 
 #plot body contour and fins
 p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)

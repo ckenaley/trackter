@@ -1200,7 +1200,7 @@ kin.free <-
       max.x <-
       m <-
       b <-
-      y.sm <-
+      y.sm <-max.n <- n <- 
       keep <-  l <-  head.pval <-  bl <-  per.bl <-  amp <- y <- im <- or.dist <- NULL
     
     
@@ -1930,14 +1930,14 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #' #download example avi video
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
 #' download.file(f,"sunfish.avi")
-#' f <- "/Users/biology/Google Drive/trout/manuscript/trackter.ms/trackterMS/sunfish_pect.avi"
+#' 
+#' #create directories
 #'  ti <-paste0(tempdir(),"/images")
 #'  dir.create(ti)
 #'
 #' #extract images with ffmpeg operations and reduce them to 600 px wide with a filter
 #' filt.red <- " -vf scale=600:-1 " #filter
-#'  vid.to.images2(vid.path="sunfish.avi",filt = filt.red,out.dir=ti) #extract
-#'  vid.to.images2(vid.path=f,filt = filt.red,out.dir=ti) #extract
+#' vid.to.images2(vid.path="sunfish.avi",filt = filt.red,out.dir=ti) #extract
 #'
 #' #number of frames
 #' fr <- list.files(ti,full.names=TRUE)
@@ -1945,20 +1945,18 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #' 
 #' #extract contours and other data
 #' kin <- kin.free(image.dir = ti,par=F,frames=1:10,thr=0.9,ant.per = 0.25,save=FALSE,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
-#' #fin amplitudes by frame with data.table
-#'  out <- read.csv("frame8.csv")
-#' qplot(d=kin$cont.sm,x,y,col=frame)+geom_point(d=kin$midline,aes(x.sm,y.sm))+facet_wrap(frame~.)+geom_point(d=kin$cont,col="red",size=0.5)
 #' 
-#' fin.kin(kin$cont[frame==8,list(x,y)],fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95)
+#' #fin amplitudes by frame with data.table
 #' fin.pos <- c(0.25,.5)
 #' fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+#' 
 #' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
 #'print(p)
 #'
 #'
 #' ## plot body and fin contours of frame 8
-#' cont <- data.frame(x=kin$cont[frame==8,list(x,y)]$x,y=kin$cont[frame==8,list(y)]$y)
-#' fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=2)
+#' cont <- kin$cont[frame==8,list(x,y)]
+#' fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=1,ml.smooth=0.95)
 #'
 #' #plot body contour and fins
 #' p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
@@ -1973,29 +1971,13 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #'
 #'
 #
-
-#out <- kin$cont[frame==8]
 fin.kin <-
-  function(out,
-           fin.pos = NULL,
-           smooth.n = 50,
-           x.bins = 0.2,
-           ml.smooth = 0.9,
-           red=NULL) {
-    y <-
-      ang <-
-      pos <-
-      y.pred <-
-     side<-
-      y.m <- ml.pred <- x.bin <- NULL # due to NSE notes in R CMD check
-      
-    
+  function(out,fin.pos = NULL,smooth.n = 5, ml.smooth = 0.9,red=NULL) {
+    y <- x <- x.sm <- y.sm <- n <- m <- b <- dist2 <- x.c <- y.c <- tip1 <- tip2 <- method <- amp2 <-pos <- y.pred <-side <- NULL # due to NSE notes in R CMD checks
    
     if (is.null(fin.pos))               
       stop("'fin.pos' not defined")
-  
-
-    
+ 
     if (length(fin.pos) != 2)
       stop("length of 'fin.pos' argument must be 2")
     if (!is.matrix(out))
@@ -2003,22 +1985,7 @@ fin.kin <-
     if (is.null(colnames(out)))
       colnames(out) <- c("x", "y")
     
-    
-    # x.m[, 2] <-
-    #   x.m[, 2] - max(x.m[, 2])#to get positive y coords after flip
-    # 
-    # #plot(x.m[,1],x.m[,2])
-    # x.o <- Momocs::coo_flipx(x.m)
-    # 
-    # #with(x.o,plot(x,y))
-    # 
-    # #with(x.o,plot(x,y))
-    # x.s <- data.table(coo_smooth(x.m, n = smooth.n))
-    # colnames(x.s) <- c("x", "y")
-    
     fml <- free.ml(out=as.matrix(out),smooth.n =smooth.n,red=red)
-    
- 
     
     #with(fml$cont.sides,plot(x,y))
     sm.spline <- function(x, sm = 0.5) {
@@ -2029,18 +1996,12 @@ fin.kin <-
       return(d)
     }
     
-    ml2 <- sm.spline(x=as.matrix(fml$ml[,list(x,y)]),sm=.98)[,bl:=cumsum(dist.2d(x.sm,dplyr::lead(x.sm),y.sm,dplyr::lead(y.sm)))][,bl:=bl/max(bl,na.rm = TRUE)][,bl:=c(0,bl[!is.na(bl)])][,n:=1:.N]
-    
-    bl <- max(copy(ml2)[,bl:=cumsum(dist.2d(x.sm,dplyr::lead(x.sm),y.sm,dplyr::lead(y.sm)))]$bl,na.rm = TRUE)
-    
-    #fin.range <- min(x) + fin.pos * bl
-    fin.range <- ml2[data.table::between(bl,fin.pos[1],fin.pos[2])]$n
-    
-    #qplot(data=fml$cont.sides[n%in%fin.range],x=x,y=y,col=side)+geom_point(data=ml2,aes(x=x.sm,y=y.sm),inherit.aes = FALSE)
-    
-    setkeyv(fml$cont.sides,c("side","n"))
-    
-    fins <- fml$cont.sides[n%in%fin.range]
+    #return position of a point rotated theta about another point
+    point.ang.orig<- function(p,o,theta){
+      xrot<-cos(theta)*(p[1]-o[1])-sin(theta)*(p[2]-o[2])+o[1]
+      yrot<-sin(theta)*(p[1]-o[1])+cos(theta)*(p[2]-o[2])+o[2]
+      return(c(xrot,yrot))
+    }
     
     dist.2d.line <- function(x, y, slope, intercept) {
       b = c(1, intercept + slope)
@@ -2052,9 +2013,20 @@ fin.kin <-
       return(abs(det(m)) / sqrt(sum(v1 * v1)))
     }
     
-    lm.coefs <- fins[n%in%c(min(n),max(n))][,{l <- lm(y~x);list(b=coef(l)[1],m=coef(l)[2])},by=side]
+    ml2 <- sm.spline(x=as.matrix(fml$ml[,list(x,y)]),sm=.99)[,n:=1:.N]
     
-    cents <- fins[n%in%c(min(n),max(n)),list(x.c=mean(x),y.c=mean(y)),by=side]
+    rot <- ml2[,{pa <- point.ang.orig(c(x.sm,y.sm),c(ml2$x.sm[1],ml2$y.sm[1]),pi/2);list(x=pa[1],y=pa[2])},by=n]
+    rot.lm <- lm(y~x,rot)
+    
+    fml$cont.sides[,dist:=dist.2d.line(x,y,coef(rot.lm)[2],coef(rot.lm)[1]),by=list(n,side)][,bl:=dist/max(dist),by=side]
+    
+    fins <- fml$cont.sides[data.table::between(bl,fin.pos[1],fin.pos[2]),]
+    
+    #qplot(data= fins,x=x,y=y,col=side)
+    
+    lm.coefs <- fins[,ends:=n%in%c(min(n),max(n)),by=side][ends==TRUE,{l <- lm(y~x);list(b=coef(l)[1],m=coef(l)[2])},by=side]
+    
+    cents <- fins[ends==TRUE,list(x.c=mean(x),y.c=mean(y)),by=side]
     fins <- fins[lm.coefs,on="side"][cents,on="side"][,dist:=dist.2d.line(x,y,m,b),by=list(side,n)][,dist2:=dist.2d(x,x.c,y,y.c),by=side]
     
     
@@ -2076,53 +2048,53 @@ fin.kin <-
     cp <- data.table(side=c("a","b"),n=c(cp.an,cp.bn),tip2=TRUE)
     
     
-    #qplot(d=fins[side=="b"],n,dist2)
+    #qplot(d=fml$cont.sides,x,y,col=n)+facet_grid(side~.)
     
     fins <- cp[fins,on=c("side","n")]
-    
 
-    
-    #qplot(data= fml$cont.sides,x=x,y=y)+geom_point(dat=fins,aes(x,y,col=side))+geom_point(data=ml2,aes(x=x.sm,y=y.sm),inherit.aes = FALSE)+geom_point(data=fins[tip1==TRUE],aes(x,y),size=3,col="black")+geom_point(d=cents,aes(x.c,y.c),col="blue")+geom_point(d= ml.comp.s,aes(x.sm,y.sm))
-    
-    
-    
     
     lms <- list()
     for(i in c("a","b")){
-      lms[[i]] <- lm(y~x,fins[n%in%c(min(n),max(n)) & side==i])
+      lms[[i]] <- lm(y~x,fins[ends==TRUE & side==i])
     }
     
     fins[, y.pred := predict(lms[[side]], newdata = data.frame(x = x)), by = list(side)]
     
-    comp <- comp2 <- merge(fml$cont.sides, fins[,list(x,y,y.pred)], by = c("x", "y"), all.x = TRUE)
-    setkey(comp, "n")
+    comp <- merge(fml$cont.sides, fins[,list(y.pred,n,side)], by = c("n","side"), all.x = TRUE)
     comp[!is.na(y.pred), y := y.pred]
-    comp <- comp[, list(n,x, y)]
     
-    #with(comp,plot(x,y))
-    setkey(comp2, "x")
+  
+    #p <- qplot(data= fml$cont.sides,x=x,y=y)+geom_point(dat=fins,aes(x,y.pred,col=side))
+    #print(p)
+  
+    setkeyv(comp, c("n","side"))
+    
+   #with(comp,plot(x,y))
     
     fins2 <- copy(fins)
     fins2[, `:=`(pos, "pt"),by=side]
-    
     
     fins2[, `:=`(pos, ifelse(n==min(n),"start",pos)),by=side]
     fins2[, `:=`(pos, ifelse(n==max(n),"end",pos)),by=side]
     fins2[tip1==TRUE,pos:="tip1"]
     fins2[tip2==TRUE,pos:="tip2"]
     
-    
-    
     finPts <- fins2[pos!="pt",list(side,n,x,y,pos)]
     
     amp <- fins2[!is.na(pos)&tip1|tip2,][,method:=pos][,list(amp1=dist[tip1],amp2=dist[tip2]),by=side][!is.na(amp2)]
-    
-
+  
+    #with(comp,plot(x,y))
     
     ml.comp <- comp[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
-    
+   
     ml.comp.s <- sm.spline(x=as.matrix(ml.comp[,list(x,y)]),sm=ml.smooth)
     
+    
+  bl <- sum(copy(ml.comp.s[,dist:=dist.2d(x.sm,dplyr::lead(x.sm),y.sm,dplyr::lead(y.sm))])$dist,na.rm = TRUE)
+    
+    # p <- qplot(data= fml$cont.sides,x=x,y=y)+geom_point(dat=fins,aes(x,y,col=side))+geom_point(data=fins[tip1==TRUE],aes(x,y),size=3,col="black")+geom_point(d=cents,aes(x.c,y.c),col="blue")+geom_point(d= ml2,aes(x.sm,y.sm))
+    # print(p)
+    # 
     return(list(
       body = fml$cont.sm, #smoothed contour
       fin = fins[,list(side,x,y)],

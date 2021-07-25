@@ -118,19 +118,19 @@ test_that("kin.free works fine", {
   
   file.copy(y,paste0(ti,"/",basename(y)))
   
-  invisible(capture.output( kin.y <- kin.free(image.dir = ti,save = TRUE,out.dir =tp)))
+  invisible(capture.output( kin.y <- kin.free(image.dir = ti,save = TRUE,out.dir =tp,red=0.5)))
   
   
   expect_length(list.files(tp),2)
   expect_length(kin.y$all.classes$siz,2)
   expect_is(kin.y,"list")
-  expect_named(kin.y,c("kin.dat", "midline","cont","all.classes","mid.pred","dim"))
+  expect_named(kin.y,c('kin.dat', 'midline', 'cont', 'cont.sm', 'all.classes', 'mid.pred', 'dim'))
   expect_true(kin.y$all.classes$size[1]>0)
   expect_type(kin.y$midline$roi,type = "character")
   expect_type(kin.y$cont$x,type = "integer")
 
   
-  expect_error(invisible(capture.output( kin.y <- kin.free(image.dir = ti,out.dir=tp,save = FALSE))),"To save processed images")
+  expect_error(invisible(capture.output( kin.free(image.dir = ti,out.dir=tp,save = FALSE))),"To save processed images")
   
   
   expect_error(invisible(capture.output( kin.free(image.dir ="foo",out.dir=tp,save=TRUE))),"does not exist")
@@ -144,16 +144,17 @@ test_that("kin.free works fine", {
   expect_error(invisible(capture.output( kin.free(image.dir = ti,frames=1,save=FALSE))),"number of frames must be")
   
   expect_error(invisible(capture.output( kin.free(image.dir =ti , thr="foo",save=FALSE))),"must be set to")
-  expect_error(invisible(capture.output( kin.free(image.dir =ti ,smoothing="foo",save=FALSE))),"must =")
+  expect_error(invisible(capture.output( kin.free(image.dir =ti,ml.smooth = list(1,"foo"),save=FALSE))),"must contain 'loess'")
+  
+  expect_error(invisible(capture.output( kin.free(image.dir =ti,ml.smooth = list(1,2),save=FALSE))),"'ml.smooth' must be a list of length 2")
   
   expect_error(invisible(capture.output( kin.free(image.dir =ti ,search.for="foo",save=FALSE))),"must be set to")
   
   expect_error(invisible(capture.output( kin.free(image.dir=ti,save=TRUE,out.qual=1.1,out.dir=tp))),"'out.qual' must be >=0 and <=1")
   
   
-  expect_error(invisible(capture.output( kin.free(image.dir=ti,save=FALSE,smooth.what = "fooo"))),"must be set to 'ml', 'cont', or")
   
-  expect_error(invisible(capture.output( kin.free(image.dir=ti,save=FALSE,smooth=1.1,smoothing = "spline"))),"'smooth' must <1")
+  expect_error(invisible(capture.output( kin.free(image.dir=ti,save=FALSE,ml.smooth=list("spline",1.1)))),"'smooth' must <1")
   
 
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
@@ -167,14 +168,11 @@ test_that("kin.free works fine", {
   }
   
 
-  invisible(capture.output( kin.yp <- kin.free(image.dir = ti,par=TRUE,cores.n=cor.n,save=FALSE)))
+  invisible(capture.output( kin.yp <- kin.free(image.dir = ti,save = TRUE,out.dir =tp,red=0.5,par=TRUE,cores.n = cor.n)))
   
   expect_identical(kin.y,kin.yp)
   
-  expect_error(invisible(capture.output( kin.free(image.dir=ti,save=FALSE,smooth=1.1,smoothing = "spline"))),"'smooth' must <1")
-  
-  
-  
+
   
   dir.create(paste0(tempdir(),"/test_images2"))
   
@@ -197,7 +195,9 @@ test_that("free.ml works fine", {
   
   expect_error(free.ml(cont,smooth.n = 5),"must be a matrix")
   
-  expect_named(fml,c("ml","cont.sm"))
+  expect_error(free.ml(as.matrix(cont),smooth.n = 5,red=10),"must be numeric and 0-1")
+  
+  expect_named(fml,c("ml","cont.sm","cont.sides"))
   
   fml2 <- free.ml(as.matrix(cont),smooth.n = 0)
   
@@ -208,7 +208,7 @@ test_that("free.ml works fine", {
 test_that("fin.kin works fine", {
 
   cont <- read.csv(system.file("extdata", "cont.csv", package = "trackter"))[,3:4]
-  fin.y <- fin.kin(cont,fin.pos  = c(0.25,0.5))
+  fin.y <- fin.kin(cont,fin.pos  = c(0.25,0.5),red=0.5)
   
   expect_is(fin.y,"list")
   expect_named(fin.y,c("body","fin","fin.pts","comp","midline","bl","amp"))
@@ -217,7 +217,7 @@ test_that("fin.kin works fine", {
   expect_type(fin.y$fin.pts$y,type = "double")
   expect_type(fin.y$fin$y,type = "double")
   expect_type(fin.y$bl[1],type = "double")
-  expect_type(fin.y$amp$amp[1],type = "double")
+  expect_type(fin.y$amp$amp2[1],type = "double")
   
   expect_error(fin.kin(kin.y$cont))
   expect_error(fin.kin(data.frame(x=kin.y$cont$x,y=kin.y$cont$y),fin.pos=0.1))
