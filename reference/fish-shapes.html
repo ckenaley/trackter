@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • trackter</title>
+<title>Contour data of fish and arbitrary shapes — fishshapes • trackter</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Contour data of fish and arbitrary shapes — fishshapes" />
+<meta property="og:description" content="Contour data constructed with the Momocs package of several fish shapes and arbitrary polygons. Intended for training of PCA and LDA analysis with LDA. Shapes are classified with shape, type, and edge factors." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -117,18 +118,54 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Contour data of fish and arbitrary shapes</h1>
+    
+    <div class="hidden name"><code>fish-shapes.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="tutorial.html">tutorial</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>Contour data constructed with the <code>Momocs</code> package of several fish shapes and arbitrary polygons. Intended for training of PCA and LDA analysis with <code>LDA</code>. Shapes are classified with shape, type, and edge factors.</p>
     </div>
+
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>fishshapes</span><span class='op'>)</span></pre>
+
+
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>An object of class <code>"Out"</code> and <code>"Coo"</code>; see <code><a href='https://rdrr.io/pkg/Momocs/man/Out.html'>Out</a></code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    
+<ul>
+<li><p>'shape': names the contour</p></li>
+<li><p>'type': classifies the shape as 'fish' or not.fish'</p></li>
+<li><p>'edge': is every coordinate of the contour represented, i.e., not cut off by an edge of the field?  One level of 'FALSE'.</p></li>
+</ul> 
+
+<p>Shapes of type 'fish' include the follow classification levels:</p><ul>
+<li><p>'eel' (genus Anguilla) swimming with body undulations</p></li>
+<li><p>'sunfish_BCF' (genus Lepomis) swimming with body-caudal fin propulsion</p></li>
+<li><p>'sunfish_pect' (genus Lepomis) swimming with both body-caudal fin and pectoral fin oscillations</p></li>
+<li><p>'trout' (genus Oncorhynchus) swimming with body-caudal fin propulsion</p></li>
+</ul>
+
+<p>Each of these fish types include contours sampled regularly over one tail-beat cycle.</p>
+<p>Shapes of type 'not.fish' include 'Ellipse', 'Lshape', 'Ushape', Ushape2', 'Ushape3','triangle', 'rectangle', and 'square'. Each 'not.fish' type was resampled 6 times with different <code>efourier</code> analyses with 'nb.h' values ranging from 5 to 30. This produces shape classes with subtly variable contours.</p>
+<p>The 'edge' factor is included so as to have the classification factors match those of the <code>efourier</code> and <code>LDA</code> analysis in <code>kin.LDA</code>.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/MomX/Momocs/'>Momocs</a></span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘Momocs’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:stats’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    filter</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>fishshapes</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/Momocs/man/panel.Coo.html'>panel</a></span><span class='op'>(</span><span class='va'>fishshapes</span><span class='op'>)</span>
+</div><div class='img'><img src='fish-shapes-1.png' alt='' width='700' height='433' /></div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 

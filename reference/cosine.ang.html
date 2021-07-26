@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • trackter</title>
+<title>Computes angle between two segments sharing a point. — cosine.ang • trackter</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Computes angle between two segments sharing a point. — cosine.ang" />
+<meta property="og:description" content="Computes angle between two segments of a triangle using law of cosines." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -117,18 +118,50 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Computes angle between two segments sharing a point.</h1>
+    
+    <div class="hidden name"><code>cosine.ang.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="tutorial.html">tutorial</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>Computes angle between two segments of a triangle using law of cosines.</p>
     </div>
+
+    <pre class="usage"><span class='fu'>cosine.ang</span><span class='op'>(</span><span class='va'>l</span>, <span class='va'>r</span>, <span class='va'>o</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>l</th>
+      <td><p>Numeric; length of segment to the left</p></td>
+    </tr>
+    <tr>
+      <th>r</th>
+      <td><p>Numeric; length of segment to the right</p></td>
+    </tr>
+    <tr>
+      <th>o</th>
+      <td><p>Numeric; length of opposite segment</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A single value of the angle in radians</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'>#a right triangle</span>
+<span class='va'>L</span><span class='op'>=</span><span class='fl'>3</span>
+<span class='va'>R</span><span class='op'>=</span><span class='fl'>3</span>
+<span class='va'>O</span><span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>L</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>+</span><span class='va'>R</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span>
+<span class='fu'>cosine.ang</span><span class='op'>(</span><span class='va'>L</span>,<span class='va'>R</span>,<span class='va'>O</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1.570796</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
