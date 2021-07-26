@@ -24,7 +24,8 @@ jobs:
           # use a different tic template type if you do not want to build on all listed platforms
           - { os: ubuntu-latest, r: "release" }
           - { os: macOS-latest, r: "release", latex: "true" }
-          - { os: ubuntu-latest, r: "devel" }
+          #
+          #- { os: ubuntu-latest, r: "devel" }
 
     env:
       # otherwise remotes::fun() errors cause the build to fail. Example: Unavailability of binaries
@@ -74,7 +75,8 @@ jobs:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-${{ matrix.config.r }}-${{steps.date.outputs.date}}
           restore-keys: ${{ runner.os }}-r-${{ matrix.config.r }}-${{steps.date.outputs.date}}
-
+  
+    ##added libfftw3-dev
       - name: "[Stage] [Linux] Install required system libs"
         if: runner.os == 'Linux'
         run: sudo apt install libcurl4-openssl-dev libgit2-dev libfftw3-dev
