@@ -50,14 +50,6 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           Ncpus: 4
-      - uses: actions/checkout@v2
-      - uses: FedericoCarboni/setup-ffmpeg@v1
-         with:
-      # Not strictly necessary, but it may prevent rate limit
-      # errors especially on GitHub-hosted macos machines.
-       token: ${{ secrets.GITHUB_TOKEN }}
-        id: setup-ffmpeg
-      - run: ffmpeg -i input.avi output.mkv
 
       # LaTeX. Installation time:
       # Linux: ~ 1 min
@@ -75,6 +67,12 @@ jobs:
         if: runner.os != 'Windows'
         id: date
         run: echo "::set-output name=date::$(date '+%d-%m')"
+        
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+        shell: Rscript {0}
 
       - name: "[Cache] Cache R packages"
         if: runner.os != 'Windows'
