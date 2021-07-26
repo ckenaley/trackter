@@ -119,8 +119,9 @@ jobs:
 
       - name: Set BiocVersion
         run: |
-          BiocManager::install(version = "${{ matrix.config.bioc }}", ask = FALSE)
+          BiocManager::install(ask = FALSE)
         shell: Rscript {0}
+        
       #from: https://github.com/leekgroup/derfinderPlot/blob/master/.github/workflows/check-bioc.yml
       - name: Install dependencies pass 1
         run: |
