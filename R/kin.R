@@ -2034,9 +2034,9 @@ fin.kin <-
     
     
     fins[,tip1:=dist==dist[which.max(dist)],by=side]
+
+    fins[tip1==T,tip1:=dist2==max(dist2)&n==max(n),by=side] #&n==max(n) for duplicated coords
     
-    
-    fins[tip1==T,tip1:=dist2==max(dist2),by=side]
     cp.a <- with(fins[side=='a'],features(n,dist2,smoother = "smooth.spline",spar=0.3))
     cp.an <- round(cp.a$cpts,0)
     cp.b <- with(fins[side=='b'],features(n,dist2,smoother = "smooth.spline",spar=0.3))
