@@ -1,4 +1,4 @@
-## tic GitHub Actions template: linux-macos-windows-deploy
+## tic GitHub Actions template: linux-macos
 ## revision date: 2021-06-27
 on:
   workflow_dispatch:
@@ -22,10 +22,9 @@ jobs:
       matrix:
         config:
           # use a different tic template type if you do not want to build on all listed platforms
-          - { os: windows-latest, r: "release" }
-          - { os: macOS-latest, r: "release", pkgdown: "true", latex: "true" }
-          - { os: ubuntu-latest, r: "devel" }
           - { os: ubuntu-latest, r: "release" }
+          - { os: macOS-latest, r: "release", latex: "true" }
+          - { os: ubuntu-latest, r: "devel" }
 
     env:
       # otherwise remotes::fun() errors cause the build to fail. Example: Unavailability of binaries
@@ -67,12 +66,6 @@ jobs:
         if: runner.os != 'Windows'
         id: date
         run: echo "::set-output name=date::$(date '+%d-%m')"
-        
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-        shell: Rscript {0}
 
       - name: "[Cache] Cache R packages"
         if: runner.os != 'Windows'
@@ -116,8 +109,45 @@ jobs:
 
       - name: "[Stage] Install"
         if: matrix.config.os != 'macOS-latest' || matrix.config.r != 'devel'
-        run: Rscript -e "remotes::install_github('ropensci/tic')" -e "print(tic::dsl_load())" -e "tic::prepare_all_stages()" -e "tic::before_install()" -e "tic::install()"
+        run: |
+          Rscript -e "remotes::install_github('ropensci/tic')" -e "print(tic::dsl_load())" -e "tic::prepare_all_stages()" -e "tic::before_install()" -e "tic::install()"
+      - name: Install BiocManager
+        run: |
+          message(paste('****', Sys.time(), 'installing BiocManager ****'))
+          remotes::install_cran("BiocManager")
+        shell: Rscript {0}
 
+      - name: Set BiocVersion
+        run: |
+          BiocManager::install(version = "${{ matrix.config.bioc }}", ask = FALSE)
+        shell: Rscript {0}
+      #from: https://github.com/leekgroup/derfinderPlot/blob/master/.github/workflows/check-bioc.yml
+      - name: Install dependencies pass 1
+        run: |
+          ## Try installing the package dependencies in steps. First the local
+          ## dependencies, then any remaining dependencies to avoid the
+          ## issues described at
+          ## https://stat.ethz.ch/pipermail/bioc-devel/2020-April/016675.html
+          ## https://github.com/r-lib/remotes/issues/296
+          ## Ideally, all dependencies should get installed in the first pass.
+          ## Pass #1 at installing dependencies
+          message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: local dependencies ****'))
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE)
+        continue-on-error: true
+        shell: Rscript {0}
+
+      - name: Install dependencies pass 2
+        run: |
+          ## Pass #2 at installing dependencies
+          message(paste('****', Sys.time(), 'pass number 2 at installing dependencies: any remaining dependencies ****'))
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE)
+          
+          ## For running the checks
+          message(paste('****', Sys.time(), 'installing rcmdcheck and BiocCheck ****'))
+          remotes::install_cran("rcmdcheck")
+          BiocManager::install("BiocCheck")
+        shell: Rscript {0}
+        
       # macOS devel needs its own stage because we need to work with an option to suppress the usage of binaries
       - name: "[Stage] Prepare & Install (macOS-devel)"
         if: matrix.config.os == 'macOS-latest' && matrix.config.r == 'devel'
