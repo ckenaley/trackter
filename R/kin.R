@@ -1179,7 +1179,7 @@ kin.simple <-
 #'
 
 kin.free <-
-  function(image.dir = NULL,frames=NULL,par=FALSE,cores.n=NULL,thr = "otsu",ant.per = 0.10,tips = 0.02,smooth.n=5,red=NULL,ml.smooth = list("spline",0.25),save = TRUE,out.qual = 1,out.dir = NULL,plot.pml = TRUE,flip = TRUE,size.min = 0.02,search.for = "largest",edges = FALSE,border = 5) {
+  function(image.dir = NULL,frames=NULL,par=FALSE,cores.n=NULL,thr = "otsu",ant.per = 0.10,tips = 0.02,smooth.n=5,red=NULL,ml.smooth = list("spline",0.25),save = FALSE,out.qual = 1,out.dir = NULL,plot.pml = TRUE,flip = TRUE,size.min = 0.02,search.for = "largest",edges = FALSE,border = 5) {
     
     #to prevent NSE warnings and NSB notes
     size <-
@@ -1944,11 +1944,14 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #' thr.check(fr[1])
 #' 
 #' #extract contours and other data
-#' kin <- kin.free(image.dir = ti,par=F,frames=1:10,thr=0.9,ant.per = 0.25,save=FALSE,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
+#' kin <- kin.free(image.dir = ti,frames=1:10,thr=0.9,
+#' ant.per = 0.25,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
 #' 
 #' #fin amplitudes by frame with data.table
 #' fin.pos <- c(0.25,.5)
-#' fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+#' fin.dat <- kin$cont[, 
+#' { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);
+#' list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
 #' 
 #' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
 #'print(p)
@@ -1973,7 +1976,7 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #
 fin.kin <-
   function(out,fin.pos = NULL,smooth.n = 5, ml.smooth = 0.9,red=NULL) {
-    y <- x <- x.sm <- y.sm <- n <- m <- b <- dist2 <- x.c <- y.c <- tip1 <- tip2 <- method <- amp2 <-pos <- y.pred <-side <- NULL # due to NSE notes in R CMD checks
+    y <- x <- x.sm <- y.sm <- n <- m <- b <- dist2 <- x.c <- y.c <- tip1 <- tip2 <- method <- amp2 <-pos <- y.pred <-side <- ends <- NULL # due to NSE notes in R CMD checks
    
     if (is.null(fin.pos))               
       stop("'fin.pos' not defined")

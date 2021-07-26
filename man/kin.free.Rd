@@ -15,7 +15,7 @@ kin.free(
   smooth.n = 5,
   red = NULL,
   ml.smooth = list("spline", 0.25),
-  save = TRUE,
+  save = FALSE,
   out.qual = 1,
   out.dir = NULL,
   plot.pml = TRUE,

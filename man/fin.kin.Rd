@@ -4,14 +4,7 @@
 \alias{fin.kin}
 \title{Tracking of fin-like extensions of body contours}
 \usage{
-fin.kin(
-  out,
-  fin.pos = NULL,
-  smooth.n = 50,
-  x.bins = 0.2,
-  ml.smooth = 0.9,
-  red = NULL
-)
+fin.kin(out, fin.pos = NULL, smooth.n = 5, ml.smooth = 0.9, red = NULL)
 }
 \arguments{
 \item{out}{a data frame or matrix with 'x' and 'y' data as columns.}
@@ -98,11 +91,14 @@ fr <- list.files(ti,full.names=TRUE)
 thr.check(fr[1])
 
 #extract contours and other data
-kin <- kin.free(image.dir = ti,par=F,frames=1:10,thr=0.9,ant.per = 0.25,save=FALSE,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
+kin <- kin.free(image.dir = ti,frames=1:10,thr=0.9,
+ant.per = 0.25,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
 
 #fin amplitudes by frame with data.table
 fin.pos <- c(0.25,.5)
-fin.dat <- kin$cont[, { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+fin.dat <- kin$cont[, 
+{ f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);
+list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
 
 p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
 print(p)
