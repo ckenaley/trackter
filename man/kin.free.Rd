@@ -2,7 +2,7 @@
 % Please edit documentation in R/kin.R
 \name{kin.free}
 \alias{kin.free}
-\title{Midline tracking of free-moving ROI over image sequences}
+\title{Midline tracking of free-moving ROIs over image sequences}
 \usage{
 kin.free(
   image.dir = NULL,
@@ -68,53 +68,6 @@ kin.free(
 \value{
 A list with the following components:
 
-\code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.
-\itemize{
-\item the frame number
-\item 'x' and ''y': the position of the tail (rightmost or posteriormost)
-\item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)
-\item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}
-\item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)
-\item 'roi': a character indicating the ROI ranked by size ('a' being the largest)
-\item 'edge': indicating whether ROI was on the edge of the image field
-\item 'size': size of the ROI in pixels^2
-\item 'offset.x': ROI distance from horizontal center
-\item 'offset.y': ROI distance from vertical center
-\item 'offset': linear distance of ROI's centroid to image center
-}
-
-\code{midline} A data table containing, for each frame described by \code{frames}, the following:
-\itemize{
-\item 'x' and 'y': x and y positions of the midline of the ROI
-\item 'roi': a character indicating ROI size ('a' being the largest)
-\item 'y.pred': the smooth predicted midline
-\item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-\item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-\item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
-\item 'roi': a character indicating ROI size ('a' being the largest)
-}
-
-\code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following:
-\itemize{
-\item 'frame': the frame
-\item 'x' and 'y': the x and y positions of the contours
-}
-
-\code{all.classes} A data table containing the following for all ROIs detected:
-\itemize{
-\item 'frame': the frame
-\item 'roi': the name of each ROI found in a frame.
-\item 'edge': indicating whether ROI was on the edge of the image field
-\item 'size': size of the ROI in pixels^2
-\item 'offset.x': ROI distance from horizontal center
-\item 'offset.y': ROI distance from vertical center
-\item 'offset': linear distance of ROI's centroid to image center
-}
-
-\code{dim} the x and y dimensions of the images analyzed
-
-A list with the following components:
-
 \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI
 \itemize{
 \item the frame number
@@ -126,14 +79,39 @@ A list with the following components:
 \item 'edge': was the roi on the edge of the frame}
 
 \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
-\item 'x' and 'y.m': x and y positions of the midline of the ROI
-\item 'x.sm' and 'y.sm': the smoothed midline positions predicted by \code{smoothing}
-\item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images if \code{save=TRUE})
-\item 'wave.y': y position of midline points (see below)
+\item 'x' and 'y': x and y positions of the midline of the ROI
+\item 'x.sm' and 'y.sm': the smoothed midline positions predicted by \code{ml.smooth}.
+\item 'wave.y': orthogona distance of midline points from predicted midline (see below)
 \item 'per.bl': the percentage of 'x.sm' along the body length calculated as the cumulative sum of distances between points
 }
 
-\code{mid.pred} the theoretical midline based on a linear model established by the anterior section of \code{midline$x.sm} in \code{ant.per}. Used to calculate \code{midline$wave.y} as the orthogonal distance between the line defined by 'x' and 'mid.pred' and each coordinate defined by '\code{midline$x.sm} and \code{midline$y.sm}. A data table that contains the following:
+\code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following:
+\itemize{
+\item 'frame': the frame
+\item 'x' and 'y': the x and y positions of the contours
+}
+
+\code{cont.sm} A data table containing x and y positions of the smooth contours. Contains the following:
+\itemize{
+\item 'frame': the frame
+\item 'n': the position of the coordinate. n=1 and max(n) are adjacent at the head
+\item 'x' and 'y': the x and y positions of the contours
+}
+
+
+
+#' \code{all.classes} A data table containing the following for all ROIs detected:
+\itemize{
+\item 'frame': the frame
+\item 'roi': the name of each ROI found in a frame.
+\item 'edge': indicating whether ROI was on the edge of the image field
+\item 'size': size of the ROI in pixels^2
+\item 'offset.x': ROI distance from horizontal center
+\item 'offset.y': ROI distance from vertical center
+\item 'offset': linear distance of ROI's centroid to image center
+}
+
+\code{mid.pred} the theoretical midline based on a linear model established by the anterior section of of the smoothed midline established by \code{ant.per}. Used to calculate \code{midline$wave.y} as the orthogonal distance between the line defined by 'x' and 'mid.pred' and each coordinate defined by '\code{midline$x.sm} and \code{midline$y.sm}. A data table that contains the following:
 \itemize{
 \item 'frame': the frame
 \item 'x': x position of the predicted midline
@@ -143,7 +121,7 @@ A list with the following components:
 \code{dim} the x and y dimensions of the images analyzed
 }
 \description{
-Automatically retrieves the midline of a detected ROI that is free to move in the spatial field of an image sequence. Does so through threshholding and segmentation; finds the midpoint coordinates from each half of the ROI sharing the same index then calculates a smoothed midline according to a chosen smoothing method (loess or smooth spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Supports parallel processing of frames.
+Automatically retrieves the midline of detected ROIs that are free to move in the spatial field of an image sequence. Does so through threshholding and segmentation; finds the midpoint coordinates from each half of the ROI sharing the same index then calculates a smoothed midline according to a chosen smoothing method (loess or smooth spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Supports parallel processing of frames.
 }
 \details{
 The midline is calculated as the midpoint coodinates between the extrema of the coordinates describing each ROIs contour (i.e, the coordinates spanning the longest euclidean distance). Chooses ROIs based on relative ROI size or position.
@@ -190,7 +168,7 @@ vid.to.images(paste0(tempdir(),"/ropefish.avi"), out.dir = paste0(tempdir(),"/im
 
 kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
       par=FALSE,
-      save=T,
+      save=TRUE,
       out.dir=paste0(tempdir(),"/out"),
       ml.smooth=list("spline",0.9),
       thr = "otsu",
@@ -201,7 +179,8 @@ kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
 
 fi <- list.files(paste0(tempdir(),"/out"),full.names=T)
 EBImage::display(EBImage::readImage(fi[1]))
-#plot instantaneous amplitude of tail (last/rightmost point) over frames
+
+#plot instantaneous amplitude of tail over frames
 p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
 print(p)
 
@@ -209,6 +188,10 @@ print(p)
 ml <- kin$midline
 p <- ggplot(dat=ml,aes(x=x.sm,y=y.sm,col=frame))+geom_point()+theme_classic(15)
 print(p)
+
+p <- ggplot(dat=kin$cont.sm[frame==1],aes(x=x,y=y,col=n))+geom_point()
+print(p)
+
 
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 unlink(paste0(tempdir(),"/out"),recursive=TRUE)

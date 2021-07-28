@@ -378,3 +378,41 @@ pts.sm <- data.table(do.call(rbind,xysm.l))
 return(list(pts=pts,smooth.pts=pts.sm) )
 }
 
+
+
+#' @title Plot data over an image
+
+#' @description  Simple wrapper for \code{\link{points}} to plat data derived from an image over that image.
+#' 
+#' @param img character, an image file path.
+#' @param x a data frame, data tablle, or matrix with two columns, the first representing x and the second y coordinates. 
+#' @param ... other arguments to be passed to \code{\link{points}}
+#' 
+#' @details 
+#' Simply plots 2D dimensional data over the image specified in \code{img}. May be useful in plotting output from \code{trackter}'s kin functions.
+#' 
+#' @return The image is plotted in the graphics device with points given in \code{x}
+#'
+#' @seealso \code{\link{kin.free}}, \code{\link{kin.search}}, \code{\link{kin.simple}}
+
+#' @export
+#'
+#' @importFrom graphics points
+#'
+#' @examples
+#' 
+#' y <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+#' 
+#' d <- dim(EBImage::readImage(y))
+#' 
+#' x <- runif(10,1,d[1])
+#' y <- runif(10,1,d[2])
+#' pts <- cbind(x,y)
+#' 
+#' data.overlay(img=y,x=pts,col="red",type="p")
+
+data.overlay <- function(img,x,...){
+  img<-  EBImage::readImage(img)
+  suppressMessages(EBImage::display(img, method = "raster"))
+  points(unlist(x[,1]),unlist(x[,2]),...)
+}

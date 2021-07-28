@@ -19,12 +19,16 @@ A list with the following components:
 \code{ml}: a data table consisting of the x,y coordinates of the midline and their index value
 
 \code{cont.sm}: a data table containing the smoothed outline according to \code{coo_smooth}. If 'smooth.n=0', this will be identical to the input 'out'.
+
+\code{cont.sides}: a data table containing the smoothed outline factorized by side 'a' or 'b' and index.
 }
 \description{
 Internal function used in \code{kin} functions for calculating a midline spanning a closed contour.
 }
 \details{
 The midline is determine by first finding the tips of the contour (i.e., the two coordinates in the outline that are farthest from one another) with \code{\link{coo_truss}} and therefore assumes the contour is elongate. The function then bisects the contour across this axis using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
+
+NOTE: The function does not make decisions about position, i.e, output values of 'n', although ordered along the long axis of the contour, may be differently arranged given the rotation of the contour.
 
 'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average. Users should be careful not to oversmooth. If the input contour has few points (say just a 100 or so extracted from \code{kin} functions run on low resolution images), much detail will be lost. In general, \code{smooth.n} should be <5.
 }
@@ -34,7 +38,7 @@ require(Momocs)
 o <- Momocs::nsfishes$coo[[136]]
 colnames(o) <- c("x","y")
 plot(o[,1],o[,2])
-fml <- free.ml(o,smooth.n=0,red=0.95)
+fml <- free.ml(o,smooth.n=0)
 points(fml$ml$x,fml$ml$y,col="red")
 #note the difference
 fml2 <- free.ml(o,smooth.n=10)

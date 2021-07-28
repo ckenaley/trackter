@@ -995,9 +995,9 @@ kin.simple <-
   }
 
 
-#' @title  Midline tracking of free-moving ROI over image sequences
+#' @title  Midline tracking of free-moving ROIs over image sequences
 
-#' @description  Automatically retrieves the midline of a detected ROI that is free to move in the spatial field of an image sequence. Does so through threshholding and segmentation; finds the midpoint coordinates from each half of the ROI sharing the same index then calculates a smoothed midline according to a chosen smoothing method (loess or smooth spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Supports parallel processing of frames.
+#' @description  Automatically retrieves the midline of detected ROIs that are free to move in the spatial field of an image sequence. Does so through threshholding and segmentation; finds the midpoint coordinates from each half of the ROI sharing the same index then calculates a smoothed midline according to a chosen smoothing method (loess or smooth spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Supports parallel processing of frames.
 #' 
 #' @param image.dir character, directory containing images to analyze.
 #' @param frames numeric, vector indicating which images to process. Must be >1. See Details.
@@ -1050,53 +1050,6 @@ kin.simple <-
 #'
 #' @return A list with the following components:
 #'
-#' \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI determined by \code{search.for}.
-#' \itemize{
-#' \item the frame number
-#' \item 'x' and ''y': the position of the tail (rightmost or posteriormost)
-#' \item 'head.x' and 'head.y': the x and y position of the head (leftmost or anteriormost)
-#' \item 'amp': the amplitude (\code{amp}) of the tail relative to thr theoretical midline determined by the \code{lm()} predictions from \code{ant.per}
-#' \item 'head.pval': p values of the \code{lm()} fit that describes the position of the head as determined by \code{ant.per} (green points in the outputted images/video)
-#' \item 'roi': a character indicating the ROI ranked by size ('a' being the largest)
-#' \item 'edge': indicating whether ROI was on the edge of the image field
-#' \item 'size': size of the ROI in pixels^2
-#' \item 'offset.x': ROI distance from horizontal center
-#' \item 'offset.y': ROI distance from vertical center
-#' \item 'offset': linear distance of ROI's centroid to image center
-#' }
-#'
-#' \code{midline} A data table containing, for each frame described by \code{frames}, the following:
-#' \itemize{
-#' \item 'x' and 'y': x and y positions of the midline of the ROI
-#' \item 'roi': a character indicating ROI size ('a' being the largest)
-#' \item 'y.pred': the smooth predicted midline
-#' \item 'mid.pred': the predicted linear midline based on the points/pixels defined by \code{head.per} (green points in the outputted images/video)
-#' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images/video)
-#' \item 'wave.y': midline points 'y.pred' relative to 'mid.pred'
-#' \item 'roi': a character indicating ROI size ('a' being the largest)
-#' }
-#'
-#' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following:
-#' \itemize{
-#' \item 'frame': the frame
-#' \item 'x' and 'y': the x and y positions of the contours
-#' }
-#'
-#' \code{all.classes} A data table containing the following for all ROIs detected:
-#' \itemize{
-#' \item 'frame': the frame
-#' \item 'roi': the name of each ROI found in a frame.
-#' \item 'edge': indicating whether ROI was on the edge of the image field
-#' \item 'size': size of the ROI in pixels^2
-#' \item 'offset.x': ROI distance from horizontal center
-#' \item 'offset.y': ROI distance from vertical center
-#' \item 'offset': linear distance of ROI's centroid to image center
-#' }
-#'
-#' \code{dim} the x and y dimensions of the images analyzed
-#'
-#' @return A list with the following components:
-#'
 #' \code{kin.dat} a data table consisting of frame-by-frame position parameters for the ROI
 #' \itemize{
 #' \item the frame number
@@ -1108,20 +1061,45 @@ kin.simple <-
 #' \item 'edge': was the roi on the edge of the frame}
 #'
 #' \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
-#' \item 'x' and 'y.m': x and y positions of the midline of the ROI
-#' \item 'x.sm' and 'y.sm': the smoothed midline positions predicted by \code{smoothing}
-#' \item 'y.pred': midline points fit to a smooth spline or loess model with spar or span equal to \code{smooth} (red curve in the outputted images if \code{save=TRUE})
-#' \item 'wave.y': y position of midline points (see below)
+#' \item 'x' and 'y': x and y positions of the midline of the ROI
+#' \item 'x.sm' and 'y.sm': the smoothed midline positions predicted by \code{ml.smooth}.
+#' \item 'wave.y': orthogona distance of midline points from predicted midline (see below)
 #' \item 'per.bl': the percentage of 'x.sm' along the body length calculated as the cumulative sum of distances between points
 #' }
 #' 
-#' \code{mid.pred} the theoretical midline based on a linear model established by the anterior section of \code{midline$x.sm} in \code{ant.per}. Used to calculate \code{midline$wave.y} as the orthogonal distance between the line defined by 'x' and 'mid.pred' and each coordinate defined by '\code{midline$x.sm} and \code{midline$y.sm}. A data table that contains the following:
+#' \code{cont} A data table containing x and y positions of the contours used to calculate the data in 'kin.dat'. Contains the following:
+#' \itemize{
+#' \item 'frame': the frame
+#' \item 'x' and 'y': the x and y positions of the contours
+#' }
+#' 
+#' \code{cont.sm} A data table containing x and y positions of the smooth contours. Contains the following:
+#' \itemize{
+#' \item 'frame': the frame
+#' \item 'n': the position of the coordinate. n=1 and max(n) are adjacent at the head
+#' \item 'x' and 'y': the x and y positions of the contours
+#' }
+#'
+#' 
+#'
+#'#' \code{all.classes} A data table containing the following for all ROIs detected:
+#' \itemize{
+#' \item 'frame': the frame
+#' \item 'roi': the name of each ROI found in a frame.
+#' \item 'edge': indicating whether ROI was on the edge of the image field
+#' \item 'size': size of the ROI in pixels^2
+#' \item 'offset.x': ROI distance from horizontal center
+#' \item 'offset.y': ROI distance from vertical center
+#' \item 'offset': linear distance of ROI's centroid to image center
+#' }
+#' 
+#' \code{mid.pred} the theoretical midline based on a linear model established by the anterior section of of the smoothed midline established by \code{ant.per}. Used to calculate \code{midline$wave.y} as the orthogonal distance between the line defined by 'x' and 'mid.pred' and each coordinate defined by '\code{midline$x.sm} and \code{midline$y.sm}. A data table that contains the following:
 #' \itemize{
 #' \item 'frame': the frame
 #' \item 'x': x position of the predicted midline
 #' \item 'mid.pred': the y position of the predicted midline
 #' }
-#'
+#' 
 #' \code{dim} the x and y dimensions of the images analyzed
 #'
 #' @export
@@ -1153,7 +1131,7 @@ kin.simple <-
 #' 
 #' kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
 #'       par=FALSE,
-#'       save=T,
+#'       save=TRUE,
 #'       out.dir=paste0(tempdir(),"/out"),
 #'       ml.smooth=list("spline",0.9),
 #'       thr = "otsu",
@@ -1164,7 +1142,8 @@ kin.simple <-
 #'
 #' fi <- list.files(paste0(tempdir(),"/out"),full.names=T)
 #' EBImage::display(EBImage::readImage(fi[1]))
-#' #plot instantaneous amplitude of tail (last/rightmost point) over frames
+#' 
+#' #plot instantaneous amplitude of tail over frames
 #' p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
 #' print(p)
 #'
@@ -1172,6 +1151,10 @@ kin.simple <-
 #' ml <- kin$midline
 #' p <- ggplot(dat=ml,aes(x=x.sm,y=y.sm,col=frame))+geom_point()+theme_classic(15)
 #' print(p)
+#'
+#'p <- ggplot(dat=kin$cont.sm[frame==1],aes(x=x,y=y,col=n))+geom_point()
+#' print(p)
+#' 
 #'
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 #' unlink(paste0(tempdir(),"/out"),recursive=TRUE)
@@ -1201,7 +1184,7 @@ kin.free <-
       m <-
       b <-
       y.sm <-max.n <- n <- 
-      keep <-  l <-  head.pval <-  bl <-  per.bl <-  amp <- y <- im <- or.dist <- NULL
+      keep <-  l <-  head.pval <-  bl <-  per.bl <-  amp <- y <- im <- or.dist <- head.dist <- closer <- n.shift <- x<- NULL
     
     
     
@@ -1551,44 +1534,39 @@ kin.free <-
     flip.f <- which(ends2[, list(x)] != ends[, list(x)])
     
     midline.dat2 <- copy(midline.dat)[, n := 1:.N, by = list(frame)]
-    if (length(flip.f) != 0)
+    if (length(flip.f) != 0){
       midline.dat2[frame %in% (flip.f - 1), n := max(n):1, by = list(frame)]
+    }
     
+    kin.dat <- ends2[,list(frame,x,y,head.x,head.y)]
     #now flip if head is the wrong direction
     
     setkeyv(midline.dat2, c("frame", "n"))
     
-   #qplot(d=cont.dat[frame==0],x,y)+geom_point(d=midline.dat2[frame==0],aes(x,y),col="red")
+   #qplot(d=cont.dat[frame==0],x,y)+geom_point(d=midline.dat2[frame==0],aes(x,y,col=n))
     #centroid in next frame
     
     keep.n <- midline.dat2[,list(max.n=round(max(n)*ant.per)),by=frame]
     midline.dat2 <- midline.dat2[keep.n, on="frame"] 
     
-    cent <-
-      midline.dat2[n <=max.n, ][n %in% c(min(n), max(n))][, list(x.c =
-                                                                                            mean(x), y.c = mean(y)), by = frame][, c("x.c", "y.c") := list(dplyr::lead(x.c), dplyr::lead(y.c))]
-    cent.ref <-
-      midline.dat2[n <=max.n, ][n %in% c(min(n), max(n)) &
-                                                           frame == 0][, list(x.c = mean(x), y.c = mean(y)), by = frame][frame == 0, ]
-
-    #head centroid in first frame  
-    cent.ref <-
-      midline.dat2[cent.ref, on = "frame"][n <=max.n, ][n %in%
-                                                                                   c(min(n), max(n)) &
-                                                                                   frame == 0][, or.dist := dist.2d(x.c, x, y.c, y), by = frame]
-    ends3 <-
-      midline.dat2[cent, on = "frame"][n <=max.n, ][n %in%
-                                                                               c(min(n), max(n))]
-    ends3[, dist := dist.2d(x.c, x, y.c, y), by = frame]
-    ends3 <-
-      ends3[cent.ref[, list(frame, n, or.dist)], on = c("frame", "n")][, diff :=
-                                                                         dist - or.dist]
-    direction <-
-      ends3[, list(direction = ifelse(n[which.min(dist)] == max(n), "tailward", "headward"))]
+    head.ml <- copy(midline.dat2[n <= max.n])
+      head.ml[, c("x.c","y.c"):=list(mean(x), y.c = mean(y)), by = list(frame)]
     
+    ends3 <- copy(head.ml)[,keep:=n==min(n)|n==max(n),by=frame][keep==T]
     
-    if (direction[1, ]$direction == "tailward")
+    distMax.cent <- ends3[n==max.n][,c("dist.next","dist.current"):=list(dist.2d(x,dplyr::lead(x.c),y,dplyr::lead(y.c)),dist.2d(x,x.c,y,y.c))][frame==0][,diff:=dist.next-dist.current]
+    dist0.cent <-ends3[n!=max.n][,c("dist.next","dist.current"):=list(dist.2d(x,dplyr::lead(x.c),y,dplyr::lead(y.c)),dist.2d(x,x.c,y,y.c))][frame==0][,diff:=dist.next-dist.current]
+    
+    ## if head is moving toward in max(n) position, it's tailward
+    direction <-ifelse(distMax.cent$diff<dist0.cent$diff, "tailward", "headward")
+    
+    #add aligned x,y to kin.dat
+    kin.dat[,c("x","y","head.x","head.y"):=ends2[,list(x,y,head.x,head.y)]]
+    
+    if (direction == "tailward"){
       midline.dat2[, n := max(n):1, by = list(frame)]
+      kin.dat[,c("x","y","head.x","head.y"):=ends2[,list(head.x,head.y,x,y)]]
+    }
     # qplot(data=midline.dat2,x=x,y=y,col=n)+facet_wrap(frame~.)
     
     #rerun kin, head, and ml calculations with new data
@@ -1616,7 +1594,7 @@ kin.free <-
         return(d)
       }
       
-      
+
       
       midline.dat2[, c("x.sm", "y.sm") := sm.spline(x = data.frame(x = x, y =
                                                                      y), sm = smooth), by = frame]
@@ -1685,7 +1663,7 @@ kin.free <-
     mid.pred2 <- mid.pred2[keep == TRUE, ]
     
   
-    #qplot(d=cont.dat[frame==0],x,y)+geom_point(d=midline.dat2[frame==0],aes(x,y),col="red")+geom_point(d=mid.pred2[frame==0],aes(x,mid.pred))
+    #qplot(d=cont.dat[frame==0],x,y)+geom_point(d=midline.dat2[frame==0],aes(x,y,col=n))+geom_point(d=mid.pred2[frame==0],aes(x,mid.pred))
     #add head.p to kin.dat
     
     kin.dat[, head.pval := head.p]
@@ -1714,6 +1692,30 @@ kin.free <-
     
     kin.dat[, amp := midline.dat2[, list(wave.y = last(wave.y)), by = frame]$wave.y]
     
+    #qplot(d=cont.sm.dat[frame==9],x,y,col=n)
+    
+ #re index cont.sm data
+    
+    #kin.dat <- kin$kin.dat
+    #cont.sm.dat <- kin$cont.sm
+    cont.sm.dat[,n:=1:.N,by=frame]
+    cont.sm.dat2 <-copy(cont.sm.dat[kin.dat[,list(head.x,head.y,frame)],on="frame"])
+    
+    cont.flip <- cont.sm.dat2[,head.dist:=dist.2d(x,head.x,y,head.y)][,list(close.n=n[which.min(head.dist)]),by=frame]
+
+    
+    
+    cont.sm.dat2 <-  cont.sm.dat2[cont.flip, on="frame"]
+    #reset n=1 to head
+    
+    cont.sm.dat2 <- cont.sm.dat2[,{c <- Momocs::coo_slide(as.matrix(data.frame(x=x,y=y)),close.n[1]);list(x=c[,1],y=c[,2])},by=frame]
+    
+    cont.sm.dat2[,n:=1:.N,by=frame]
+    #qplot(d=cont.sm.dat2,x,y,col=n)+facet_wrap(frame~.)
+    
+    #qplot(d=cont.sm.dat2[frame==7],x,y,col=n)+geom_point(d=cont.sm.dat2[frame==7&flip==T],aes(x,y),col="re")
+    
+  setkeyv(cont.sm.dat,c("frame","n"))
   
     ##save
     
@@ -1734,6 +1736,7 @@ kin.free <-
             col = "blue",
             lwd = 4
           ))
+          
           with(midline.dat2[frame == (frame2 - 1)], lines(y.sm ~ x.sm, col = "red", lwd =
                                                             4))
           with(midline.dat2[frame == (frame2 - 1)][n<=max.n,],
@@ -1754,15 +1757,13 @@ kin.free <-
         kin.dat = kin.dat,
         midline = midline.dat2,
         cont = cont.dat,
-        cont.sm = cont.sm.dat,
+        cont.sm = cont.sm.dat2[,list(frame,n,x,y)],
         all.classes = class.dat,
         mid.pred = mid.pred2[, list(frame, x, mid.pred)],
         dim = dim
       )
     )
   }
-
-
 
 
 #' @title  Midline estimations for closed contours
@@ -1779,9 +1780,14 @@ kin.free <-
 #' 
 #' \code{cont.sm}: a data table containing the smoothed outline according to \code{coo_smooth}. If 'smooth.n=0', this will be identical to the input 'out'.
 #' 
-#'
+#' \code{cont.sides}: a data table containing the smoothed outline factorized by side 'a' or 'b' and index.
+#' 
+#' 
 #' @details
 #' The midline is determine by first finding the tips of the contour (i.e., the two coordinates in the outline that are farthest from one another) with \code{\link{coo_truss}} and therefore assumes the contour is elongate. The function then bisects the contour across this axis using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
+#' 
+#' NOTE: The function does not make decisions about position, i.e, output values of 'n', although ordered along the long axis of the contour, may be differently arranged given the rotation of the contour.
+
 #' 
 #' 'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average. Users should be careful not to oversmooth. If the input contour has few points (say just a 100 or so extracted from \code{kin} functions run on low resolution images), much detail will be lost. In general, \code{smooth.n} should be <5.
 #' @export
@@ -1794,13 +1800,12 @@ kin.free <-
 #' o <- Momocs::nsfishes$coo[[136]]
 #' colnames(o) <- c("x","y")
 #' plot(o[,1],o[,2])
-#' fml <- free.ml(o,smooth.n=0,red=0.95)
+#' fml <- free.ml(o,smooth.n=0)
 #' points(fml$ml$x,fml$ml$y,col="red")
 #' #note the difference
 #' fml2 <- free.ml(o,smooth.n=10)
 #' points(fml2$ml$x,fml2$ml$y,col="blue")
 
-#out=o
 free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
   
   if(!"matrix" %in% class(out)) stop("'out' must be a matrix")
@@ -1832,20 +1837,34 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
   tips2 <-
     c(as.numeric(gsub("(\\d+)-(\\d+)", "\\1", tip.n2)), as.numeric(gsub("(\\d+)-(\\d+)", "\\2", tip.n2)))
   
- 
   
   coo.sl <-  Momocs::coo_slice(coo, ids = tips2)
+
+  n.pts <- sapply(coo.sl,nrow)
   coo.sl <-
     lapply(coo.sl, function(x)
-      Momocs::coo_sample(x, n = min(sapply(coo.sl, nrow))))
-  coo.sl[[2]] <- coo.sl[[2]][nrow(coo.sl[[2]]):1, ]
-  coo.dist <-
-    data.table(do.call(rbind, coo.sl))[, n := rep(min(sapply(coo.sl, nrow)):1, 2)][,side:=c(rep("a",min(sapply(coo.sl, nrow))),rep("b",min(sapply(coo.sl, nrow))))]
+      Momocs::coo_sample(x,n=min(n.pts)))
   
+  coo.sl <-
+    lapply(coo.sl, function(x)
+      Momocs::coo_smoothcurve(Opn(list(x)),n=1))
+  
+coo.dist <- rbind(
+  data.table(coo.sl[[1]]$coo$shp1,n=1:min(n.pts),side="a"),
+  data.table(coo.sl[[2]]$coo$shp1,n=min(n.pts):1,side="b")
+)
+
+
+colnames(coo.dist)[1:2] <- c("x","y")
+
+#qplot(d=coo.dist,x,y,col=side)
+  
+
   setkeyv(coo.dist,c("n"))
   
   coo.ml <- coo.dist[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
 
+  #qplot(d=coo.dist,x,y,col=n)+geom_point(d=coo.ml)
   
   return(list(ml = coo.ml,cont.sm=data.table(coo),cont.sides=coo.dist))
 }
@@ -1855,7 +1874,7 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 
 #' @description  Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  \link{kin.simple} and \link{kin.search}. Also computes a smoothed midline based on the body outline with the fin region removed.
 #'
-#' @param out a data frame or matrix with 'x' and 'y' data as columns.
+#' @param out a data frame or matrix with 'x' and 'y' data as columns. The first row should be a point near the head, the last near the tail
 #' @param fin.pos numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the body length.
 #' @param smooth.n numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'. See Details.
 #' @param ml.smooth numeric (0-1), the smoothing value for the midline. See details. 
@@ -1889,6 +1908,7 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #'
 #' \itemize{
 #' \item 'side': fin side, 'a' or 'b'
+#' \item 'n': the position of fin coordinates where min(n) is closest to the head
 #' \item x,y coordinates within the range of \code{fin.pos}
 #'
 #' }
@@ -1911,7 +1931,7 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #'
 #' \code{midline} a data table describing the estimated midline, 'x.sm', 'y.sm', the smooth x and y positions, respectively
 #' 
-#' \code{bl} the body lenght in pixels
+#' \code{bl} the body length in pixels
 #' 
 #' \code{amp} a data table describing the estimated fin amplitudes based on each method of finding the fin tip. 'amp1', the amplitude of the fin positions based on the maximum euclidean distance from the fin base and 'amp2', the distance of the fin points (based on distance inflections) from the fin base.
 #'
@@ -1944,13 +1964,13 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #' thr.check(fr[1])
 #' 
 #' #extract contours and other data
-#' kin <- kin.free(image.dir = ti,frames=1:10,thr=0.9,
+#' kin <- kin.free(image.dir = ti,thr=0.9,
 #' ant.per = 0.25,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
 #' 
 #' #fin amplitudes by frame with data.table
 #' fin.pos <- c(0.25,.5)
-#' fin.dat <- kin$cont[, 
-#' { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);
+#' fin.dat <- kin$cont.sm[, 
+#' { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=0,red=0.75,ml.smooth=0.75);
 #' list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
 #' 
 #' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
@@ -1958,22 +1978,19 @@ free.ml <- function(out = NULL,smooth.n=NULL,red=NULL) {
 #'
 #'
 #' ## plot body and fin contours of frame 8
-#' cont <- kin$cont[frame==8,list(x,y)]
-#' fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=1,ml.smooth=0.95)
+#' cont <- kin$cont.sm[frame==8,list(x,y)]
+#' fins <- fin.kin(cont,fin.pos =fin.pos,red=NULL,smooth.n=0,ml.smooth=0.75)
 #'
 #' #plot body contour and fins
 #' p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
 #' p+geom_point(data=fins$fin.pts,aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
-#'
 #' #plot body contour minus fins and the body midline
-#' p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x.sm,y.sm),col="red",size=2)
+#' p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x,y),col="red",size=2)
 #' p+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 #'
 #'unlink(ti,recursive=TRUE)
 #' }
 #'
-#'
-#
 fin.kin <-
   function(out,fin.pos = NULL,smooth.n = 5, ml.smooth = 0.9,red=NULL) {
     y <- x <- x.sm <- y.sm <- n <- m <- b <- dist2 <- x.c <- y.c <- tip1 <- tip2 <- method <- amp2 <-pos <- y.pred <-side <- ends <- NULL # due to NSE notes in R CMD checks
@@ -2016,10 +2033,50 @@ fin.kin <-
       return(abs(det(m)) / sqrt(sum(v1 * v1)))
     }
     
-    ml2 <- sm.spline(x=as.matrix(fml$ml[,list(x,y)]),sm=.99)[,n:=1:.N]
+    ## shift points to match order in input
     
+    out2 <- data.table(out,n=1:nrow(out))
+    
+    head <- out2[n==1]
+    qplot(d=out2,x,y,col=n)
+    
+    
+    cont.sm <- fml$cont.sm[,n:=1:.N]
+    #qplot(d=cont.sm,x,y,col=n)
+    
+    cont.flip <- cont.sm[,head.dist:=dist.2d(x,head$x,y,head$y)][,list(close.n=n[which.min(head.dist)])]
+    
+  
+    
+    #reset n=1 to head
+    cont.sm2 <- data.table(Momocs::coo_slide(as.matrix(cont.sm[,list(x,y)]),cont.flip$close.n))
+    cont.sm2[,n:=1:.N]
+    #qplot(d=cont.sm2,x,y,col=n)
+    
+    
+    setkeyv(cont.sm2,c("n"))
+    
+    ml2 <- sm.spline(x=as.matrix(fml$ml[,list(x,y)]),sm=.8)[,n:=1:.N]
+    
+    qplot(d=ml2,x.sm,y.sm,col=n)
+    min.dist <- with(ml2,dist.2d(x.sm,head$x,y.sm,head$y))
+    
+    #    #flip cont.sides  and ml2 if needed
+    if(which.min(min.dist)>which.max(min.dist)){ ml2[,n:=max(n):min(n)]
+      
+      fml$cont.sides[,n:=max(n):min(n),by=side]
+    }
+    
+    setkeyv(fml$cont.sides,c("side","n"))
+    setkeyv(ml2,c("n"))
+    
+    #qplot(d=ml2,x.sm,y.sm,col=n)
+    
+    #qplot(d=fml$cont.sides,x,y,col=n)
     rot <- ml2[,{pa <- point.ang.orig(c(x.sm,y.sm),c(ml2$x.sm[1],ml2$y.sm[1]),pi/2);list(x=pa[1],y=pa[2])},by=n]
     rot.lm <- lm(y~x,rot)
+    
+
     
     fml$cont.sides[,dist:=dist.2d.line(x,y,coef(rot.lm)[2],coef(rot.lm)[1]),by=list(n,side)][,bl:=dist/max(dist),by=side]
     
@@ -2051,6 +2108,7 @@ fin.kin <-
     cp <- data.table(side=c("a","b"),n=c(cp.an,cp.bn),tip2=TRUE)
     
     
+    #qplot(cont)
     #qplot(d=fml$cont.sides,x,y,col=n)+facet_grid(side~.)
     
     fins <- cp[fins,on=c("side","n")]
@@ -2090,20 +2148,21 @@ fin.kin <-
     
     ml.comp <- comp[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
    
-    ml.comp.s <- sm.spline(x=as.matrix(ml.comp[,list(x,y)]),sm=ml.smooth)
+    #ml.comp.s <- sm.spline(x=as.matrix(ml.comp[,list(x,y)]),sm=ml.smooth)
+    ml.comp.s <- ml.comp[,{s <- predict(smooth.spline(data.frame(x,y),spar = ml.smooth));list(x=s$x,y=s$y)}]
     
     
-  bl <- sum(copy(ml.comp.s[,dist:=dist.2d(x.sm,dplyr::lead(x.sm),y.sm,dplyr::lead(y.sm))])$dist,na.rm = TRUE)
+  bl <- sum(copy(ml.comp.s[,dist:=dist.2d(x,dplyr::lead(x),y,dplyr::lead(y))])$dist,na.rm = TRUE)
     
     # p <- qplot(data= fml$cont.sides,x=x,y=y)+geom_point(dat=fins,aes(x,y,col=side))+geom_point(data=fins[tip1==TRUE],aes(x,y),size=3,col="black")+geom_point(d=cents,aes(x.c,y.c),col="blue")+geom_point(d= ml2,aes(x.sm,y.sm))
     # print(p)
     # 
     return(list(
-      body = fml$cont.sm, #smoothed contour
-      fin = fins[,list(side,x,y)],
+      body = cont.sm2, #smoothed contour
+      fin = fins[,list(side,n,x,y)],
       fin.pts = finPts,
-      comp = comp,
-      midline = ml.comp.s,
+      comp = comp[,list(n,side,x,y)],
+      midline = ml.comp.s[,list(x,y)],
       bl = bl ,
       amp = amp
     ))

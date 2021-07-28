@@ -7,7 +7,7 @@
 fin.kin(out, fin.pos = NULL, smooth.n = 5, ml.smooth = 0.9, red = NULL)
 }
 \arguments{
-\item{out}{a data frame or matrix with 'x' and 'y' data as columns.}
+\item{out}{a data frame or matrix with 'x' and 'y' data as columns. The first row should be a point near the head, the last near the tail}
 
 \item{fin.pos}{numeric, a vector of length 2 indicating the start and end of the contour region that contains the fins of interest as a proportion of the body length.}
 
@@ -26,6 +26,7 @@ A list with the following components:
 
 \itemize{
 \item 'side': fin side, 'a' or 'b'
+\item 'n': the position of fin coordinates where min(n) is closest to the head
 \item x,y coordinates within the range of \code{fin.pos}
 
 }
@@ -48,7 +49,7 @@ A list with the following components:
 
 \code{midline} a data table describing the estimated midline, 'x.sm', 'y.sm', the smooth x and y positions, respectively
 
-\code{bl} the body lenght in pixels
+\code{bl} the body length in pixels
 
 \code{amp} a data table describing the estimated fin amplitudes based on each method of finding the fin tip. 'amp1', the amplitude of the fin positions based on the maximum euclidean distance from the fin base and 'amp2', the distance of the fin points (based on distance inflections) from the fin base.
 }
@@ -91,13 +92,13 @@ fr <- list.files(ti,full.names=TRUE)
 thr.check(fr[1])
 
 #extract contours and other data
-kin <- kin.free(image.dir = ti,frames=1:10,thr=0.9,
+kin <- kin.free(image.dir = ti,thr=0.9,
 ant.per = 0.25,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
 
 #fin amplitudes by frame with data.table
 fin.pos <- c(0.25,.5)
-fin.dat <- kin$cont[, 
-{ f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=1,red=0.5,ml.smooth=0.95);
+fin.dat <- kin$cont.sm[, 
+{ f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=0,red=0.75,ml.smooth=0.75);
 list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
 
 p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
@@ -105,20 +106,18 @@ print(p)
 
 
 ## plot body and fin contours of frame 8
-cont <- kin$cont[frame==8,list(x,y)]
-fins <- fin.kin(cont,fin.pos =fin.pos,red=0.5,smooth.n=1,ml.smooth=0.95)
+cont <- kin$cont.sm[frame==8,list(x,y)]
+fins <- fin.kin(cont,fin.pos =fin.pos,red=NULL,smooth.n=0,ml.smooth=0.75)
 
 #plot body contour and fins
 p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
 p+geom_point(data=fins$fin.pts,aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
-
 #plot body contour minus fins and the body midline
-p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x.sm,y.sm),col="red",size=2)
+p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x,y),col="red",size=2)
 p+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 
 unlink(ti,recursive=TRUE)
 }
-
 
 }
 \seealso{
