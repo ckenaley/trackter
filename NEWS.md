@@ -3,7 +3,7 @@
 
 # *trackter*
 
-## trackter (development version)
+## trackter (0.0.1)
 
 ### What happened
 
@@ -18,17 +18,20 @@
   - otsu thresholding for `kin` functions
   - universal edge parameter for `kin` functions
 
-## trackter 0.1.1
+## trackter 0.1.1 (Release version-CRAN)
 
 ### What happened
 
   - added vignette
   - removed progress bar from `kin.simple` and `kin.search`
 
-## trackter 0.1.2 (current development version)
+## trackter 0.1.2 (development version)
 
 ### What happened
 
   - added functions `thr.check` and `crop.img`
   - added `out.qual` parameter to `kin` functions
-  - added functions `kin.free`, `free.ml`, and `pick.pts`
+  - removed `smooth.points`kin\` functions
+  - added functions `kin.free`, `free.ml.ang`,`free.ml.hull`,
+    `free.ml.del` and `pick.pts`
+  - added functions `gg.overlay`, `data.overlay`, `find.roi`

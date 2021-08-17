@@ -4,7 +4,14 @@
 \alias{fin.kin}
 \title{Tracking of fin-like extensions of body contours}
 \usage{
-fin.kin(out, fin.pos = NULL, smooth.n = 5, ml.smooth = 0.9, red = NULL)
+fin.kin(
+  out,
+  fin.pos = NULL,
+  smooth.n = 5,
+  ml.meth = "hull",
+  ml.smooth = 0.9,
+  red = NULL
+)
 }
 \arguments{
 \item{out}{a data frame or matrix with 'x' and 'y' data as columns. The first row should be a point near the head, the last near the tail}
@@ -13,7 +20,9 @@ fin.kin(out, fin.pos = NULL, smooth.n = 5, ml.smooth = 0.9, red = NULL)
 
 \item{smooth.n}{numeric, the number of smoothing operations undertaken by \link{coo_smooth} on the contour described by 'x'. See Details.}
 
-\item{ml.smooth}{numeric (0-1), the smoothing value for the midline. See details.}
+\item{ml.meth}{character, the midline detection method. One of 'ang' for bisection using \code{\link{free.ml.ang}}, 'hull' for bisection using \code{\link{free.ml.hull}}, or 'del' for Delaunay triangulation using \code{\link{free.ml.del}}. See Details.}
+
+\item{ml.smooth}{numeric (0-1), the smoothing value for the midline. See Details.}
 
 \item{red}{numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up fin position and midline estimations. If 'NULL', the full conour in \code{out} will be used See Details.}
 }
@@ -59,7 +68,7 @@ Estimates the amplitudes of regions along a body contour that are protruding. Us
 \details{
 If \code{red} is specified, the contour \code{out} is sampled with \code{\link{coo_interpolate}} from the \code{Momocs} package. The number of points sampled (n) equals \code{red} times the number of points in \code{out}
 
-To establish the contour positions that are within \code{fin.pos}, a midline is estimated using \code{\link{free.ml}}. These midline points are indexed by position along the body length by calculating the cumulative distance between midline coordinates in pixels.  
+To establish the contour positions that are within \code{fin.pos}, a midline is estimated using one of two methods specified by \code{ml.meth}, "ang" for \code{\link{free.ml.ang}} or "hull" for  \code{\link{free.ml.hull}}. Midline points are indexed by position along the body length by calculating the cumulative distance between midline coordinates in pixels. This midline distance is then used to estimate the position of the fin about the contour using the paramter \code{fin.pos}.
 
 The positions of the tip of the fin appendages is estimated in two ways. The first is simply the point in each appendage that is farthest from the base of the fin. The base is estimated as a straight line between the contour coordinates that match \code{fin.pos}.  The second is a little more complicated and starts with calculation the distance between each fin contours coordinates and the midpoint of the fin base. \code{\link{features}} from the \code{features} package is then use to calculate an inflection in this distance and the point of this inflection is used to estimate the fin position. Amplitudes of each method are caculated based on the orthogonal euclidean distance from the fin bases.
 
@@ -92,8 +101,7 @@ fr <- list.files(ti,full.names=TRUE)
 thr.check(fr[1])
 
 #extract contours and other data
-kin <- kin.free(image.dir = ti,thr=0.9,
-ant.per = 0.25,red=0.5,smooth.n=3,ml.smooth=list("spline",0.97))
+kin <- kin.free(image.dir = ti,thr=0.9,ant.per = 0.25,red=0.5,smooth.n=2)
 
 #fin amplitudes by frame with data.table
 fin.pos <- c(0.25,.5)
@@ -118,6 +126,7 @@ p+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 
 unlink(ti,recursive=TRUE)
 }
+
 
 }
 \seealso{

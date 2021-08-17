@@ -2,28 +2,26 @@
 % Please edit documentation in R/kin.R
 \name{kin.free}
 \alias{kin.free}
-\title{Midline tracking of free-moving ROIs over image sequences}
+\title{Contour and midline tracking of free-moving ROIs over image sequences}
 \usage{
 kin.free(
   image.dir = NULL,
   frames = NULL,
   par = FALSE,
   cores.n = NULL,
-  thr = "otsu",
   ant.per = 0.1,
+  ant.pos = NULL,
   tips = 0.02,
-  smooth.n = 5,
+  smooth.n = 1,
   red = NULL,
+  ml.meth = "hull",
   ml.smooth = list("spline", 0.25),
   save = FALSE,
   out.qual = 1,
   out.dir = NULL,
   plot.pml = TRUE,
   flip = TRUE,
-  size.min = 0.02,
-  search.for = "largest",
-  edges = FALSE,
-  border = 5
+  ...
 )
 }
 \arguments{
@@ -35,15 +33,17 @@ kin.free(
 
 \item{cores.n}{numeric, the number of CPU cores to use if \code{par=TRUE}. If \code{cores.n=NULL} (the default), the total number of cores minus 1 are used.}
 
-\item{thr}{numeric or character ('otsu'); the threshold to determine binary image. See Details.}
-
 \item{ant.per}{numeric; anterior percentage of ROI that establishes the reference for the midline displacement.}
+
+\item{ant.pos}{character, one of , NULL, "l","r","u",or "d" to specify the position of the anterior of the ROI. If not NULL, the default algorithm to find the anterior is overridden. See Details.}
 
 \item{tips, }{numeric, the proportion the the midline data to use in calculation of the head and tail position.}
 
 \item{smooth.n, }{numeric, the number of contour smoothing iterations. See Details.}
 
-\item{red}{numeric, between 0-1 the proportion of contour coordinates to sample for midline estimates. Will speed up midline estimations. If 'NULL', the full contour retrieved from the ROI will be passed to \code{\link{free.ml}}.}
+\item{red}{numeric, between 0-1 the proportion of contour coordinates to sample for midline estimates. Ignored if \code{ml.meth} is not 'del'. Will speed up midline estimations with Delauny triangulation. If 'NULL', the full contour retrieved from the ROI will be passed to \code{\link{free.ml.del}}. See Detail.}
+
+\item{ml.meth}{character, the midline detection method. One of 'ang' for bisection using \code{\link{free.ml.ang}}, 'hull' for bisection using \code{\link{free.ml.hull}}, or 'del' for Delaunay triangulation using \code{\link{free.ml.del}}. See Details.}
 
 \item{ml.smooth}{a list of length two with unnamed components including a character string specifying the midline smoothing method, either 'loess' or "spline", and a numeric value specifying the amount of smoothing. See Details.}
 
@@ -55,15 +55,9 @@ kin.free(
 
 \item{plot.pml}{logical, value indicating if outputted images should include an overlay of the midline, head region and theoretical midline based on \code{ant.per}.}
 
-\item{flip}{logical, indicating if binary image should be flipped.}
+\item{thr}{numeric or character ('otsu'); the threshold to determine binary image. See Details.}
 
-\item{size.min}{numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.}
-
-\item{search.for}{character, the search parameter. See Details.}
-
-\item{edges}{logical, should ROIs on image edges be evaluated. See Details.}
-
-\item{border}{if \code{edges=TRUE}, size of border to add in pixels. Dee details.}
+\item{.}{. . , other arguments passed to \code{\link{find.roi}}}
 }
 \value{
 A list with the following components:
@@ -99,7 +93,6 @@ A list with the following components:
 }
 
 
-
 #' \code{all.classes} A data table containing the following for all ROIs detected:
 \itemize{
 \item 'frame': the frame
@@ -121,83 +114,68 @@ A list with the following components:
 \code{dim} the x and y dimensions of the images analyzed
 }
 \description{
-Automatically retrieves the midline of detected ROIs that are free to move in the spatial field of an image sequence. Does so through threshholding and segmentation; finds the midpoint coordinates from each half of the ROI sharing the same index then calculates a smoothed midline according to a chosen smoothing method (loess or smooth spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Supports parallel processing of frames.
+A wrapper function for \code{find.roi} that automatically ROIs that are free to move in the spatial field of an image sequence. Does so through thresholding and segmentation. Estimates midlines by various methods. Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff. Supports parallel processing of frames.
 }
 \details{
-The midline is calculated as the midpoint coodinates between the extrema of the coordinates describing each ROIs contour (i.e, the coordinates spanning the longest euclidean distance). Chooses ROIs based on relative ROI size or position.
+By default, the position of the anterior of the ROI (that which is moving forward in the field) is determined by the displacement of the ROI between the first two frames. Thus, \code{frames} must be >1. For analyses of relatively static ROIs in the field (e.g., steadily swimming animals in flumes, etc.), automatically determining the anterior of the ROI may be spurious. In this case, the automatic determination of the anterior should be overridden by specifying 'l', 'r', 'u', 'd' with \code{ant.pos}. These values specify that the anterior region of the ROI is leftmost, rightmost, upmost, or downmost in the field, respectively, and assumes that the origin of the field (0,0) is the upper left corner of each frame. 
 
-The position of the anterior of the ROI (that which is moving forward in the field) is determined by the displacement of the ROI between the first two frames. Thus, \code{frames} must be >1.
+Thresholding operations are preformed with \code{link{find.roi}}. Parameters for this function are passed through addition arguments with ...
 
-The midline is determine by first finding the tips of the ROI (i.e., the two coordinates in the outline that are farthest from one another) with \code{\link{free.ml}} and therefore assumes the ROI is elongate and moving along this long axis. Using \code{\link{free.ml}}, the function bisects the ROI contour at the tips, giving it two sides with coordinates of equal length. The midline coordinates are calculated as the midpoints defined between all pairs of coordinates with the same index value.
 
-Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
-
-If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
-
-\code{search.for} determines how ROIs are chosen:
-\itemize{
-\item "offset", the ROI with a centroid that is the shortest linear distance to the center of the field
-\item "offset.x", the ROI with a centroid x position that is closest to the x position of the center of the field
-\item "offset.y", the ROI with a centroid y position that is closest to the y position of the center of the field
-\item "largest", the largest ROI.
-}
-
-These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.
-
-\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	Yet, if set to 'TRUE', the \code{border} adds a black border to the image so that the intended ROI may be distinguished from the edge.
+Midline estimation is pursued by one of three algorithms: bisection of contours across the long axis defined by the tips using \code{\link{free.ml.ang}} or \code{\link{free.ml.hull}}  or by Delaunay triangulation using \code{\link{free.ml.del}}. The default is 'hull' This choice is not arbitrary. The use of \code{free.ml.ang} and \code{free.ml.hull} can be faster, but perfom poorly for tips that snake back on themselves (i.e., a high degree curvature). The use of \code{free.ml.del} can be slowe for high resolution outlines, but  produces better results when contour regions overlap (i.e, those that snake back on themselves), but produces less precise midlines for complicated contours.
 
 For midline smoothing, if \code{ml.smooth} contains 'spline' (the default), \code{\link{smooth_spline}} from the \code{smoothr} package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times numeric value of the list in \code{ml.smooth}. If \code{ml.smooth} contains 'loess', \code{loess} is used to fit a polynomial surface. For contours that have a complicated midline with non-unique x values, loess smoothing can produce poor results. Thus, spline smoothing is usually the advisable option. 
 
-For contour smoothing \code{smooth.n} is passed to the \code{n} parameter of \code{\link{free.ml}}, which smooths coordinates using a simple moving average. Users should be wary of oversmoothing by smoothing both the contour (from which the midline is calculated) and the midline.
+For contour smoothing \code{smooth.n} is passed to the \code{n} parameter of \code{\link{free.ml.ang}}, \code{\link{free.ml.hull}}, or \code{\link{free.ml.del}}, which smooths coordinates using a simple moving average. Users should be wary of oversmoothing by smoothing both the contour (from which the midline is calculated) and the midline.
 }
 \examples{
 
-#### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish
-##A very long example.
+##A somewhat long example
+#### plot midline waveform on images of swimming ropefish
 \dontrun{
-
-#download example images and place in 'example' subdirectory
+#download example video and establish directories
 f <- "https://github.com/ckenaley/exampledata/blob/master/ropefish.avi?raw=true"
-
 download.file(f, paste0(tempdir(),"/ropefish.avi"))
 
 dir.create(paste0(tempdir(),"/images"))
 dir.create(paste0(tempdir(),"/out"))
-
+#extract images
 vid.to.images(paste0(tempdir(),"/ropefish.avi"), out.dir = paste0(tempdir(),"/images"))
 
+#run kin.free() 
+
 kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
-      par=FALSE,
+      par=TRUE,
       save=TRUE,
       out.dir=paste0(tempdir(),"/out"),
-      ml.smooth=list("spline",0.9),
+      ml.smooth=list("spline",0.5),
       thr = "otsu",
-      size.min=0.01,
-      frame=1:20,
-      red=0.5
+      ml.meth="ang",
+      ant.pos="l",
+      red=0.5,
+      size.min=0.01
       )
 
-fi <- list.files(paste0(tempdir(),"/out"),full.names=T)
-EBImage::display(EBImage::readImage(fi[1]))
 
-#plot instantaneous amplitude of tail over frames
-p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
-print(p)
+#see results
+#images
+fi <- list.files(paste0(tempdir(),"/out"),full.names=TRUE)
+EBImage::display(EBImage::readImage(fi[320]),"raster")
 
-# midline plot
-ml <- kin$midline
-p <- ggplot(dat=ml,aes(x=x.sm,y=y.sm,col=frame))+geom_point()+theme_classic(15)
-print(p)
+#with gg.overlay() on first 300 frames
 
-p <- ggplot(dat=kin$cont.sm[frame==1],aes(x=x,y=y,col=n))+geom_point()
-print(p)
+gg.overlay(kin=kin,data="midline",frames=0:300,size=.2,animate=TRUE,zoom=FALSE,alpha=0.01,col="red",fps=10)
 
-
+#clean up
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 unlink(paste0(tempdir(),"/out"),recursive=TRUE)
+
+
 }
+
+
 
 }
 \seealso{
-\code{\link{kin.search}}, \code{\link{kin.simple}},\code{\link{free.ml}}
+\code{\link{kin.search}}, \code{\link{kin.simple}},\code{\link{free.ml.bis}}, \code{\link{free.ml.del}}
 }

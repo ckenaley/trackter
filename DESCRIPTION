@@ -14,24 +14,25 @@ Imports:
   dplyr,
   Momocs,
   raster,
-  zoo,
   plyr,
-  pastecs,
   features,
   jpeg,
-  ggplot2,
-  graphics,
-  stats,
-  utils,
   smoothr,
   foreach,
-  doParallel
+  doParallel,
+  ggplot2,
+  gganimate,
+  transformr,
+  deldir,
+  igraph,
+  rgeos,
+  sf,
+  sp
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 3.0.1),
     covr,
     knitr,
     rmarkdown,
-    animation
 SystemRequirements: FFmpeg
 VignetteBuilder: knitr

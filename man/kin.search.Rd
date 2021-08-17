@@ -2,40 +2,42 @@
 % Please edit documentation in R/kin.R
 \name{kin.search}
 \alias{kin.search}
-\title{Midline tracking over image sequences}
+\alias{kin.simple}
+\title{Midline and outline tracking over image sequences}
 \usage{
 kin.search(
   image.dir = NULL,
   frames = NULL,
-  thr = "otsu",
   plot.pml = TRUE,
-  show.prog = FALSE,
   ant.per = 0.1,
   tips = 0.02,
   smoothing = "loess",
   smooth = 0.25,
-  smooth.points = 200,
-  image.type = "orig",
   save = TRUE,
   out.qual = 1,
   out.dir = NULL,
-  flip = TRUE,
-  size.min = 0.02,
-  search.for = "largest",
-  edges = FALSE,
-  border = 5
+  ...
+)
+
+kin.simple(
+  image.dir = NULL,
+  frames = NULL,
+  ant.per = 0.2,
+  tips = 0.02,
+  smoothing = "loess",
+  smooth = 0.25,
+  save = TRUE,
+  out.qual = 1,
+  out.dir = NULL,
+  plot.pml = TRUE
 )
 }
 \arguments{
 \item{image.dir}{character, directory containing images to analyze.}
 
-\item{frames}{numeric, vector indicating which images to process.}
-
-\item{thr}{numeric or character ('otsu') threshold to determine binary image. See Details.}
+\item{frames}{numeric, vector indicating which images to process. NULL, the default, will result in all images in \code{image.dir} processed.}
 
 \item{plot.pml}{logical, value indicating if outputted images should include an overlay of the theoretical midline based on \code{ant.per}.}
-
-\item{show.prog}{logical value indicating if outputted image should be displayed during analysis.}
 
 \item{ant.per}{numeric; left-most percentage of ROI that establishes the horizontal reference for the midline displacement.}
 
@@ -43,11 +45,7 @@ kin.search(
 
 \item{smoothing}{character, the midline smoothing method, either 'loess' or "spline".}
 
-\item{smooth}{numeric; if \code{smoothing} is set to 'loess', smoothing parameter value for plotted midline.}
-
-\item{smooth.points}{numeric, number of equally spaced points along the ROI midline on which the smoothed midline is computed.}
-
-\item{image.type}{character; the type of image to be outputted, either 'orig' or 'bin' representing the original or binary images, respectively. Ignored if 'save=FALSE'.}
+\item{smooth}{numeric; if \code{smoothing} if set to 'loess', smoothing parameter value for plotted midline.}
 
 \item{save}{logical, value indicating if images should be outputted with midline and predicted midline based on the \code{ant.per} \code{lm()} overlaying original or binary images.}
 
@@ -55,15 +53,7 @@ kin.search(
 
 \item{out.dir}{character, the directory to which outputted images should be saved.}
 
-\item{flip}{logical, indicating if binary should be flipped.}
-
-\item{size.min}{numeric, indicating the minimum size of ROIs as a proportion of the pixel field to be considered in analysis. May be useful if smaller unimportant ROIs appear in the frame. Default is 0.02.}
-
-\item{search.for}{character, the search parameter. See Details.}
-
-\item{edges}{logical, should ROIs on image edges be evaluated. See Details.}
-
-\item{border}{if \code{edges=TRUE}, size of border to add in pixels. Dee details.}
+\item{...}{other parameters passed to \code{link{find.roi}} (\code{kin.search} only).}
 }
 \value{
 A list with the following components:
@@ -114,7 +104,7 @@ A list with the following components:
 
 A list with the following components:
 
-\code{kin.dat} a data frame consisting of frame-by-frame position parameters for the ROI indicated by \code{n.blob}:
+\code{kin.dat} a data frame consisting of frame-by-frame position parameters for the ROI
 \itemize{
 \item the frame number
 
@@ -136,32 +126,18 @@ A list with the following components:
 \code{dim} the x and y dimensions of the images analyzed
 }
 \description{
-Automatically retrieves the midline of a detected ROI in each image of a sequence through thresholding and segmentation; finds the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+Wrapper functions for \code{\link{find.roi}} that automatically retrieve the contour and midline coordinates of a detected ROI in each image of a sequence through thresholding and segmentation.  Functions find the y-value midpoint along the x-value array of the ROI and fits a midline according to a chosen smoothing method (loess or spline). Also outputs the midline amplitude relative to a reference line determined by an anterior section of the ROI. Supported image formats are jpeg, png, and tiff.
+
+\code{kin.search} includes arguments for flexible ROI selection.
+
+\code{kin.simple} is itself a wrapper for \code{kin.search}, finding the largest ROI in field using Otsu thresholding for segmentation.
 }
 \details{
-The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. Chooses ROIs based on relative ROI size or position.
 
-Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
-
-If 'edges=TRUE', it is best to add an artificial border so that any part of the ROI in contact with the edge can be distinguished from it.
-
-\code{search.for} determines how ROIs are chosen:
-\itemize{
-\item "offset", the ROI with a centroid that is the shortest linear distance to the center of the field
-\item "offset.x", the ROI with a centroid x position that is closest to the x position of the center of the field
-\item "offset.y", the ROI with a centroid y position that is closest to the y position of the center of the field
-\item "largest", the largest ROI.
-}
-
-These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.
-
-\code{edges} Set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	Yet, if set to 'TRUE', the \code{border} adds a black border to the image so that the intended ROI may be distinguished from the edge.
-
-\code{image.type} Can be set as "orig" or "bin". "orig" plots midline and reference lines over the original video frames, "bin" over binary images.
 }
 \examples{
 
-#### plot lot caudal amplitude and produce a classic midline waveform plot of swimming fish
+#### plot caudal amplitude and produce a classic midline waveform plot of a swimming rainbow trout
 ##A very long example.
 \dontrun{
 
@@ -174,13 +150,13 @@ unlink(paste0(tempdir(),"/temp.zip"))
 
 dir.create(paste0(tempdir(),"/processed_images"))
 kin <- kin.search(image.dir =paste0(tempdir(),"/example"),
-       search.for = "largest",
       smoothing = "loess",frames=1:50,
       out.dir=paste0(tempdir(),"/processed_images"),
-      show.prog = FALSE,thr = "otsu",
-      image.type="bin",smooth=0.4)
+      smooth=0.4)
+      
 
 #plot instantaneous amplitude of tail (last/rightmost point) over frames
+library(ggplot2)
 p <- ggplot(dat=kin$kin.dat,aes(x=frame,y=amp))+geom_line()+geom_point()+theme_classic(15)
 print(p)
 
@@ -191,9 +167,7 @@ ml <- ml[,x2:=x-x[1],by=frame]
 
 ml <- merge(ml,kin$kin.dat[,list(frame,amp)],by="frame") #merge these
 
-pal <- wes_palette("Zissou1", 100, type = "continuous") #"Zissou" color palette
-
-p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)+scale_color_gradientn(colours = pal)
+p <- ggplot(dat=ml,aes(x=x2,y=wave.y))+theme_classic(15)
 p <- p+geom_line(aes(group=frame,color=amp),stat="smooth",method = "loess", size = 1.5)
 print(p)
 
@@ -205,24 +179,36 @@ file.exists(paste0(tempdir(),"/trout_test_red.mp4"))
 
 }
 
-## A very short example.
+## A very quick example using kin.simple() and kin.search().
 
-#retrieve image
+#retrieve image with arguments passed to find.roi()
 i <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
 #create directory and write image to it
 t <- tempdir()
 
 
 dir.create(paste0(t,"/images"))
+
 EBImage::writeImage(i,paste0(t,"/images/sunfish001.jpg"),type = "jpeg")
 
-list.files(paste0(t,"/images"))
+fi <- list.files(paste0(t,"/images"),full.names=TRUE)
 #run kin.search and save output image to directory
-kin.i<- kin.search(image.dir = paste0(t,"/images"),smooth=0.7,save = TRUE,out.dir = t)
 
-#plot midline over original image
-with(kin.i$midline,plot(x,wave.y))
+kin.srch<- kin.search(image.dir = paste0(t,"/images"),smooth=0.2,
+save = TRUE,out.dir = t,thr=0.8,search.for="largest",size.min=0.01)
 
+kin.simp<- kin.simple(image.dir = paste0(t,"/images"),smooth=0.2,
+save = TRUE,out.dir = t)
+
+#plot similar results
+library(ggplot2)
+
+kin.both <- rbind(data.table(kin.srch$midline,fun="search"),
+data.table(kin.simp$midline,fun="simple"))
+
+qplot(data=kin.both,x=x,y=y.pred,col=fun)
+
+#' #plot midline over original image from kin.simple()
 i2 <- EBImage::readImage(paste0(t,"/sunfish001_000.jpg"))
 EBImage::display(i2,method="raster")
 
@@ -231,5 +217,5 @@ unlink(paste0(t,"/images"),recursive=TRUE)
 
 }
 \seealso{
-\code{\link{kin.simple}}
+\code{\link{kin.simple}}, \code{\link{kin.free}}, \code{\link{find.roi}}
 }

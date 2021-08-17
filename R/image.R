@@ -382,10 +382,10 @@ return(list(pts=pts,smooth.pts=pts.sm) )
 
 #' @title Plot data over an image
 
-#' @description  Simple wrapper for \code{\link{points}} to plat data derived from an image over that image.
+#' @description  Simple wrapper for \code{\link{points}} to plot data derived from an image over that image.
 #' 
 #' @param img character, an image file path.
-#' @param x a data frame, data tablle, or matrix with two columns, the first representing x and the second y coordinates. 
+#' @param x a data frame, data table, or matrix with two columns, the first representing x and the second y coordinates. 
 #' @param ... other arguments to be passed to \code{\link{points}}
 #' 
 #' @details 
@@ -401,18 +401,132 @@ return(list(pts=pts,smooth.pts=pts.sm) )
 #'
 #' @examples
 #' 
-#' y <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+#' f <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
 #' 
-#' d <- dim(EBImage::readImage(y))
+#' d <- dim(EBImage::readImage(f))
 #' 
 #' x <- runif(10,1,d[1])
 #' y <- runif(10,1,d[2])
 #' pts <- cbind(x,y)
 #' 
-#' data.overlay(img=y,x=pts,col="red",type="p")
+#' data.overlay(img=f,x=pts,col="red",type="p")
 
 data.overlay <- function(img,x,...){
   img<-  EBImage::readImage(img)
   suppressMessages(EBImage::display(img, method = "raster"))
   points(unlist(x[,1]),unlist(x[,2]),...)
 }
+
+#' @title Plot output from \code{kin} functions
+
+#' @description  Plots data output from one of \code{trackter}'s \code{kin} functions using \code{ggplot2}. Useful for quickly visualizing results from \code{kin} functions. Data and geometries include body-contour polygons with midline points, head points, both midline and head points, or neither (contours only). Optionally builds and saves an animation of data with reference to frame from \code{kin} data. 
+#' 
+#' @param kin a list of data returned from \code{kin} functions
+#' @param frames integer, a vector for frames within the the data (a column common to all \code{kin} function output). Will subset the data or, if NULL, will not. If more than one frame is specified, plot will be faceted by frame with \code{facet_wrap}.
+#' @param data character, the data to plot over the contour(s). Must be either 'kin.dat', 'midline', 'both', or none. See Details.
+#' @param zoom logical, should the plotted area zoom to the extents of the contours. See Detail.
+#' @param animate logical, should an animation be plotted to the graphics device with state changes reflected by \code{frame}.
+#' @param shadow logical,should \code{\link{shadow_mark}} be implemented to draw geometries in previous frames. Ignored if \code{animate=FALSE}.
+#' @param alpha numeric, the opacity of geometries in previous frames during animation. Ignored if \code{animate=FALSE}.
+#' @param fps integer, the play back speed of animation in frames per second. Ignored if \code{animate=FALSE}.
+#' @param save logical, should the animation be saved as a GIF. Ignored if \code{animate=FALSE}. See Details.
+#' @param filename character, the name given to the GIF file. Ignored if \code{animate=FALSE} or \code{save=FALSE}.
+#' @param out.dir character, the file path of the directory to which the GIF file is saved. Ignored if \code{animate=FALSE} or \code{save=FALSE}.
+#' @param ... other arguments to be passed to midline and head point geometries, e.g. 'size', 'color'.
+#' 
+#' @details 
+#' Simply plots 2D dimensional data over contours retrieved from \code{kin} functions. May be useful in quickly assesses their results. The overlayed data can be \code{midline}, \code{kin.dat}, both, or neither. Either should be contained in a list along with \code{cont.sm}, the smoothed contour output from \code{kin} functions.
+#' 
+#' Animations are produced with \code{gganimate} and optionally saved as a GIF with \code{anim_save} using the default \code{gifski_renderer()}.
+#' 
+#' 
+#' 
+#' @return A \code{ggplot} plotted to the graphics device, a \code{gganimate} object plotted to graphics device, or a GIF file saved to a local directory specified in \code{out.dir}.
+#'
+#' @seealso \code{\link{geom_point}}, \code{\link{geom_polygon}},\code{\link{gganimate}}, \code{\link{kin.free}}, \code{\link{kin.search}}, \code{\link{kin.simple}}
+
+#' @export
+#' 
+#'
+#' @import ggplot2 gganimate
+#'
+#' @examples
+#' 
+#' \dontrun{
+#' #animate a ropefish swimming with its midline
+#' 
+#' #download example avi and place in subdirectory
+#' f <- "https://github.com/ckenaley/exampledata/blob/master/ropefish.avi?raw=true"
+#'
+#' download.file(f, paste0(tempdir(),"/ropefish.avi"))
+#'
+#' dir.create(paste0(tempdir(),"/images"))
+#' 
+#' vid.to.images(paste0(tempdir(),"/ropefish.avi"), out.dir = paste0(tempdir(),"/images"))
+#' 
+#' kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
+#'       ml.smooth=list("spline",0.9),
+#'       thr = "otsu",
+#'       size.min=0.01,
+#'       red=0.5
+#'       )
+#'
+#' gg.overlay(kin=kin,frames=seq(20,320,20),data="midline",size=1,animate=TRUE,col="red",fps=10)
+#' 
+#' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
+#'}
+#'
+gg.overlay <- function(kin,frames=NULL,data="kin.dat",zoom=FALSE,animate=FALSE,shadow=TRUE,alpha=0.1,fps=10,save=FALSE,filename=NULL,out.dir=NULL,...){
+  
+  frame <- x <- y <- head.x <- head.y <- x.sm <- y.sm <- NULL
+  
+  stopifnot(class(kin)=="list",c("midline","kin.dat","cont.sm") %in% names(kin),frames %in% kin$cont.sm$frame,!is.null(kin))
+  
+  an <- animate
+  if(save&is.null(animate)&is.null(out.dir)) stop("'save=TRUE' but 'out.dir' is not specified")
+  if(!is.null(out.dir))if(!dir.exists(out.dir)) stop("'out.dir' does not exists")
+  
+  z <- kin$midline[frame%in%frames,list(x=range(x)*c(0.9,1.1),y=range(y)*c(0.9,1.1))]
+  
+  cart <- list(xlim(c(0,kin$dim[1])),ylim(c(kin$dim[2],0)))
+  
+  if(zoom & !animate) cart <- coord_cartesian(xlim=z$x,ylim=z$y[2:1]) 
+  c<- kin$cont[frame%in%frames]
+  cs <- kin$cont.sm[frame%in%frames]
+  k <- kin$kin.dat[frame%in%frames]
+  m <- kin$midline[frame%in%frames]
+  
+  if(length(frames)>1 | is.null(frames)) facet <- facet_wrap(frame~.) else facet <- NULL
+  
+  
+  g.k <- geom_point(data=k,aes(head.x,head.y),...)
+  g.m <- geom_point(data=m,aes(x.sm,y.sm),...)
+  
+  
+  if(data=="kin.dat") g <- g.k
+  if(data=="midline") g <- g.m
+  if(data=="both") { g.m2 <- geom_point(data=m,aes(x.sm,y.sm),col="blue",...)
+  g.k2 <- geom_point(data=k,aes(head.x,head.y),col="red",size=g.m2$aes_params$size+1)
+  g <- list(g.m2,g.k2)
+  }
+  
+  if(data=="none") g <- NULL
+  p<- ggplot()+geom_polygon(data=cs,aes(x,y))+g+cart+theme_void()+facet
+  
+  ta <- alpha
+  
+  sh <- NULL
+  if(shadow) sh<- gganimate::shadow_mark(alpha = ta)
+  p.anim <-  ggplot()+geom_polygon(data=cs,aes(x,y))+g+theme_void()+cart+sh+transition_time(as.integer(frame)) +labs(title = "frame: {frame_time}")
+  
+  FPS <- fps
+  fn <- filename
+  if(animate) {p <- gganimate::animate(p.anim, fps=FPS,height = kin$dim[2], width = kin$dim[1]) 
+  
+  if(save) gganimate::anim_save(filename = fn,animation = p,path=out.dir)
+  }
+  print(p)
+  
+}
+
+

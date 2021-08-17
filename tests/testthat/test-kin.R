@@ -108,7 +108,7 @@ test_that("kin.search works fine", {
 
 
 test_that("kin.free works fine", {
-
+  
   y <- list.files(system.file("extdata/img", package = "trackter"),full.names = TRUE)
   y <- y[grepl("lamp",y)]
   ti <-paste0(tempdir(),"/images")
@@ -120,9 +120,8 @@ test_that("kin.free works fine", {
   
   invisible(capture.output( kin.y <- kin.free(image.dir = ti,save = TRUE,out.dir =tp,red=0.5)))
   
-  
   expect_length(list.files(tp),2)
-  expect_length(kin.y$all.classes$siz,2)
+  expect_length(kin.y$all.classes$size,2)
   expect_is(kin.y,"list")
   expect_named(kin.y,c('kin.dat', 'midline', 'cont', 'cont.sm', 'all.classes', 'mid.pred', 'dim'))
   expect_true(kin.y$all.classes$size[1]>0)
@@ -137,7 +136,7 @@ test_that("kin.free works fine", {
   
   expect_error(invisible(capture.output( kin.free(image.dir = ti,out.dir="foo",save=TRUE))),"does not exist")
   
-  expect_error(invisible(capture.output(kin.free(image.dir =ti ,save=TRUE))),"not specified")
+  expect_error(invisible(capture.output(kin.free(image.dir =ti,save=TRUE))),"not specified")
   
   expect_error(invisible(capture.output( kin.free(image.dir = ti,frames=1:3,save=FALSE))),"out of range")
   
@@ -187,23 +186,7 @@ test_that("kin.free works fine", {
   
 })
 
-test_that("free.ml works fine", {
-  
-  cont <- read.csv(system.file("extdata", "cont.csv", package = "trackter"))[,3:4]
-  cont <- cont[seq(1,nrow(cont),length.out = 500),]
-  fml <- free.ml(as.matrix(cont),smooth.n = 5)
-  
-  expect_error(free.ml(cont,smooth.n = 5),"must be a matrix")
-  
-  expect_error(free.ml(as.matrix(cont),smooth.n = 5,red=10),"must be numeric and 0-1")
-  
-  expect_named(fml,c("ml","cont.sm","cont.sides"))
-  
-  fml2 <- free.ml(as.matrix(cont),smooth.n = 0)
-  
-  expect_true(!all(fml$ml==fml2$ml))
-  
-})
+
 
 test_that("fin.kin works fine", {
 

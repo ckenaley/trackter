@@ -9,7 +9,7 @@ data.overlay(img, x, ...)
 \arguments{
 \item{img}{character, an image file path.}
 
-\item{x}{a data frame, data tablle, or matrix with two columns, the first representing x and the second y coordinates.}
+\item{x}{a data frame, data table, or matrix with two columns, the first representing x and the second y coordinates.}
 
 \item{...}{other arguments to be passed to \code{\link{points}}}
 }
@@ -17,22 +17,22 @@ data.overlay(img, x, ...)
 The image is plotted in the graphics device with points given in \code{x}
 }
 \description{
-Simple wrapper for \code{\link{points}} to plat data derived from an image over that image.
+Simple wrapper for \code{\link{points}} to plot data derived from an image over that image.
 }
 \details{
 Simply plots 2D dimensional data over the image specified in \code{img}. May be useful in plotting output from \code{trackter}'s kin functions.
 }
 \examples{
 
-y <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+f <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
 
-d <- dim(EBImage::readImage(y))
+d <- dim(EBImage::readImage(f))
 
 x <- runif(10,1,d[1])
 y <- runif(10,1,d[2])
 pts <- cbind(x,y)
 
-data.overlay(img=y,x=pts,col="red",type="p")
+data.overlay(img=f,x=pts,col="red",type="p")
 }
 \seealso{
 \code{\link{kin.free}}, \code{\link{kin.search}}, \code{\link{kin.simple}}
