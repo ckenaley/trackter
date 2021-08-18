@@ -126,7 +126,7 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   #reduce, smooth
   if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
   colnames(coo) <- c("x","y")
-  if(!is.null(smooth.n)) coo <- Momocs::coo_smooth(coo,smooth.n)
+  if(!is.null(smooth.n) & smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
   
   #some outlines have duplicated points, nicht gut
   coo <- coo[!duplicated(coo),]
@@ -186,7 +186,7 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   ##end dont need
   
   setkeyv(coo.sides,c("n"))
-  #qplot(d=coo.sides,x,y,col=side)
+  #qplot(d=coo.sides,x,y,col=n)
 
   
 
@@ -301,7 +301,7 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   colnames(coo.sides)[1:2] <- c("x","y")
   
-  #qplot(d=coo.dist2[n<10],x,y,col=as.factor(n))
+  #qplot(d=coo.sides[n<10],x,y,col=as.factor(n))
   
   setkeyv(coo.sides,c("n"))
   
@@ -362,7 +362,7 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   #reduce, smooth
   if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
   colnames(coo) <- c("x","y")
-  if(!is.null(smooth.n)) coo <- Momocs::coo_smooth(coo,smooth.n)
+  if(!is.null(smooth.n) & smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
   
   #some outlines have duplicated points, nicht gut
   coo <- coo[!duplicated(coo),]
@@ -419,9 +419,9 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   coo.ml <- coo.sides[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
   
-  #qplot(d=coo.sides,x,y)+geom_point(d=coo.ml,aes(x,y),col="red")
+  #qplot(d=coo.sides,x,y,col=n)+geom_point(d=coo.ml,aes(x,y),col="red")
   
-  return(list(ml = coo.ml,cont.sm=coo1[,list(n,x,y)],cont.sides=coo.sides))
+  return(list(ml = coo.ml,cont.sm=coo2[,list(n,x,y)],cont.sides=coo.sides))
 }
 
 
@@ -468,7 +468,7 @@ free.ml.del <- function(out = NULL,smooth.n=NULL,red=NULL,dens=NULL) {
   coo <- Momocs::coo_close(out)
   if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
   colnames(coo) <- c("x","y")
-  if(!is.null(smooth.n)) coo <- Momocs::coo_smooth(coo,smooth.n)
+  if(!is.null(smooth.n) & smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
   
   
   tr <-  Momocs::coo_truss(coo)

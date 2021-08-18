@@ -5,7 +5,9 @@
 \title{Tracking of fin-like extensions of body contours}
 \usage{
 fin.kin(
-  out,
+  kin,
+  out = "cont",
+  frames = NULL,
   fin.pos = NULL,
   smooth.n = 5,
   ml.meth = "hull",
@@ -29,7 +31,7 @@ fin.kin(
 \value{
 A list with the following components:
 
-\code{body} a data table consisting of x,y coordinates of the body contour
+\code{cont} a data table consisting of x,y coordinates of the body contour
 
 \code{fin} a data table describing the contour of the fins consisting of the following:
 
@@ -103,30 +105,29 @@ thr.check(fr[1])
 #extract contours and other data
 kin <- kin.free(image.dir = ti,thr=0.9,ant.per = 0.25,red=0.5,smooth.n=2)
 
-#fin amplitudes by frame with data.table
+#fin data by frame
 fin.pos <- c(0.25,.5)
-fin.dat <- kin$cont.sm[, 
-{ f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=0,red=0.75,ml.smooth=0.75);
-list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+fin.dat <- fin.kin2(kin=kin,fin.pos = fin.pos,smooth.n=0,red=0.9)
 
-p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
+p <- ggplot(dat=fin.dat$amp,aes(x=frame,y=amp2,col=side))+geom_line()+theme_classic(15)
 print(p)
 
 
 ## plot body and fin contours of frame 8
 cont <- kin$cont.sm[frame==8,list(x,y)]
-fins <- fin.kin(cont,fin.pos =fin.pos,red=NULL,smooth.n=0,ml.smooth=0.75)
 
 #plot body contour and fins
-p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
-p+geom_point(data=fins$fin.pts,aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
+p <- qplot(data=cont,x=x,y=y)+geom_point(data=fin.dat$fin[frame==8],aes(x,y),col="red",size=3)
+p+geom_point(data=fin.dat$fin.pts[frame==8],aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
+
 #plot body contour minus fins and the body midline
-p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x,y),col="red",size=2)
+p <- qplot(data=fin.dat$comp[frame==8],x=x,y=y)+geom_point(data=fin.dat$midline[frame==8],aes(x,y),col="red",size=2)
 p+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 
 unlink(ti,recursive=TRUE)
 }
 
+out=as.matrix(cont[,list(x,y)])
 
 }
 \seealso{

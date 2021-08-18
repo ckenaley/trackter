@@ -1043,7 +1043,7 @@ kin.free <-
 #'
 #' @return A list with the following components:
 #'
-#' \code{body} a data table consisting of x,y coordinates of the body contour
+#' \code{cont} a data table consisting of x,y coordinates of the body contour
 #'
 #' \code{fin} a data table describing the contour of the fins consisting of the following:
 #'
@@ -1107,68 +1107,56 @@ kin.free <-
 #' #extract contours and other data
 #' kin <- kin.free(image.dir = ti,thr=0.9,ant.per = 0.25,red=0.5,smooth.n=2)
 #' 
-#' #fin amplitudes by frame with data.table
+#' #fin data by frame
 #' fin.pos <- c(0.25,.5)
-#' fin.dat <- kin$cont.sm[, 
-#' { f <- fin.kin(data.frame(x=x,y=y),fin.pos =fin.pos,smooth.n=0,red=0.75,ml.smooth=0.75);
-#' list(amp=f$amp$amp2,side=f$amp$side)},by=frame]
+#' fin.dat <- fin.kin2(kin=kin,fin.pos = fin.pos,smooth.n=0,red=0.9)
 #' 
-#' p <- ggplot(dat=fin.dat,aes(x=frame,y=amp,col=side))+geom_line()+theme_classic(15)
+#' p <- ggplot(dat=fin.dat$amp,aes(x=frame,y=amp2,col=side))+geom_line()+theme_classic(15)
 #'print(p)
 #'
 #'
 #' ## plot body and fin contours of frame 8
 #' cont <- kin$cont.sm[frame==8,list(x,y)]
-#' fins <- fin.kin(cont,fin.pos =fin.pos,red=NULL,smooth.n=0,ml.smooth=0.75)
 #'
 #' #plot body contour and fins
-#' p <- qplot(data=fins$body,x=x,y=y)+geom_point(data=fins$fin,aes(x,y),col="red",size=3)
-#' p+geom_point(data=fins$fin.pts,aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
+#' p <- qplot(data=cont,x=x,y=y)+geom_point(data=fin.dat$fin[frame==8],aes(x,y),col="red",size=3)
+#' p+geom_point(data=fin.dat$fin.pts[frame==8],aes(x,y,shape=pos))+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
+#' 
 #' #plot body contour minus fins and the body midline
-#' p <- qplot(data=fins$comp,x=x,y=y)+geom_point(data=fins$midline,aes(x,y),col="red",size=2)
+#' p <- qplot(data=fin.dat$comp[frame==8],x=x,y=y)+geom_point(data=fin.dat$midline[frame==8],aes(x,y),col="red",size=2)
 #' p+xlim(c(0,kin$dim[1]))+ylim(c(0,kin$dim[2]))
 #'
 #'unlink(ti,recursive=TRUE)
 #' }
+#' 
+#' out=as.matrix(cont[,list(x,y)])
 #'
-#'
-
-#out=cont
 fin.kin <-
-  function(out,fin.pos = NULL,smooth.n = 5, ml.meth="hull",ml.smooth = 0.9,red=NULL) {
+  function(kin,out="cont",frames=NULL,fin.pos = NULL,smooth.n = 5, ml.meth="hull",ml.smooth = 0.9,red=NULL) {
+    
     y <- x <- x.sm <- y.sm <- n <- m <- b <- dist2 <- x.c <- y.c <- tip1 <- tip2 <- method <- amp2 <-pos <- y.pred <-side <- ends <- head.dist <- NULL # due to NSE notes in R CMD checks
    
-    if (is.null(fin.pos))               
+    if(is.null(frames)) frames <-unique(kin[[1]]$frame)
+    if(!is.null(frames) & any(!frames %in% c$frame)) stop("not all frames are in 'kin' list")
+    
+     if (is.null(fin.pos))               
       stop("'fin.pos' not defined")
- 
+    
     if (length(fin.pos) != 2)
       stop("length of 'fin.pos' argument must be 2")
-    if (!is.matrix(out))
-     out<- as.matrix(out)
-    if (is.null(colnames(out)))
-      colnames(out) <- c("x", "y")
+    
+    if(!out %in% names(kin)) stop("outline data not in kin list. Did you mean to enter 'cont'")
     
     
     if (!ml.meth %in% c("ang", "hull"))
       stop("'ml.meth' must be set to 'ang' or 'hull")
     
-    if(ml.meth=="ang") fml <- free.ml.ang(out=as.matrix(out),smooth.n =smooth.n,red=red)
-    if(ml.meth=="hull") fml <- free.ml.hull(out=as.matrix(out),smooth.n =smooth.n,red=red)
-    
-    #with(fml$cont.sides,plot(x,y))
     sm.spline <- function(x, sm = 0.5) {
       s <-  round(seq(1, nrow(x), length.out = nrow(x) * (1 - sm)), 0)
       x <- as.matrix(x)
       d <- data.table(smoothr::smooth_spline(x[s, ], n = nrow(x)))
       colnames(d) <- c("x.sm", "y.sm")
       return(d)
-    }
-    
-    #return position of a point rotated theta about another point
-    point.ang.orig<- function(p,o,theta){
-      xrot<-cos(theta)*(p[1]-o[1])-sin(theta)*(p[2]-o[2])+o[1]
-      yrot<-sin(theta)*(p[1]-o[1])+cos(theta)*(p[2]-o[2])+o[2]
-      return(c(xrot,yrot))
     }
     
     dist.2d.line <- function(x, y, slope, intercept) {
@@ -1181,16 +1169,44 @@ fin.kin <-
       return(abs(det(m)) / sqrt(sum(v1 * v1)))
     }
     
+    #return position of a point rotated theta about another point
+    point.ang.orig<- function(p,o,theta){
+      xrot<-cos(theta)*(p[1]-o[1])-sin(theta)*(p[2]-o[2])+o[1]
+      yrot<-sin(theta)*(p[1]-o[1])+cos(theta)*(p[2]-o[2])+o[2]
+      return(c(xrot,yrot))
+    }
+    
+    k <- kin$kin.dat
+    c <- kin$cont
+    if(out=="cont.sm") c <- kin$cont.sm
+    
+ 
+    r <- lapply(frames, function(f,...){
+      o <- c[frame==f,list(x,y)]
+      
+    if (!is.matrix(o))
+     out<- as.matrix(o)
+    if (is.null(colnames(o)))
+      colnames(o) <- c("x", "y")
+    
+    
+    if(ml.meth=="ang") fml <- free.ml.ang(out=as.matrix(o),smooth.n =smooth.n,red=red)
+    if(ml.meth=="hull") fml <- free.ml.hull(out=as.matrix(o),smooth.n =smooth.n,red=red)
+    
+    #with(fml$cont.sides,plot(x,y))
+    
+    
     ## shift points to match order in input
     
-    out2 <- data.table(out,n=1:nrow(out))
+    out2 <- data.table(o,n=1:nrow(o))
     
-    head <- out2[n==1]
+    #the head
+    h <- k[frame==f,]
   
     cont.sm <- fml$cont.sm[,n:=1:.N]
     #qplot(d=cont.sm,x,y,col=n)
     
-    cont.flip <- cont.sm[,head.dist:=dist.2d(x,head$x,y,head$y)][,list(close.n=n[which.min(head.dist)])]
+    cont.flip <- cont.sm[,head.dist:=dist.2d(x,h$head.x,y,h$head.y)][,list(close.n=n[which.min(head.dist)])]
     
 
     #reset n=1 to head
@@ -1269,13 +1285,17 @@ fin.kin <-
     
     fins[, y.pred := predict(lms[[side]], newdata = data.frame(x = x)), by = list(side)]
     
+  
+    #number of coordinates not in fins
+
     comp <- merge(fml$cont.sides, fins[,list(y.pred,n,side)], by = c("n","side"), all.x = TRUE)
+    comp[,y:=as.numeric(y)]
     comp[!is.na(y.pred), y := y.pred]
     
     comp[,dist:=dist.2d(x,cont.sm[n==1]$x,y,cont.sm[n==1]$y),by=side]
     setkeyv(comp,c("side","dist"))
   
-    qplot(data= cont.sm,x=x,y=y,col=n)
+    #qplot(data= cont.sm,x=x,y=y,col=n)
     #p <- qplot(data= comp,x=x,y=y,col=n)+geom_point(dat=fins,aes(x,y.pred,col=side))
     #print(p)
 
@@ -1313,15 +1333,39 @@ fin.kin <-
     # print(p)
     # 
     return(list(
-      cont = cont.sm2, #smoothed contour
-      fin = fins[,list(side,n,x,y)],
-      fin.pts = finPts,
-      comp = comp[,list(n,side,x,y)],
-      midline = ml.comp.s[,list(x,y)],
-      bl = bl ,
-      amp = amp,
-    
-      
+      cont = data.table(frame=f,cont.sm2), #smoothed contour
+      fin = data.table(frame=f,fins[,list(side,n,x,y)]),
+      fin.pts = data.table(frame=f,finPts),
+      comp = data.table(frame=f,comp[,list(n,side,x,y)]),
+      midline = data.table(frame=f,ml.comp.s[,list(x,y)]),
+      bl = data.table(frame=f,bl) ,
+      amp = data.table(frame=f,amp)
     ))
-  }
-
+    }
+    )
+    
+    cont.dat <- do.call(rbind, lapply(r, function(x)
+      x$cont))
+    fin.dat <- do.call(rbind, lapply(r, function(x)
+      x$fin))
+    fin.pts <- do.call(rbind, lapply(r, function(x)
+      x$fin.pts))
+    comp.dat <- do.call(rbind, lapply(r, function(x)
+      x$comp))
+    mid.dat <- do.call(rbind, lapply(r, function(x)
+      x$midline))
+    bl.dat <- do.call(rbind, lapply(r, function(x)
+      x$bl))
+    amp.dat <- do.call(rbind, lapply(r, function(x)
+      x$amp))
+    
+    
+    return(list(cont=cont.dat,
+                fin=fin.dat,
+                fin.pts=fin.pts,
+                comp=comp.dat,
+                midline=mid.dat,
+                amp=amp.dat,
+                bl=bl.dat
+                ))
+}

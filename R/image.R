@@ -471,37 +471,41 @@ data.overlay <- function(img,x,...){
 #'       red=0.5
 #'       )
 #'
-#' gg.overlay(kin=kin,frames=seq(20,320,20),data="midline",size=1,animate=TRUE,col="red",fps=10)
+#' gg.overlay(kin=kin,frames=seq(20,320,20),under="cont.sm",over="midline",size=1,animate=TRUE,col="red",fps=10)
 #' 
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 #'}
 #'
-gg.overlay <- function(kin,frames=NULL,data="kin.dat",zoom=FALSE,animate=FALSE,shadow=TRUE,alpha=0.1,fps=10,save=FALSE,filename=NULL,out.dir=NULL,...){
+gg.overlay <- function(kin,frames=NULL,under="cont",over="midline",zoom=FALSE,animate=FALSE,shadow=TRUE,alpha=0.1,fps=10,save=FALSE,filename=NULL,out.dir=NULL,...){
+  
   
   frame <- x <- y <- head.x <- head.y <- x.sm <- y.sm <- NULL
   
-  stopifnot(class(kin)=="list",c("midline","kin.dat","cont.sm") %in% names(kin),frames %in% kin$cont.sm$frame,!is.null(kin))
-  
+if(!"fin" %in% names(kin))  stopifnot(class(kin)=="list",c("midline","kin.dat","cont.sm") %in% names(kin),frames %in% kin$cont.sm$frame,!is.null(kin))
+
+  if("fin" %in% names(kin))  stopifnot(class(kin)=="list",c("cont","fin","comp","fin.pts") %in% names(kin),frames %in% kin$cont$frame,!is.null(kin))
   an <- animate
+  
   if(save&is.null(animate)&is.null(out.dir)) stop("'save=TRUE' but 'out.dir' is not specified")
   if(!is.null(out.dir))if(!dir.exists(out.dir)) stop("'out.dir' does not exists")
   
-  z <- kin$midline[frame%in%frames,list(x=range(x)*c(0.9,1.1),y=range(y)*c(0.9,1.1))]
+  z <- kin$cont[frame%in%frames,list(x=range(x)*c(0.9,1.1),y=range(y)*c(0.9,1.1))]
   
+  if(is.null(kin$dim)) kin$dim <-c(max(z$x)*1.25,max(z$y)*1.25)
   cart <- list(xlim(c(0,kin$dim[1])),ylim(c(kin$dim[2],0)))
   
   if(zoom & !animate) cart <- coord_cartesian(xlim=z$x,ylim=z$y[2:1]) 
   c<- kin$cont[frame%in%frames]
-  cs <- kin$cont.sm[frame%in%frames]
-  k <- kin$kin.dat[frame%in%frames]
+  
+  #midline data
   m <- kin$midline[frame%in%frames]
   
-  if(length(frames)>1 | is.null(frames)) facet <- facet_wrap(frame~.) else facet <- NULL
-  
-  
+  if(!"fin" %in% names(kin)) {
+  c <- kin$cont[frame%in%frames]
+  if(over=="cont.sm") c <- kin$cont.sm[frame%in%frames]
+  k <- kin$kin.dat[frame%in%frames]
   g.k <- geom_point(data=k,aes(head.x,head.y),...)
   g.m <- geom_point(data=m,aes(x.sm,y.sm),...)
-  
   
   if(data=="kin.dat") g <- g.k
   if(data=="midline") g <- g.m
@@ -510,8 +514,36 @@ gg.overlay <- function(kin,frames=NULL,data="kin.dat",zoom=FALSE,animate=FALSE,s
   g <- list(g.m2,g.k2)
   }
   
+  }
+  
+  if("fin" %in% names(kin) ) {
+    c <- kin$cont[frame%in%frames]
+    if(over=="comp") c <- kin$comp[frame%in%frames]
+    
+    fp <- kin$fin.pts[frame%in%frames]
+    f <- kin$fin[frame%in%frames]
+    cmp <- kin$comp[frame%in%frames]
+    g.fp <- geom_point(data=fp,aes(head.x,head.y,col=side),...)
+    g.f <- geom_point(data=f,aes(x,y,col=side,shape=pos),...)
+    g.m <- geom_point(data=m,aes(x,y,col=side),...)
+    
+    if(data=="fin") g <- g.d
+    if(data=="fin.pts") g <- g.fp
+    if(data=="midline") g <- g.m
+    
+    if(data=="all") { g.m2 <- geom_point(data=m,aes(x,y),col="blue",...)
+    g.f2 <- geom_point(data=f,aes(head.x,head.y))
+    g.fp2 <- geom_point(data=fp,aes(head.x,head.y))
+    g <- list(g.m2,g.f2,g.fp2)
+    }
+    
+  }
+  
+  if(length(frames)>1 | is.null(frames)) facet <- facet_wrap(frame~.) else facet <- NULL
+
+  
   if(data=="none") g <- NULL
-  p<- ggplot()+geom_polygon(data=cs,aes(x,y))+g+cart+theme_void()+facet
+  p<- ggplot()+geom_polygon(data=c,aes(x,y))+g+cart+theme_void()+facet
   
   ta <- alpha
   

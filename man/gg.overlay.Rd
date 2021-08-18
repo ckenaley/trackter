@@ -7,7 +7,8 @@
 gg.overlay(
   kin,
   frames = NULL,
-  data = "kin.dat",
+  under = "cont",
+  over = "midline",
   zoom = FALSE,
   animate = FALSE,
   shadow = TRUE,
@@ -23,8 +24,6 @@ gg.overlay(
 \item{kin}{a list of data returned from \code{kin} functions}
 
 \item{frames}{integer, a vector for frames within the the data (a column common to all \code{kin} function output). Will subset the data or, if NULL, will not. If more than one frame is specified, plot will be faceted by frame with \code{facet_wrap}.}
-
-\item{data}{character, the data to plot over the contour(s). Must be either 'kin.dat', 'midline', 'both', or none. See Details.}
 
 \item{zoom}{logical, should the plotted area zoom to the extents of the contours. See Detail.}
 
@@ -43,6 +42,8 @@ gg.overlay(
 \item{out.dir}{character, the file path of the directory to which the GIF file is saved. Ignored if \code{animate=FALSE} or \code{save=FALSE}.}
 
 \item{...}{other arguments to be passed to midline and head point geometries, e.g. 'size', 'color'.}
+
+\item{data}{character, the data to plot over the contour(s). Must be either 'kin.dat', 'midline', 'both', or none. See Details.}
 }
 \value{
 A \code{ggplot} plotted to the graphics device, a \code{gganimate} object plotted to graphics device, or a GIF file saved to a local directory specified in \code{out.dir}.
@@ -76,7 +77,7 @@ kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
       red=0.5
       )
 
-gg.overlay(kin=kin,frames=seq(20,320,20),data="midline",size=1,animate=TRUE,col="red",fps=10)
+gg.overlay(kin=kin,frames=seq(20,320,20),under="cont.sm",over="midline",size=1,animate=TRUE,col="red",fps=10)
 
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 }
