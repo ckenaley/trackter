@@ -20,7 +20,6 @@ kin.free(
   out.qual = 1,
   out.dir = NULL,
   plot.pml = TRUE,
-  flip = TRUE,
   ...
 )
 }
@@ -41,7 +40,7 @@ kin.free(
 
 \item{smooth.n, }{numeric, the number of contour smoothing iterations. See Details.}
 
-\item{red}{numeric, between 0-1 the proportion of contour coordinates to sample for midline estimates. Ignored if \code{ml.meth} is not 'del'. Will speed up midline estimations with Delauny triangulation. If 'NULL', the full contour retrieved from the ROI will be passed to \code{\link{free.ml.del}}. See Detail.}
+\item{red}{numeric, between 0-1 the proportion of contour coordinates to sample for midline estimates. Ignored if \code{ml.meth} is not 'del'. Will speed up midline estimations with Delaunay triangulation. If 'NULL', the full contour retrieved from the ROI will be passed to \code{\link{free.ml.del}}. See Detail.}
 
 \item{ml.meth}{character, the midline detection method. One of 'ang' for bisection using \code{\link{free.ml.ang}}, 'hull' for bisection using \code{\link{free.ml.hull}}, or 'del' for Delaunay triangulation using \code{\link{free.ml.del}}. See Details.}
 
@@ -55,9 +54,7 @@ kin.free(
 
 \item{plot.pml}{logical, value indicating if outputted images should include an overlay of the midline, head region and theoretical midline based on \code{ant.per}.}
 
-\item{thr}{numeric or character ('otsu'); the threshold to determine binary image. See Details.}
-
-\item{.}{. . , other arguments passed to \code{\link{find.roi}}}
+\item{...}{, other arguments passed to \code{\link{find.roi}}}
 }
 \value{
 A list with the following components:
@@ -75,7 +72,7 @@ A list with the following components:
 \code{midline} A data table containing, for each frame described by \code{frames}, the following: \itemize{
 \item 'x' and 'y': x and y positions of the midline of the ROI
 \item 'x.sm' and 'y.sm': the smoothed midline positions predicted by \code{ml.smooth}.
-\item 'wave.y': orthogona distance of midline points from predicted midline (see below)
+\item 'wave.y': orthogonal distance of midline points from predicted midline (see below)
 \item 'per.bl': the percentage of 'x.sm' along the body length calculated as the cumulative sum of distances between points
 }
 
@@ -119,10 +116,10 @@ A wrapper function for \code{find.roi} that automatically ROIs that are free to 
 \details{
 By default, the position of the anterior of the ROI (that which is moving forward in the field) is determined by the displacement of the ROI between the first two frames. Thus, \code{frames} must be >1. For analyses of relatively static ROIs in the field (e.g., steadily swimming animals in flumes, etc.), automatically determining the anterior of the ROI may be spurious. In this case, the automatic determination of the anterior should be overridden by specifying 'l', 'r', 'u', 'd' with \code{ant.pos}. These values specify that the anterior region of the ROI is leftmost, rightmost, upmost, or downmost in the field, respectively, and assumes that the origin of the field (0,0) is the upper left corner of each frame. 
 
-Thresholding operations are preformed with \code{link{find.roi}}. Parameters for this function are passed through addition arguments with ...
+Thresholding operations are preformed with \code{link{find.roi}}. Parameters for this function are passed through addition arguments with \code{...}
 
 
-Midline estimation is pursued by one of three algorithms: bisection of contours across the long axis defined by the tips using \code{\link{free.ml.ang}} or \code{\link{free.ml.hull}}  or by Delaunay triangulation using \code{\link{free.ml.del}}. The default is 'hull' This choice is not arbitrary. The use of \code{free.ml.ang} and \code{free.ml.hull} can be faster, but perfom poorly for tips that snake back on themselves (i.e., a high degree curvature). The use of \code{free.ml.del} can be slowe for high resolution outlines, but  produces better results when contour regions overlap (i.e, those that snake back on themselves), but produces less precise midlines for complicated contours.
+Midline estimation is pursued by one of three algorithms: bisection of contours across the long axis defined by the tips using \code{\link{free.ml.ang}} or \code{\link{free.ml.hull}}  or by Delaunay triangulation using \code{\link{free.ml.del}}. The default is 'hull' This choice is not arbitrary. The use of \code{free.ml.ang} and \code{free.ml.hull} can be faster, but perform poorly for tips that snake back on themselves (i.e., a high degree curvature). The use of \code{free.ml.del} can be slower for high resolution outlines, but  produces better results when contour regions overlap (i.e, those that snake back on themselves), but produces less precise midlines for complicated contours.
 
 For midline smoothing, if \code{ml.smooth} contains 'spline' (the default), \code{\link{smooth_spline}} from the \code{smoothr} package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times numeric value of the list in \code{ml.smooth}. If \code{ml.smooth} contains 'loess', \code{loess} is used to fit a polynomial surface. For contours that have a complicated midline with non-unique x values, loess smoothing can produce poor results. Thus, spline smoothing is usually the advisable option. 
 
@@ -133,6 +130,7 @@ For contour smoothing \code{smooth.n} is passed to the \code{n} parameter of \co
 ##A somewhat long example
 #### plot midline waveform on images of swimming ropefish
 \dontrun{
+library(data.table)
 #download example video and establish directories
 f <- "https://github.com/ckenaley/exampledata/blob/master/ropefish.avi?raw=true"
 download.file(f, paste0(tempdir(),"/ropefish.avi"))
@@ -164,7 +162,15 @@ EBImage::display(EBImage::readImage(fi[320]),"raster")
 
 #with gg.overlay() on first 300 frames
 
-gg.overlay(kin=kin,data="midline",frames=0:300,size=.2,animate=TRUE,zoom=FALSE,alpha=0.01,col="red",fps=10)
+gg.overlay(kin=kin,
+data="midline",
+frames=0:300,
+size=.2,
+animate=TRUE,
+zoom=FALSE,
+alpha=0.01,
+col="red",
+fps=10)
 
 #clean up
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
@@ -177,5 +183,5 @@ unlink(paste0(tempdir(),"/out"),recursive=TRUE)
 
 }
 \seealso{
-\code{\link{kin.search}}, \code{\link{kin.simple}},\code{\link{free.ml.bis}}, \code{\link{free.ml.del}}
+\code{\link{kin.search}}, \code{\link{kin.simple}}, \code{\link{free.ml.ang}},\code{\link{free.ml.hull}}, \code{\link{free.ml.del}}
 }

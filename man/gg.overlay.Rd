@@ -5,7 +5,7 @@
 \title{Plot output from \code{kin} functions}
 \usage{
 gg.overlay(
-  kin,
+  dat = NULL,
   frames = NULL,
   under = "cont",
   over = "midline",
@@ -21,9 +21,13 @@ gg.overlay(
 )
 }
 \arguments{
-\item{kin}{a list of data returned from \code{kin} functions}
+\item{dat}{a list of data returned from \code{kin} functions. See Details.}
 
-\item{frames}{integer, a vector for frames within the the data (a column common to all \code{kin} function output). Will subset the data or, if NULL, will not. If more than one frame is specified, plot will be faceted by frame with \code{facet_wrap}.}
+\item{frames}{integer, a vector for frames within the data (a column common to all \code{kin} functions' output). Will subset the data or, if NULL, will not. If more than one frame is specified, plot will be faceted by frame with \code{facet_wrap} or animated across frames.}
+
+\item{under}{character, the data to plot under \code{over}, the contour(s) from \code{kin} functions, i.e, 'cont' or 'cont.sm'. See Details.}
+
+\item{over}{character, the data to plot over the contour(s). Must be either 'kin.dat', 'midline', 'both', 'fin', 'fin.pt', 'all', or 'none'. See Details.}
 
 \item{zoom}{logical, should the plotted area zoom to the extents of the contours. See Detail.}
 
@@ -42,17 +46,20 @@ gg.overlay(
 \item{out.dir}{character, the file path of the directory to which the GIF file is saved. Ignored if \code{animate=FALSE} or \code{save=FALSE}.}
 
 \item{...}{other arguments to be passed to midline and head point geometries, e.g. 'size', 'color'.}
-
-\item{data}{character, the data to plot over the contour(s). Must be either 'kin.dat', 'midline', 'both', or none. See Details.}
 }
 \value{
 A \code{ggplot} plotted to the graphics device, a \code{gganimate} object plotted to graphics device, or a GIF file saved to a local directory specified in \code{out.dir}.
 }
 \description{
-Plots data output from one of \code{trackter}'s \code{kin} functions using \code{ggplot2}. Useful for quickly visualizing results from \code{kin} functions. Data and geometries include body-contour polygons with midline points, head points, both midline and head points, or neither (contours only). Optionally builds and saves an animation of data with reference to frame from \code{kin} data.
+Plots data output from one of \code{trackter}'s \code{kin} functions using \code{ggplot2}. Useful for quickly visualizing results from \code{kin} functions. Data and geometries include body-contour polygons with midline points, head or fin points, both midline and head points, or none or all of these. Optionally builds and saves an animation of data with reference to frame from \code{kin} data.
 }
 \details{
-Simply plots 2D dimensional data over contours retrieved from \code{kin} functions. May be useful in quickly assesses their results. The overlayed data can be \code{midline}, \code{kin.dat}, both, or neither. Either should be contained in a list along with \code{cont.sm}, the smoothed contour output from \code{kin} functions.
+Simply plots 2D dimensional data over contours retrieved from \code{kin} functions. May be useful in quickly assesses their results. The \code{under} layer can be one of the named contour data tables in lists returned by the \code{kin} functions \code{\link{kin.search}},\code{\link{kin.simple}}, \code{\link{kin.free}}, or \code{\link{fin.kin}}. The overlayed data layer specified by \code{over} are non-contour data from the \code{kin} functions.
+
+If the list specified by 'kin' is from \code{\link{kin.search}},\code{\link{kin.simple}}, or  \code{\link{kin.free}}, 'over' must be 'cont' or 'cont.sm' and under one of 'midline', 'kin', 'none' or 'both'.
+
+If the list specified by 'kin' is from \code{\link{fin.kin}}, 'over' must be 'cont' or 'comp' and under one of 'midline', 'fin', 'fin.pts', 'none' or 'all'.
+
 
 Animations are produced with \code{gganimate} and optionally saved as a GIF with \code{anim_save} using the default \code{gifski_renderer()}.
 }
@@ -71,18 +78,26 @@ dir.create(paste0(tempdir(),"/images"))
 vid.to.images(paste0(tempdir(),"/ropefish.avi"), out.dir = paste0(tempdir(),"/images"))
 
 kin <- kin.free(image.dir =paste0(tempdir(),"/images"),
+par=TRUE,
       ml.smooth=list("spline",0.9),
       thr = "otsu",
       size.min=0.01,
       red=0.5
       )
 
-gg.overlay(kin=kin,frames=seq(20,320,20),under="cont.sm",over="midline",size=1,animate=TRUE,col="red",fps=10)
+gg.overlay(kin=kin,
+frames=seq(20,320,20),
+under="cont.sm",
+over="midline",
+size=1,
+animate=TRUE,
+col="red",
+fps=10)
 
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 }
 
 }
 \seealso{
-\code{\link{geom_point}}, \code{\link{geom_polygon}},\code{\link{gganimate}}, \code{\link{kin.free}}, \code{\link{kin.search}}, \code{\link{kin.simple}}
+\code{\link{geom_point}}, \code{\link{geom_polygon}},\code{\link{gganimate}}, \code{\link{kin.free}}, \code{\link{kin.search}}, \code{\link{kin.simple}},\code{\link{fin.kin}}
 }

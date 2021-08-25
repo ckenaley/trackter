@@ -1,3 +1,70 @@
+#' @title Computes new position of a point rotating about an orgin.
+#' @description Computes the coordinate position of a point after rotation about an origin.
+#' @param p numeric vector of length 2, the x and y coordinates of the point that will rotate
+#' @param o numeric vector of length 2, the x and y coordinates of the origin
+#' @param theta numeric, the angle of rotation
+#' @return A vector of length 2 containing the resulting x,y coordinates
+#' @export
+#' @examples
+#'p <- c(2,2)
+#'o <- c(0,0)
+#'
+#'plot(c(-4,4),col=NULL)
+#'points(p[1],p[2],col="red")
+#'points(o[1],o[2])
+#'
+#'new.p <- point.ang.orig(p,o,pi/2*-1)
+#'points(new.p[1],new.p[2],col="blue")
+#'
+point.ang.orig<- function(p,o,theta){
+  xrot<-cos(theta)*(p[1]-o[1])-sin(theta)*(p[2]-o[2])+o[1]
+  yrot<-sin(theta)*(p[1]-o[1])+cos(theta)*(p[2]-o[2])+o[2]
+  return(c(xrot,yrot))
+}
+
+#' @title Computes orthogonal distance between a point and a line.
+#' @description Computes 2D orthogonal distance between a point and a line given the points coordinates and the line's slope and intercept or model formula
+#' @param x numeric, the x coordinate of the point
+#' @param y numeric, the y coordinate of the point
+#' @param slope numeric, the slope of the line
+#' @param intercept numeric, the slope of the line
+#' @param form  formula of type \code{lm} describing the line, ignored if \code{slope} and \code{intercept} are specified
+#' @return The distance between the point and line
+#' @details if \code{slope} and \code{intercept} are missing, a model formula of form \code{lm(y~x)} can be passed to \code{form}.
+#' @export
+#' @examples
+#'x <- runif(1:10)
+#'y <- x*0.5
+#'
+#'xy.lm <- lm(y~x)
+#'
+#'x.p <- y.p <- -3
+#'
+#'#one way . . .
+#'dist.2d.line(x.p,y.p,form=xy.lm)
+#'
+#'#or another
+#'dist.2d.line(x.p,y.p,slope=coef(xy.lm)[2],intercept=coef(xy.lm)[1])
+#'
+dist.2d.line <- function(x=NULL, y=NULL, slope=NULL, intercept=NULL,form=NULL) {
+  
+  if(all(sapply(list(slope,intercept,form), is.null))) stop("must specify slope and intercept of model formula")
+  
+  if(all(sapply(list(slope,intercept), is.null))&!is.null(form)) {
+    intercept <- coef(form)[1]
+    slope <- coef(form)[2]
+  }
+  
+  b = c(1, intercept + slope)
+  c = c(-intercept / slope, 0)
+  a = c(x, y)
+  v1 <- b - c
+  v2 <- a - b
+  m <- cbind(v1, v2)
+  return(abs(det(m)) / sqrt(sum(v1 * v1)))
+}
+
+
 #' @title Computes distance between two points in Cartesian space.
 #'
 #' @description Computes distance between two points in Cartesian space using simple trigonometry functions

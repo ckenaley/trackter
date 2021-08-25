@@ -25,7 +25,7 @@ images.to.video(
 
 \item{frame.rate}{numeric; video frame rate in fps.}
 
-\item{overwrite}{logical; should path described by vid.name  be overwritten if it exhists.}
+\item{overwrite}{logical; should path described by vid.name  be overwritten if it exists.}
 
 \item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
 }

@@ -42,10 +42,8 @@ test_that("kin.simple works fine", {
   
   expect_error(invisible(capture.output( kin.simple(image.dir =ti,frames=2,save=FALSE))),"out of range")
   
-  expect_error(invisible(capture.output( kin.simple(image.dir =ti , thr="foo",save=FALSE))),"must be set to")
   expect_error(invisible(capture.output( kin.simple(image.dir =ti ,smoothing="foo",save=FALSE))),"must =")
   
-  expect_error(invisible(capture.output( kin.simple(image.dir =ti,save=TRUE,out.qual=1.1,paste0(t,"/test_images")))),"'out.qual' must be >=0 and <=1")
   
   unlink(ti,recursive = TRUE)
   unlink(tp,recursive = TRUE)
@@ -189,22 +187,34 @@ test_that("kin.free works fine", {
 
 
 test_that("fin.kin works fine", {
-
-  cont <- read.csv(system.file("extdata", "cont.csv", package = "trackter"))[,3:4]
-  fin.y <- fin.kin(cont,fin.pos  = c(0.25,0.5),red=0.5)
+  
+  y <- EBImage::readImage(system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter"))
+  t <-tempdir()
+  
+  ti <-paste0(tempdir(),"/images")
+  tp <- paste0(tempdir(),"/processed_images")
+  dir.create(ti)
+  dir.create(tp)
+  
+  EBImage::writeImage(y,paste0(ti,"/sunfish001.jpg"),type = "jpeg")
+  
+  invisible(capture.output( kin.y <- kin.simple(image.dir = ti,save = TRUE,out.dir =tp)))
+  
+  fin.pos <- c(0.2,0.55)
+  fin.y <- fin.kin(kin=kin.y,fin.pos = fin.pos,smooth.n=1,ml.smooth=0.3)
   
   expect_is(fin.y,"list")
-  expect_named(fin.y,c("body","fin","fin.pts","comp","midline","bl","amp"))
-  expect_type(fin.y$body$y,type = "double")
+  expect_named(fin.y,c("cont","fin","fin.pts","comp","midline","amp","bl"))
+  expect_type(fin.y$cont$y,type = "double")
   expect_type(fin.y$comp$y,type = "double")
   expect_type(fin.y$fin.pts$y,type = "double")
   expect_type(fin.y$fin$y,type = "double")
-  expect_type(fin.y$bl[1],type = "double")
+  expect_type(fin.y$bl$bl,type = "double")
   expect_type(fin.y$amp$amp2[1],type = "double")
   
   expect_error(fin.kin(kin.y$cont))
-  expect_error(fin.kin(data.frame(x=kin.y$cont$x,y=kin.y$cont$y),fin.pos=0.1))
-  expect_error(fin.kin(data.frame(x=kin.y$cont$x,y=kin.y$cont$y),fin.pos=NULL))
+  expect_error(fin.kin(kin.y,fin.pos=0.1))
+  expect_error(fin.kin(kin.y,fin.pos=NULL))
 })
 
 

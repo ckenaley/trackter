@@ -11,7 +11,7 @@ vid.to.images(vid.path = NULL, out.dir = NULL, overwrite = FALSE, qual = 50)
 
 \item{out.dir}{character; directory path in which to store images.}
 
-\item{overwrite}{logical; should path described by 'out.dir' be overwritten if it exhists.}
+\item{overwrite}{logical; should path described by 'out.dir' be overwritten if it exists.}
 
 \item{qual}{numeric; the quality of the jpeg images to be rendered from 1-100\%. Defaults to 50\%.}
 }

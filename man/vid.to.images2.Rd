@@ -18,7 +18,7 @@ vid.to.images2(
 
 \item{out.dir}{character; directory path in which to store images.}
 
-\item{overwrite}{logical; should path described by 'out.dir' be overwritten if it exhists.}
+\item{overwrite}{logical; should path described by 'out.dir' be overwritten if it exists.}
 
 \item{filt}{character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}}
 

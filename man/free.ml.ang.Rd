@@ -33,9 +33,9 @@ A list with the following components:
 \description{
 Internal functions used in \code{kin} functions for calculating a midline spanning a closed contour. 
 
-\code{free.ml.ang} estimates a midline by finding angular tips that lie in end regions of the long axis of a contour and bissects the contour according to these tips.
+\code{free.ml.ang} estimates a midline by finding angular tips that lie in end regions of the long axis of a contour and bisects the contour according to these tips.
 
-\code{free.ml.hull} estimates a midline by finding the most distant coordinates in the convex hull and then bissects the contour according to these tips.
+\code{free.ml.hull} estimates a midline by finding the most distant coordinates in the convex hull and then bisects the contour according to these tips.
 
 \code{free.ml.del} estimates a midline through Delaunay triangulation and Voronoi tesselation.
 }
@@ -89,6 +89,7 @@ out.sm <- Momocs::coo_smooth(out,n=1)
 
 fml.del <- free.ml.del(out.sm)
 points(fml.del$ml$x,fml.del$ml$y,col="red")
+
 
 }
 \seealso{

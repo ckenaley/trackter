@@ -27,12 +27,16 @@ Imports:
   igraph,
   rgeos,
   sf,
-  sp
+  sp,
+  methods,
+  animation
 RoxygenNote: 7.1.1
-Suggests: 
+Suggests:
+    spelling, 
     testthat (>= 3.0.1),
     covr,
     knitr,
     rmarkdown,
 SystemRequirements: FFmpeg
 VignetteBuilder: knitr
+Language: en-US

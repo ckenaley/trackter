@@ -4,12 +4,12 @@
 \alias{data.overlay}
 \title{Plot data over an image}
 \usage{
-data.overlay(img, x, ...)
+data.overlay(img, over, ...)
 }
 \arguments{
 \item{img}{character, an image file path.}
 
-\item{x}{a data frame, data table, or matrix with two columns, the first representing x and the second y coordinates.}
+\item{over}{a data frame, data table, or matrix with two columns, the first representing x and the second y coordinates.}
 
 \item{...}{other arguments to be passed to \code{\link{points}}}
 }
@@ -32,7 +32,7 @@ x <- runif(10,1,d[1])
 y <- runif(10,1,d[2])
 pts <- cbind(x,y)
 
-data.overlay(img=f,x=pts,col="red",type="p")
+data.overlay(img=f,over=pts,col="red",type="p")
 }
 \seealso{
 \code{\link{kin.free}}, \code{\link{kin.search}}, \code{\link{kin.simple}}

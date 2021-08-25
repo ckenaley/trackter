@@ -2,9 +2,9 @@
 #' @title  Midline estimations for closed contours
 #' @description Internal functions used in \code{kin} functions for calculating a midline spanning a closed contour. 
 #' 
-#' \code{free.ml.ang} estimates a midline by finding angular tips that lie in end regions of the long axis of a contour and bissects the contour according to these tips.
+#' \code{free.ml.ang} estimates a midline by finding angular tips that lie in end regions of the long axis of a contour and bisects the contour according to these tips.
 #' 
-#' \code{free.ml.hull} estimates a midline by finding the most distant coordinates in the convex hull and then bissects the contour according to these tips.
+#' \code{free.ml.hull} estimates a midline by finding the most distant coordinates in the convex hull and then bisects the contour according to these tips.
 #' 
 #' \code{free.ml.del} estimates a midline through Delaunay triangulation and Voronoi tesselation.
 #'
@@ -53,6 +53,7 @@
 #' @importFrom rgeos gDistance
 #' @importFrom igraph get.diameter graph.adjacency minimum.spanning.tree vcount
 #' @importFrom sf as_Spatial
+#' @import methods
 #' 
 #' @seealso \code{\link{coo_smooth}}, \code{\link{coo_slice}},\code{\link{coo_slide}}, \code{\link{coo_truss}}, \code{\link{kin.free}}, \code{\link{deldir}}, \code{\link{kin.free}}
 #' 
@@ -86,8 +87,10 @@
 #' fml.del <- free.ml.del(out.sm)
 #' points(fml.del$ml$x,fml.del$ml$y,col="red")
 #' 
+#' 
 free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
+  hull <- bl <- bl2 <- NULL
   if(!"matrix" %in% class(out)) stop("'out' must be a matrix")
   n <- side <- x <- y <- tip <- n2 <- ang <- is.tip <- dist <- dist2 <- is.tip2 <- tip1.dist <- tip2.dist <- is.tip1 <- ang.rm<- NULL
   
@@ -125,8 +128,11 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   #reduce, smooth
   if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
+  
+  if(!is.null(smooth.n)) if( smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
+  
   colnames(coo) <- c("x","y")
-  if(!is.null(smooth.n) & smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
+
   
   #some outlines have duplicated points, nicht gut
   coo <- coo[!duplicated(coo),]
@@ -177,8 +183,6 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
     data.table(coo.sl[[1]],n=1:min(n.pts2),side="a"),
     data.table(coo.sl[[2]],n=min(n.pts2):1,side="b")
   )
-  
-  
   
   
   colnames(coo.sides)[1:2] <- c("x","y")
@@ -261,7 +265,7 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   #qplot()+geom_point(d=coo.dist,aes(x,y))+geom_point(d=ends1[n2%in% ends1.newN2],aes(x,y),col="red")+geom_point(d=ends1[n2%in% ends1.newN],aes(x,y),col="blue")
   #qplot()+geom_point(d=coo.dist,aes(x,y))+geom_point(d=ends2[n2%in% ends2.newN2],aes(x,y),col="red")+geom_point(d=ends2[n2%in% ends2.newN],aes(x,y),col="blue")
   
-  #redfine tips
+  #redefine tips
   tip1 <- ends1[is.tip==TRUE]
   tip2 <- ends2[is.tip==TRUE]
   
@@ -285,18 +289,18 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   #slice a final time
   coo.sl<-  Momocs::coo_slice(as.matrix(coo3[,list(x,y)]), ids = tips4$n)
   
-  n.pts4 <- sapply(coo.sl,nrow)
-  
+   n.pts4 <- sapply(coo.sl,nrow)
+
   #make final slice coo have about as many points as original coo/out
-  coo.sl <- lapply(coo.sl, function(x)
-    smoothr::smooth_spline(x,n = max(n.pts4)))
+  # coo.sl <- lapply(coo.sl, function(x)
+  #   smoothr::smooth_spline(x,n = max(n.pts4)))
   
-  n.pts4.2 <- sapply(coo.sl,nrow)
+  # n.pts4.2 <- sapply(coo.sl,nrow)
   
-  #new table with factores sides or equal length
+  #new table with factors sides of equal length
   coo.sides <- rbind(
-    data.table(coo.sl[[1]],n=1:max(n.pts4.2),side="a"),
-    data.table(coo.sl[[2]],n=max(n.pts4.2):1,side="b")
+    data.table(coo.sl[[1]],n=1:nrow(coo.sl[[1]]),side="a"),
+    data.table(coo.sl[[2]],n=nrow(coo.sl[[2]]):1,side="b")
   )
   
   colnames(coo.sides)[1:2] <- c("x","y")
@@ -307,9 +311,43 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   coo.ml <- coo.sides[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
   
-  #qplot(d=coo.sides,x,y)+geom_point(d=coo.ml,aes(x,y),col="red")
+  coo.sides <- rbind(
+    data.table(coo.sl[[1]],n=1:nrow(coo.sl[[1]]),side="a"),
+    data.table(coo.sl[[2]],n=nrow(coo.sl[[2]]):1,side="b")
+  )
   
-  return(list(ml = coo.ml,cont.sm=coo3[,list(n,x,y)],cont.sides=coo.sides))
+  rot <- coo.ml[,{pa <- point.ang.orig(c(x,y),c(coo.ml$x[1],coo.ml$y[1]),pi/2);list(x=pa[1],y=pa[2])},by=n][c(range(n)),]
+  rot.lm <- lm(y~x,rot)
+  #rot$pred <- predict(rot.lm)
+  
+  # qplot(d=fml$cont.sides,x,y,col=dist)+geom_point(d=rot,aes(x,),col="red")
+  
+  
+  coo.sides[,dist:=dist.2d.line(x,y,coef(rot.lm)[2],coef(rot.lm)[1]),by=list(n,side)][,bl:=dist/max(dist),by=side]
+  
+  coo.sides2 <- copy(coo.sides[,bl2:=round(bl,2)])[,list(x=mean(x),y=mean(y)),by=list(bl2,side)]
+  
+  setkeyv(coo.sides2,c("side","bl2"))
+  coo.sides2[,n:=1:.N,by=(side)]
+  
+ coo.sides3 <-  coo.sides2[,{s <- smoothr::smooth_spline(as.matrix(data.frame(x,y)),n = max(n.pts4));
+    list(
+      x=s[,1],
+      y=s[,2]
+    )
+  },
+  by=side
+  ]
+ 
+ coo.sides3[,n:=1:.N,by=(side)]
+
+  
+  coo.ml2 <- coo.sides3[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
+  
+  
+  #qplot(d=coo.sides,x,y,col=side)+geom_point(d=coo.ml2,aes(x,y),col="red")
+  
+  return(list(ml = coo.ml2,cont.sm=coo3[,list(n,x,y)],cont.sides=coo.sides))
 }
 
 NULL
@@ -317,12 +355,9 @@ NULL
 #' @rdname free.ml.ang
 #' @export
 #' 
-#out=as.matrix(kin$cont[frame==19,list(x,y)])
-#red=0.5
-#out=as.matrix(cont.dat[frame==36,list(x,y)])
 
 free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
-  
+  hull <- bl <- bl2 <- NULL
   
   if(!"matrix" %in% class(out)) stop("'out' must be a matrix")
   n <- side <- x <- y <- tip <- n2 <- ang <- is.tip <- dist <- dist2 <- is.tip2 <- tip1.dist <- tip2.dist <- is.tip1 <- ang.rm<- NULL
@@ -361,8 +396,10 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   #reduce, smooth
   if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
+
+  if(!is.null(smooth.n)) if( smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
+  
   colnames(coo) <- c("x","y")
-  if(!is.null(smooth.n) & smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
   
   #some outlines have duplicated points, nicht gut
   coo <- coo[!duplicated(coo),]
@@ -399,7 +436,6 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   #pull tips from slidden coo (coo2) and reslice on matrix of coo2
   tips2 <- coo2[is.tip1==TRUE|is.tip2==TRUE]$n
   
-  ##dont need
   coo.sl <-  Momocs::coo_slice(as.matrix(coo2[,list(x,y)]), ids = tips2)
   n.pts2 <- sapply(coo.sl,nrow)
   
@@ -410,8 +446,8 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   #coo.sl becomes coo.sides with side factor
   coo.sides <- rbind(
-    data.table(coo.sl[[1]],n=1:min(n.pts2),side="a"),
-    data.table(coo.sl[[2]],n=min(n.pts2):1,side="b")
+    data.table(coo.sl[[1]],n=1:nrow(coo.sl[[1]]),side="a"),
+    data.table(coo.sl[[2]],n=nrow(coo.sl[[2]]):1,side="b")
   )
   
   colnames(coo.sides)[1:2] <- c("x","y")
@@ -421,7 +457,34 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   #qplot(d=coo.sides,x,y,col=n)+geom_point(d=coo.ml,aes(x,y),col="red")
   
-  return(list(ml = coo.ml,cont.sm=coo2[,list(n,x,y)],cont.sides=coo.sides))
+  rot <- coo.ml[,{pa <- point.ang.orig(c(x,y),c(coo.ml$x[1],coo.ml$y[1]),pi/2);list(x=pa[1],y=pa[2])},by=n][c(range(n)),]
+  rot.lm <- lm(y~x,rot)
+  
+
+  coo.sides[,dist:=dist.2d.line(x,y,coef(rot.lm)[2],coef(rot.lm)[1]),by=list(n,side)][,bl:=dist/max(dist),by=side]
+  
+  coo.sides2 <- copy(coo.sides[,bl2:=round(bl,2)])[,list(x=mean(x),y=mean(y)),by=list(bl2,side)]
+  
+  setkeyv(coo.sides2,c("side","bl2"))
+  coo.sides2[,n:=1:.N,by=(side)]
+  
+  coo.sides3<-  coo.sides2[,{s <- smoothr::smooth_spline(as.matrix(data.frame(x,y)),n = max(n.pts2));
+  list(
+    x=s[,1],
+    y=s[,2]
+  )
+  },
+  by=side
+  ]
+  
+  coo.sides3[,n:=1:.N,by=(side)]
+  
+  
+  coo.ml2 <- coo.sides3[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]
+  
+  #qplot(d=coo.sides,x,y,col=n)+geom_point(d=coo.ml2,aes(x,y),col="red")
+  
+  return(list(ml = coo.ml2,cont.sm=coo2[,list(n,x,y)],cont.sides=coo.sides))
 }
 
 
@@ -434,6 +497,8 @@ NULL
 #out <- as.matrix(kin.del$cont[frame==14,list(x,y)])
 free.ml.del <- function(out = NULL,smooth.n=NULL,red=NULL,dens=NULL) {
 
+  hull <- bl <- bl2 <- NULL
+  
   if(!"matrix" %in% class(out)) stop("'out' must be a matrix")
   n <- side <- x <- y <- tip <- n2 <- ang <- is.tip <- dist <- dist2 <- is.tip2 <- tip1.dist <- tip2.dist <- is.tip1 <- ang.rm <- NULL
   densify <- function(xy,n=5){
@@ -467,9 +532,9 @@ free.ml.del <- function(out = NULL,smooth.n=NULL,red=NULL,dens=NULL) {
   
   coo <- Momocs::coo_close(out)
   if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
+  if(!is.null(smooth.n)) if( smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
   colnames(coo) <- c("x","y")
-  if(!is.null(smooth.n) & smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
-  
+
   
   tr <-  Momocs::coo_truss(coo)
   tip.n <- names(tr[which.max(tr)])
@@ -507,7 +572,7 @@ free.ml.del <- function(out = NULL,smooth.n=NULL,red=NULL,dens=NULL) {
   div <- 30
   
   while(path.l!=vct){
-    dPoly <- gDistance(methods::as(sr,"SpatialLines"),SpatialPoints(ml.pts),byid=TRUE)
+    dPoly <- gDistance(as(sr,"SpatialLines"),SpatialPoints(ml.pts),byid=TRUE)
     ml.pts <-  ml.pts[dPoly > max(dPoly/div),]
     
     

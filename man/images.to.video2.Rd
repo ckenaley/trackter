@@ -24,7 +24,7 @@ images.to.video2(
 
 \item{vid.name}{character; file name to be given video (should not include file extension).}
 
-\item{overwrite}{logical; should path described by vid.name  be overwritten if it exhists.}
+\item{overwrite}{logical; should path described by vid.name  be overwritten if it exists.}
 
 \item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
 

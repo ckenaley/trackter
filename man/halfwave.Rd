@@ -37,7 +37,7 @@ A list with the following components:
 
 \code{method} the method chosen to find half waves
 
- \code{names} a data table with columns 'x', 'y', and 'wave' describing the x and y positions of the wave and a numeric name of each half wave detected, resptively.  If 'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by \code{smoothing},\code{smooth}, and \code{dens}.
+ \code{names} a data table with columns 'x', 'y', and 'wave' describing the x and y positions of the wave and a numeric name of each half wave detected, respectively.  If 'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by \code{smoothing},\code{smooth}, and \code{dens}.
  
 \code{dat} a data table describing each have wave detected.
 \itemize{

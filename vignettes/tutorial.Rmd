@@ -91,9 +91,9 @@ y <- EBImage::readImage(i)
 EBImage::display(y,method="raster")
 ```
 
-<img src="sunfishimage-1.png" title="plot of chunk sunfishimage" alt="plot of chunk sunfishimage" width="50%" />
+<img src="sunfishimage-1.png" title="plot of chunk sunfish image" alt="plot of chunk sunfishimage" width="50%" />
 
-Here, `kin.simple` is used to extract contour and shape information from the image above by refering to the directory that contains it. An image with a midline overlay is saved to the working directory (see below).
+Here, `kin.simple` is used to extract contour and shape information from the image above by referring to the directory that contains it. An image with a midline overlay is saved to the working directory (see below).
 
 
 ```r

@@ -4,7 +4,7 @@
 #'
 #' @param vid.path Character; path of video file to be processed.
 #' @param out.dir character; directory path in which to store images.
-#' @param overwrite logical; should path described by 'out.dir' be overwritten if it exhists. 
+#' @param overwrite logical; should path described by 'out.dir' be overwritten if it exists. 
 #' @param qual numeric; the quality of the jpeg images to be rendered from 1-100\%. Defaults to 50\%.
 #' @return Extracts all the images of the video and saves them to an "images" directory with appended number sequence
 #' @seealso \code{\link{images.to.video}}
@@ -82,7 +82,7 @@ vid.to.images <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,qual=50)  {
 #' @param vid.name character; file name given to video including extension.  mp4 currently works best.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
 #' @param frame.rate numeric; video frame rate in fps.
-#' @param overwrite logical; should path described by vid.name  be overwritten if it exhists. 
+#' @param overwrite logical; should path described by vid.name  be overwritten if it exists. 
 #' @param silent logical; should output of \code{system} call for ffmpeg operation be suppressed.
 #' @return Outputs a video of name "video.name+vid.ext".
 #' @export
@@ -175,7 +175,7 @@ images.to.video <- function(image.dir=NULL,out.dir=NULL,vid.name=NULL,qual=50,fr
 #'
 #' @param vid.path character; path of video file to be processed.
 #' @param out.dir character; directory path in which to store images.
-#' @param overwrite logical; should path described by 'out.dir' be overwritten if it exhists.
+#' @param overwrite logical; should path described by 'out.dir' be overwritten if it exists.
 #' @param filt character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}
 #' @param codec character; video codec to apply in ffmpeg operation
 #' @param silent logical; should output of \code{system} call for ffmpeg operation be suppressed.
@@ -262,7 +262,7 @@ vid.to.images2 <- function(vid.path=NULL,out.dir=NULL,overwrite=FALSE,filt=NULL,
 #' @param out.dir character; directory in which to store video.
 #' @param qual numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.
 #' @param vid.ext character; video type to output. mp4 currently works best.
-#' @param overwrite logical; should path described by vid.name  be overwritten if it exhists. 
+#' @param overwrite logical; should path described by vid.name  be overwritten if it exists. 
 #' @param frame.rate numeric; video frame rate in fps.
 #' @param raw logical; encodes a raw AVI video with the "rawvideo" codec.
 #' @param filt character; video filter that should be applied to ffmpeg operation. See \url{https://ffmpeg.org/ffmpeg-filters.html}.

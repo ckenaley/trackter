@@ -133,11 +133,16 @@ Wrapper functions for \code{\link{find.roi}} that automatically retrieve the con
 \code{kin.simple} is itself a wrapper for \code{kin.search}, finding the largest ROI in field using Otsu thresholding for segmentation.
 }
 \details{
+The algorithm assumes a left-right orientation, i.e., the head of the ROI is positioned left, the tail right. If this is not the case, consider using \code{\link{kin.free}} or rotating images before processing. The \code{ant.per} value therefor establishes the reference line (theoretical straight midline) based on that portion of the head. The midline is calculated as the midpoints between the y extrema for each x position. 
 
+\code{kin.search} chooses ROIs based on relative ROI size or position according too to \code{\link{find.roi}}. Thresholding operations can be performed with an arbitrary (user defined) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}. Other search arguments can be adjusted by passing arguments to \code{\link{find.roi}}.
+
+\code{kin.simple} is more streamlined. It attempts to find the largest ROI using Outsu thresholding and invokes other default values of \code{\link{find.roi}}.
 }
 \examples{
 
 #### plot caudal amplitude and produce a classic midline waveform plot of a swimming rainbow trout
+library(data.table)
 ##A very long example.
 \dontrun{
 
@@ -162,6 +167,7 @@ print(p)
 
 # midline plot
 ml <- kin$midline
+
 #leftmost x starts at 0
 ml <- ml[,x2:=x-x[1],by=frame]
 

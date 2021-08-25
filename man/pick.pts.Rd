@@ -18,7 +18,7 @@ pick.pts(img, n = 1000, review = TRUE, smoothing = NULL, smooth = NULL)
 \item{smooth}{numeric; if \code{smoothing} is set to 'loess', this values is passed to 'span' parameter of \code{\link{loess}}. If \code{smoothing} is set to 'spline', this value is ignored and the smooth points are determined by the default values of \code{\link{spline}}. See details.}
 }
 \value{
-A list of one or two data tables, alwyas \code{pts} with the picked points and, optionally, \code{smooth.pts} containing the the smoothed points if \code{smoothing} is chosen. Each contains the following columns:
+A list of one or two data tables, always \code{pts} with the picked points and, optionally, \code{smooth.pts} containing the the smoothed points if \code{smoothing} is chosen. Each contains the following columns:
 
 \itemize{
 \item 'frame', the frame file name

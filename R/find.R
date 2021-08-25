@@ -53,6 +53,7 @@
 #' 
 #' @examples
 #'
+#'library(data.table)
 #' #download example video of a sunfish swimming and establish directories
 #' f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
 #' download.file(f, paste0(tempdir(),"/sunfish.avi"))
@@ -79,8 +80,10 @@
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 #' unlink(paste0(tempdir(),"/out"),recursive=TRUE)
 #' 
-#' img <- fi
+
 find.roi <-  function(img=NULL,thr="otsu",search.for="largest",size.min=0.01,bg="white",edges=FALSE,border = 5,results=FALSE){
+  
+  size <- NULL
    
   if (length(img) > 1) results <-  FALSE
 
