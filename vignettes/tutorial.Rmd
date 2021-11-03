@@ -31,7 +31,7 @@ The current development version can be installed with:
 
 ## External dependencies
 
-The core functions of *trackter* that extract shape and contour data from images ( `kin.simple` and `kin.search`) depend upon *EBImage*, available on the Bioconductor repository. The current build and development versions of *trackter* install this dependency. If it does not install, it can be done so easily with just a few lines of code: 
+The core functions of *trackter* that extract shape and contour data from images (the `kin` functions: `kin.simple`, `kin.search`, and `kin.free`) depend upon *EBImage*, available on the Bioconductor repository. The current build and development versions of *trackter* install this dependency. If it does not install, it can be done so easily with just a few lines of code: 
 
 
 ```r

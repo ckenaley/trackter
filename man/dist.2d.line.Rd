@@ -40,4 +40,5 @@ dist.2d.line(x.p,y.p,form=xy.lm)
 #or another
 dist.2d.line(x.p,y.p,slope=coef(xy.lm)[2],intercept=coef(xy.lm)[1])
 
+
 }

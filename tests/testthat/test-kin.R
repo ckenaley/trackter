@@ -18,16 +18,14 @@ test_that("kin.simple works fine", {
   expect_length(list.files(tp),1)
   
   expect_is(kin.y,"list")
-  expect_named(kin.y,c("kin.dat", "midline","cont","all.classes","dim"))
-  expect_true(kin.y$kin.dat$size>0)
+  expect_named(kin.y,c("kin.dat", "midline","cont","cont.sm","mid.pred","all.classes","dim"))
+  expect_true(kin.y$kin.dat$head.pval!=0)
   expect_type(kin.y$midline$roi,type = "character")
   expect_type(kin.y$cont$x,type = "integer")
   expect_true(kin.y$all.classes$size>0)
   
-  expect_error(invisible(capture.output( kin.y <- kin.simple(image.dir = ti,out.dir=tp,save = FALSE))),"To save processed images")
   
-  
-  expect_error(invisible(capture.output( kin.y <- kin.simple(image.dir = ti,out.dir=tp,save = FALSE))),"To save processed images")
+  expect_error(invisible(capture.output( kin.y <- kin.simple(image.dir = ti,save = TRUE))),"'out.dir' not specified")
   
  dir.create(paste0(t,"/test_images2"))
   
@@ -42,7 +40,7 @@ test_that("kin.simple works fine", {
   
   expect_error(invisible(capture.output( kin.simple(image.dir =ti,frames=2,save=FALSE))),"out of range")
   
-  expect_error(invisible(capture.output( kin.simple(image.dir =ti ,smoothing="foo",save=FALSE))),"must =")
+  expect_error(invisible(capture.output( kin.simple(image.dir =ti ,ml.smooth=list(0.5,"foo"),save=FALSE))),"'ml.smooth' must")
   
   
   unlink(ti,recursive = TRUE)
@@ -68,13 +66,13 @@ test_that("kin.search works fine", {
   expect_length(list.files(tp),1)
   
   expect_is(kin.y,"list")
-  expect_named(kin.y,c("kin.dat", "midline","cont","all.classes","dim"))
-  expect_true(kin.y$kin.dat$size>0)
+  expect_named(kin.y,c("kin.dat", "midline","cont","cont.sm","mid.pred","all.classes","dim"))
+  expect_true(kin.y$all.classes$size>0)
   expect_type(kin.y$midline$roi,type = "character")
   expect_type(kin.y$cont$x,type = "integer")
-  expect_true(kin.y$all.classes$size>0)
+  
 
-  expect_error(invisible(capture.output( kin.y <- kin.search(image.dir = ti,out.dir=tp,save = FALSE))),"To save processed images")
+  expect_error(invisible(capture.output( kin.y <- kin.search(image.dir = ti,save = TRUE))),"'out.dir' not specified")
   
   
   expect_error(invisible(capture.output( kin.search(image.dir = "foo",out.dir=tp,save=TRUE))),"does not exist")
@@ -85,7 +83,7 @@ test_that("kin.search works fine", {
   expect_error(invisible(capture.output( kin.search(image.dir = ti,frames=2,save=FALSE))),"out of range")
   
   expect_error(invisible(capture.output( kin.search(image.dir =ti , thr="foo",save=FALSE))),"must be set to")
-  expect_error(invisible(capture.output( kin.search(image.dir =ti ,smoothing="foo",save=FALSE))),"must =")
+  expect_error(invisible(capture.output( kin.search(image.dir =ti ,ml.smooth=list("foo",0.6),save=FALSE))),"'ml.smooth' must")
   
   expect_error(invisible(capture.output( kin.search(image.dir =ti ,search.for="foo",save=FALSE))),"must be set to")
   

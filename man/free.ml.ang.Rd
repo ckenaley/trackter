@@ -31,7 +31,7 @@ A list with the following components:
 \code{cont.sides}: a data table containing the smoothed outline factorized by side 'a' or 'b' and index.
 }
 \description{
-Internal functions used in \code{kin} functions for calculating a midline spanning a closed contour. 
+Internal functions used in \code{kin} functions for calculating the long-axis midlline spanning a closed contour. 
 
 \code{free.ml.ang} estimates a midline by finding angular tips that lie in end regions of the long axis of a contour and bisects the contour according to these tips.
 
@@ -40,7 +40,7 @@ Internal functions used in \code{kin} functions for calculating a midline spanni
 \code{free.ml.del} estimates a midline through Delaunay triangulation and Voronoi tesselation.
 }
 \details{
-\code{free.ml.ang} estimates the midline by first creating a convex hull of the contour and then finding candidate tips that are farthest from one another with \code{\link{coo_truss}}. This and \code{free.ml.hull}  therefore assume the contour is elongate. The candidate tips are then refined by finding coordinates whose index are within the 5% quantiles of the extrema. From the additional coordinates, the final candidate tips are defined as those that form the greatest angle between adjacent coordinates. The function then **bisects** the contour across this axis determined by the tips using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
+\code{free.ml.ang} estimates the midline by first creating a convex hull of the contour and then finding candidate tips that are farthest from one another with \code{\link{coo_truss}}. This and \code{free.ml.hull} therefore assume the contour is elongate. The candidate tips are then refined by finding coordinates whose index are within the 5% quantiles of the extrema. From the additional coordinates, the final candidate tips are defined as those that form the greatest angle between adjacent coordinates. The function then **bisects** the contour across this axis determined by the tips using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
 
 \code{free.ml.hull} creates a convex hull of the contour and then finds the two coordinates in the hull that are farthest from one another. As with \code{free.ml.ang}, this function then bisects the contour across an axis determined by the tips and calculates the midline as midpoints defined between all pairs of coordinates with the same index value
 

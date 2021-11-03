@@ -438,3 +438,62 @@ amp.freq <- function(x = NULL, y, sf = 100) {
   return(dat)
 }
 
+#' @title Calculate waveform cycles 
+#' @description Finds discrete cycles of wave-like data using critical points (peaks and troughs). 
+#'
+#' @param x numeric; x position
+#' @param y numeric; y position
+#' @param start character; where the cycles should start either 'peak' or `trough'. See Details. 
+#' @param ... additional arguments to be passed to \code{\link{features}}
+#'
+#' @details If "'start='peak'", the cycles start at critical points with high values, If "'start='trough'", cycles start at critical points with low values. 
+#' 
+#' @return A a data table including the following: 
+#' 
+#' \itemize{
+#' \item 'cyc': The cycle number.
+#' \item 'pos': the position/index values of the x data (not the x values themselves).
+#' }
+#' 
+#' @import features
+#' @import data.table
+#' 
+#' 
+#' @seealso \code{\link{features}}
+#' 
+#' @examples
+#' library(ggplot2)
+#' n <- 200
+#' d <- data.frame(
+#' x <- sort(runif(n))
+#' y <- exp(-0.2 * sin(10*pi*x)) + rnorm(n, sd=0.05)
+#' )
+#' 
+#' #start at peaks
+#' c <- cyclize(d$x,d$y)
+#' d$cyc <- c$cyc
+#' qplot(d=d,x,y,col=as.factor(cyc))
+#'
+#'  #start at troughs
+#' c <- cyclize(d$x,d$y,start="trough")
+#' d$cyc <- c$cyc
+#' qplot(d=d,x,y,col=as.factor(cyc))
+#' 
+#' @export
+#' 
+cyclize <- function(x,y,start="peak",...){
+  x <- unlist(x)
+  y <- unlist(y)
+  #ft <- features(x,y)
+  ft <- features(x,y,...)
+  pt <- sapply(ft$curvature,function(x) ifelse(x>0,"trough","peak"))
+  pt.x <- sapply(ft$cpts,function(z) which.min(abs(z-x)))
+  if(start=="peak") pt.dat <- data.table(pt=pt,start=pt.x)[pt=="peak"]
+  if(start=="trough") pt.dat <- data.table(pt=pt,start=pt.x)[pt=="trough"]
+  pt.dat[,c("end","cyc"):=list(dplyr::lead(start)-1,1:.N)]
+  pt.dat2 <- pt.dat[!is.na(end),.(pos=start:end),by=cyc]
+  if(pt.dat2[1,2]!=1) {pt.dat2 <- rbind(data.table(cyc=0,pos=1:(unlist(pt.dat2[1,2])-1)),pt.dat2)}
+  if(max(pt.dat2[,2])!=length(x)) {pt.dat2 <- rbind(pt.dat2,
+                                                      data.table(cyc=max(pt.dat2[,1])+1,pos=(max(pt.dat2[,2])+1):length(x)))}
+  return(pt.dat2)
+}

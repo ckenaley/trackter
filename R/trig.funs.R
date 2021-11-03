@@ -46,6 +46,7 @@ point.ang.orig<- function(p,o,theta){
 #'#or another
 #'dist.2d.line(x.p,y.p,slope=coef(xy.lm)[2],intercept=coef(xy.lm)[1])
 #'
+#'
 dist.2d.line <- function(x=NULL, y=NULL, slope=NULL, intercept=NULL,form=NULL) {
   
   if(all(sapply(list(slope,intercept,form), is.null))) stop("must specify slope and intercept of model formula")
@@ -153,4 +154,6 @@ bearing.xy <- function(x1,x2,y1,y2){
   theta <- atan((x2-x1)/(y1-y2))
   return(theta)
 }
+
+
 

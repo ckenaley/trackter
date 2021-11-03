@@ -16,7 +16,7 @@ fin.kin(
 )
 }
 \arguments{
-\item{kin, }{a named list from one of the \code{kin} functions.}
+\item{kin, }{a named list from one of \code{trackter}s \code{kin} functions.}
 
 \item{out}{character, specifying the contour data in 'kin'}
 

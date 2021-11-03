@@ -5,7 +5,7 @@
 \title{Plot output from \code{kin} functions}
 \usage{
 gg.overlay(
-  dat = NULL,
+  kin = NULL,
   frames = NULL,
   under = "cont",
   over = "midline",
@@ -21,7 +21,7 @@ gg.overlay(
 )
 }
 \arguments{
-\item{dat}{a list of data returned from \code{kin} functions. See Details.}
+\item{kin}{a list of data returned from \code{kin} functions. See Details.}
 
 \item{frames}{integer, a vector for frames within the data (a column common to all \code{kin} functions' output). Will subset the data or, if NULL, will not. If more than one frame is specified, plot will be faceted by frame with \code{facet_wrap} or animated across frames.}
 
@@ -56,9 +56,9 @@ Plots data output from one of \code{trackter}'s \code{kin} functions using \code
 \details{
 Simply plots 2D dimensional data over contours retrieved from \code{kin} functions. May be useful in quickly assesses their results. The \code{under} layer can be one of the named contour data tables in lists returned by the \code{kin} functions \code{\link{kin.search}},\code{\link{kin.simple}}, \code{\link{kin.free}}, or \code{\link{fin.kin}}. The overlayed data layer specified by \code{over} are non-contour data from the \code{kin} functions.
 
-If the list specified by 'kin' is from \code{\link{kin.search}},\code{\link{kin.simple}}, or  \code{\link{kin.free}}, 'over' must be 'cont' or 'cont.sm' and under one of 'midline', 'kin', 'none' or 'both'.
+If the list specified by 'kin' is from \code{\link{kin.search}},\code{\link{kin.simple}}, or  \code{\link{kin.free}}, 'over' must be 'cont' or 'cont.sm' and under one of 'midline','kin', 'none' or 'both'. 'midline' will produce the smoothed midline coordinates.
 
-If the list specified by 'kin' is from \code{\link{fin.kin}}, 'over' must be 'cont' or 'comp' and under one of 'midline', 'fin', 'fin.pts', 'none' or 'all'.
+If the list specified by 'kin' is from \code{\link{fin.kin}}, 'over' must be 'cont' or 'comp' and under one of 'midline','fin', 'fin.pts', 'none' or 'all'.
 
 
 Animations are produced with \code{gganimate} and optionally saved as a GIF with \code{anim_save} using the default \code{gifski_renderer()}.

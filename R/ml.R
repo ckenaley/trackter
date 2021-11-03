@@ -1,6 +1,6 @@
 
 #' @title  Midline estimations for closed contours
-#' @description Internal functions used in \code{kin} functions for calculating a midline spanning a closed contour. 
+#' @description Internal functions used in \code{kin} functions for calculating the long-axis midlline spanning a closed contour. 
 #' 
 #' \code{free.ml.ang} estimates a midline by finding angular tips that lie in end regions of the long axis of a contour and bisects the contour according to these tips.
 #' 
@@ -26,7 +26,7 @@
 #' 
 #' @details
 #' 
-#' \code{free.ml.ang} estimates the midline by first creating a convex hull of the contour and then finding candidate tips that are farthest from one another with \code{\link{coo_truss}}. This and \code{free.ml.hull}  therefore assume the contour is elongate. The candidate tips are then refined by finding coordinates whose index are within the 5% quantiles of the extrema. From the additional coordinates, the final candidate tips are defined as those that form the greatest angle between adjacent coordinates. The function then **bisects** the contour across this axis determined by the tips using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
+#' \code{free.ml.ang} estimates the midline by first creating a convex hull of the contour and then finding candidate tips that are farthest from one another with \code{\link{coo_truss}}. This and \code{free.ml.hull} therefore assume the contour is elongate. The candidate tips are then refined by finding coordinates whose index are within the 5% quantiles of the extrema. From the additional coordinates, the final candidate tips are defined as those that form the greatest angle between adjacent coordinates. The function then **bisects** the contour across this axis determined by the tips using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
 #' 
 #'\code{free.ml.hull} creates a convex hull of the contour and then finds the two coordinates in the hull that are farthest from one another. As with \code{free.ml.ang}, this function then bisects the contour across an axis determined by the tips and calculates the midline as midpoints defined between all pairs of coordinates with the same index value
 #' 
@@ -192,12 +192,11 @@ free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   setkeyv(coo.sides,c("n"))
   #qplot(d=coo.sides,x,y,col=n)
 
-  
 
   #qplot(d=coo2,x,y,col=n)+geom_point(data=coo2[n%in%tips2],aes(x,y),col="red")
   
-  #find 5% of ends
-  ends.q <- round(quantile(min(tips2):max(tips2),probs=c(.025)))
+  #find 10% of ends
+  ends.q <- round(quantile(min(tips2):max(tips2),probs=c(.1)))
   ends1.n <- c((max(coo2$n)-ends.q):max(coo2$n),min(tips2):ends.q)
   ends2.n <- c((max(tips2)-ends.q):(max(tips2)+ends.q))
   
@@ -356,6 +355,7 @@ NULL
 #' @export
 #' 
 
+#out=as.matrix(kin$cont[frame==163,list(x,y)])
 free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   hull <- bl <- bl2 <- NULL
   
@@ -466,7 +466,7 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   coo.sides2 <- copy(coo.sides[,bl2:=round(bl,2)])[,list(x=mean(x),y=mean(y)),by=list(bl2,side)]
   
   setkeyv(coo.sides2,c("side","bl2"))
-  coo.sides2[,n:=1:.N,by=(side)]
+  coo.sides2[,n:=1:.N,by=side]
   
   coo.sides3<-  coo.sides2[,{s <- smoothr::smooth_spline(as.matrix(data.frame(x,y)),n = max(n.pts2));
   list(
@@ -477,7 +477,7 @@ free.ml.hull <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   by=side
   ]
   
-  coo.sides3[,n:=1:.N,by=(side)]
+  coo.sides3[,n:=1:.N,by=side]
   
   
   coo.ml2 <- coo.sides3[, list(x = sum(x) / 2, y = sum(y) / 2), by = list(n)]

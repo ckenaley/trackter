@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Tracking of fin-like extensions of body contours — fin.kin" />
-<meta property="og:description" content="Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  kin.simple and kin.search. Also computes a smoothed midline based on the body outline with the fin region removed." />
+<meta property="og:description" content="Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  kin.simple, kin.search, or kin.free. Also computes a smoothed midline based on the body outline with the fin region removed." />
 
 
 
@@ -124,25 +124,34 @@
     </div>
 
     <div class="ref-description">
-    <p>Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  <a href='kin.simple.html'>kin.simple</a> and <a href='kin.search.html'>kin.search</a>. Also computes a smoothed midline based on the body outline with the fin region removed.</p>
+    <p>Estimates the amplitudes of regions along a body contour that are protruding. Useful in computing paired-fin amplitudes from contour data produced from  <a href='kin.search.html'>kin.simple</a>, <a href='kin.search.html'>kin.search</a>, or <a href='kin.search.html'>kin.free</a>. Also computes a smoothed midline based on the body outline with the fin region removed.</p>
     </div>
 
     <pre class="usage"><span class='fu'>fin.kin</span><span class='op'>(</span>
-  <span class='va'>x</span>,
+  <span class='va'>kin</span>,
+  out <span class='op'>=</span> <span class='st'>"cont"</span>,
+  frames <span class='op'>=</span> <span class='cn'>NULL</span>,
   fin.pos <span class='op'>=</span> <span class='cn'>NULL</span>,
-  smooth.n <span class='op'>=</span> <span class='fl'>50</span>,
-  tip.ang <span class='op'>=</span> <span class='fl'>10</span>,
-  smoothing <span class='op'>=</span> <span class='st'>"loess"</span>,
-  x.bins <span class='op'>=</span> <span class='fl'>0.2</span>,
-  ml.smooth <span class='op'>=</span> <span class='fl'>0.25</span>
+  smooth.n <span class='op'>=</span> <span class='fl'>5</span>,
+  ml.meth <span class='op'>=</span> <span class='st'>"hull"</span>,
+  ml.smooth <span class='op'>=</span> <span class='fl'>0.9</span>,
+  red <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>a data frame or matrix with 'x' and 'y' data as columns.</p></td>
+      <th>kin, </th>
+      <td><p>a named list from one of <code>trackter</code>s <code>kin</code> functions.</p></td>
+    </tr>
+    <tr>
+      <th>out</th>
+      <td><p>character, specifying the contour data in 'kin'</p></td>
+    </tr>
+    <tr>
+      <th>frames</th>
+      <td><p>integer, the frames within 'kin' to analyze. If NULL then all frames are included.</p></td>
     </tr>
     <tr>
       <th>fin.pos</th>
@@ -150,65 +159,61 @@
     </tr>
     <tr>
       <th>smooth.n</th>
-      <td><p>numeric, the number of smoothing operations undertaken by coo_smooth on the contour described by 'x'.</p></td>
+      <td><p>numeric, the number of smoothing operations undertaken by coo_smooth on the contour described by 'x'. See Details.</p></td>
     </tr>
     <tr>
-      <th>tip.ang</th>
-      <td><p>the minimum angle, in degrees, that defines tip of each fin. See Details.</p></td>
-    </tr>
-    <tr>
-      <th>smoothing</th>
-      <td><p>character, the midline smoothing method, either 'loess' or 'spline'.</p></td>
-    </tr>
-    <tr>
-      <th>x.bins</th>
-      <td><p>numeric, when less than or equal to 1, the proportion of contour coordinates to sample for midline estimation. If greater than 1, the absolute number of equally spaced x values from which to compute the midline. See Details.</p></td>
+      <th>ml.meth</th>
+      <td><p>character, the midline detection method. One of 'ang' for bisection using <code><a href='free.ml.ang.html'>free.ml.ang</a></code> or 'hull' for bisection using <code><a href='free.ml.ang.html'>free.ml.hull</a></code>. Delaunay triangulation using <code><a href='free.ml.ang.html'>free.ml.del</a></code> is not supported. See Details.</p></td>
     </tr>
     <tr>
       <th>ml.smooth</th>
-      <td><p>numeric the smoothing value for the midline. If <code>smoothing</code> is set to 'loess', passed to 'span' value for <code><a href='https://rdrr.io/r/stats/loess.html'>loess</a></code>. If <code>smoothing</code> is set to 'spline', passed to 'spar' value for <code><a href='https://rdrr.io/r/stats/smooth.spline.html'>smooth.spline</a></code></p></td>
+      <td><p>numeric (0-1), the smoothing value for the midline. See Details.</p></td>
+    </tr>
+    <tr>
+      <th>red</th>
+      <td><p>numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up fin position and midline estimations. If 'NULL', the full contour in <code>out</code> will be used See Details.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list with the following components:</p>
-<p><code>body</code> a data table consisting of x,y coordinates of the body contour</p>
+<p><code>cont</code> a data table consisting of x,y coordinates of the body contour</p>
 <p><code>fin</code> a data table describing the contour of the fins consisting of the following:</p>
 <ul>
+<li><p>'side': fin side, 'a' or 'b'</p></li>
+<li><p>'n': the position of fin coordinates where min(n) is closest to the head</p></li>
 <li><p>x,y coordinates within the range of <code>fin.pos</code></p></li>
-<li><p>'ang': the angle formed by each coordinate and its adjacent points.</p></li>
-<li><p>'fin': fin side, 'L' or 'R'</p></li>
-<li><p>'y.pred': predicted y values according to <code><a href='https://rdrr.io/r/stats/lm.html'>lm()</a></code> from start to end of fins.</p></li>
 </ul>
 
 <p><code>fin.pts</code> a data table describing fin position consisting of the following:</p>
 <ul>
+<li><p>'side': fin side, 'a' or 'b'</p></li>
+<li><p>'n': The index matching that of the body contour coordinates</p></li>
 <li><p>x,y coordinates of the fin tips, start, and end within the range of <code>fin.pos</code>.</p></li>
-<li><p>'ang': the angle formed by the coordinates and their adjacent points.</p></li>
-<li><p>'pos': description  of the coordinates' positions, 'start', 'end' or 'tip'.</p></li>
+<li><p>'n': The index matching that of the body contour coordinates</p></li>
+<li><p>'pos': description  of the coordinates' positions, 'start', 'end' or 'tip' or 'tip2'.</p></li>
 </ul>
 
 <p><code>comp</code> a data table describing the composite contour of the body minus the fins.</p><ul>
+<li><p>'n': The index matching that of the body contour coordinates</p></li>
 <li><p>x,y coordinates of the body except the range of x values within <code>fin.pos</code>. These values take on a straight line described by the prediction of <code><a href='https://rdrr.io/r/stats/lm.html'>lm()</a></code> based on the start and end of the fin. See Details.</p></li>
 </ul>
 
-<p><code>midline</code> a data table describing the estimated</p><ul>
-<li><p>'x': the mean x position within the bin.</p></li>
-<li><p>'x.bin': the x bin in <code><a href='https://rdrr.io/r/base/cut.html'>cut</a></code> notation.</p></li>
-<li><p>'y.m': the y midpoint at the bind and mean x value.</p></li>
-<li><p>'ml.pred': the y midline value according to the smoothing parameters.</p></li>
-</ul>
-
+<p><code>midline</code> a data table describing the estimated midline, 'x', 'y', the smoothed x and y positions, respectively</p>
+<p><code>bl</code> the body length in pixels</p>
+<p><code>amp</code> a data table describing the estimated fin amplitudes based on each method of finding the fin tip. 'amp1', the amplitude of the fin positions based on the maximum euclidean distance from the fin base and 'amp2', the distance of the fin points (based on distance inflections) from the fin base.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The algorithm assumes a left-right orientation, i.e., the head of the contour is left. If otherwise oriented, contour can be flipped with <code>coo_flipx</code> and <code>coo_flipy</code> after converting contour to class <code>coo</code>.</p>
-<p><code>tip.angle</code> is used to define the tip of the fin, assuming that the tip of the fin is pointed and, for a sufficiently smoothed fin contour, will have contour edges that form the highest angles within the fin region defined by <code>fin.pos</code>. Low values of <code>smooth.n</code> (&lt;5) should be avoided if the contour is jagged, perhaps due to digitization.</p>
-<p>In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by <code>fin.pos</code>. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by <code>fin.pos</code>. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on the method indicated by <code>smoothing</code> and number of points indicated by <code>x.bins</code>.</p>
-<p><code>x.bins</code> controls the bin size of x values used to estimate the midline. From these bins, mean x and the range of y is calculated. The midpoint at each mean x is then calculated from the mid point of y. When less then 1, <code>x.bins</code> values approaching 1 may result in poor a midline as x values on one side of the contour may not have corresponding identical values on the other. Values closer to 0 will result in fewer points but a more robust midline. Higher <code>smooth.n</code> values will also result in a more robust midline estimation (but also a loss of contour information).</p>
+    <p>If <code>red</code> is specified, the contour <code>out</code> is sampled with <code>coo_interpolate</code> from the <code>Momocs</code> package. The number of points sampled (n) equals <code>red</code> times the number of points in <code>out</code></p>
+<p>To establish the contour positions that are within <code>fin.pos</code>, a midline is estimated using one of two methods specified by <code>ml.meth</code>, "ang" for <code><a href='free.ml.ang.html'>free.ml.ang</a></code> or "hull" for  <code><a href='free.ml.ang.html'>free.ml.hull</a></code>. Midline points are indexed by position along the body length by calculating the cumulative distance between midline coordinates in pixels. This midline distance is then used to estimate the position of the fin about the contour using the parameter <code>fin.pos</code>.</p>
+<p>The positions of the tip of the fin appendages is estimated in two ways. The first is simply the point in each appendage that is farthest from the base of the fin. The base is estimated as a straight line between the contour coordinates that match <code>fin.pos</code>.  The second is a little more complicated and starts with calculation the distance between each fin contours coordinates and the midpoint of the fin base. <code>features</code> from the <code>features</code> package is then use to calculate an inflection in this distance and the point of this inflection is used to estimate the fin position. Amplitudes of each method are calculated based on the orthogonal euclidean distance from the fin bases.</p>
+<p>In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by <code>fin.pos</code>. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by <code>fin.pos</code>, that is, the fin bases. The result is a straight line between the start and end of each fin.</p>
+<p>From this composite body contour, a midline prediction is made based on the mean position of contour coordinates from each side of the contour sharing a the same position along body using the <code>free.ml</code> functions.</p>
+<p>#' For midline smoothing, <code>smooth_spline</code> from the <code>smoothr</code> package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times the value of <code>ml.smooth</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='kin.simple.html'>kin.simple</a></code>, <code><a href='kin.LDA.html'>kin.LDA</a></code>, <code><a href='kin.search.html'>kin.search</a></code>, <code>efourier</code>, <code>coo_angle_edges</code>, <code>coo_smooth</code>, <code><a href='https://rdrr.io/r/stats/loess.html'>loess</a></code>, <code><a href='https://rdrr.io/r/stats/smooth.spline.html'>smooth.spline</a></code></p></div>
+    <div class='dont-index'><p><code><a href='kin.search.html'>kin.simple</a></code>, <code><a href='kin.search.html'>kin.search</a></code>, <code><a href='kin.search.html'>kin.free</a></code>, <code>coo_sample</code>, <code>coo_smooth</code>, <code>smooth_spline</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>###plot pectoral-fin amplitudes of a swimming sunfish</span>
@@ -219,36 +224,55 @@
 <span class='va'>f</span> <span class='op'>&lt;-</span> <span class='st'>"https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='st'>"sunfish.avi"</span><span class='op'>)</span>
 
+<span class='co'>#create directories</span>
+ <span class='va'>ti</span> <span class='op'>&lt;-</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='st'>"/images"</span><span class='op'>)</span>
+ <span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span><span class='va'>ti</span><span class='op'>)</span>
+
 <span class='co'>#extract images with ffmpeg operations and reduce them to 600 px wide with a filter</span>
 <span class='va'>filt.red</span> <span class='op'>&lt;-</span> <span class='st'>" -vf scale=600:-1 "</span> <span class='co'>#filter</span>
-<span class='fu'><a href='vid.to.images2.html'>vid.to.images2</a></span><span class='op'>(</span>vid.path<span class='op'>=</span><span class='st'>"sunfish.avi"</span>,filt <span class='op'>=</span> <span class='va'>filt.red</span><span class='op'>)</span> <span class='co'>#extract</span>
+<span class='fu'><a href='vid.to.images2.html'>vid.to.images2</a></span><span class='op'>(</span>vid.path<span class='op'>=</span><span class='st'>"sunfish.avi"</span>,filt <span class='op'>=</span> <span class='va'>filt.red</span>,out.dir<span class='op'>=</span><span class='va'>ti</span><span class='op'>)</span> <span class='co'>#extract</span>
 
 <span class='co'>#number of frames</span>
-<span class='va'>fr</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='st'>"images"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>fr</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>ti</span>,full.names<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'><a href='thr.check.html'>thr.check</a></span><span class='op'>(</span><span class='va'>fr</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>)</span>
+
 <span class='co'>#extract contours and other data</span>
-<span class='va'>kin</span> <span class='op'>&lt;-</span> <span class='fu'><a href='kin.simple.html'>kin.simple</a></span><span class='op'>(</span>image.dir <span class='op'>=</span> <span class='st'>"images"</span>,frames<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>fr</span><span class='op'>)</span>,thr<span class='op'>=</span><span class='fl'>0.9</span>,ant.per <span class='op'>=</span> <span class='fl'>0.25</span><span class='op'>)</span>
-<span class='co'>#fin amplitudes by frame with data.table</span>
-<span class='va'>fin.pos</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>,<span class='fl'>.5</span><span class='op'>)</span>
-<span class='va'>fin.dat</span> <span class='op'>&lt;-</span> <span class='va'>kin</span><span class='op'>$</span><span class='va'>cont</span><span class='op'>[</span>, <span class='op'>{</span> <span class='va'>f</span> <span class='op'>&lt;-</span> <span class='fu'>fin.kin</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>x</span>,y<span class='op'>=</span><span class='va'>y</span><span class='op'>)</span>,fin.pos <span class='op'>=</span><span class='va'>fin.pos</span><span class='op'>)</span>;
-<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>amp<span class='op'>=</span><span class='va'>f</span><span class='op'>$</span><span class='va'>amp</span><span class='op'>$</span><span class='va'>amp</span>,fin<span class='op'>=</span><span class='va'>f</span><span class='op'>$</span><span class='va'>amp</span><span class='op'>$</span><span class='va'>fin</span>,amp.bl<span class='op'>=</span><span class='va'>f</span><span class='op'>$</span><span class='va'>amp</span><span class='op'>$</span><span class='va'>amp.bl</span><span class='op'>)</span><span class='op'>}</span>,by<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>frame</span><span class='op'>)</span><span class='op'>]</span>
-<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>dat<span class='op'>=</span><span class='va'>fin.dat</span>,<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>frame</span>,y<span class='op'>=</span><span class='va'>amp</span>,col<span class='op'>=</span><span class='va'>fin</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_classic</a></span><span class='op'>(</span><span class='fl'>15</span><span class='op'>)</span>
+<span class='va'>kin</span> <span class='op'>&lt;-</span> <span class='fu'><a href='kin.search.html'>kin.search</a></span><span class='op'>(</span>image.dir <span class='op'>=</span> <span class='va'>ti</span>,thr<span class='op'>=</span><span class='fl'>0.9</span>,ant.per <span class='op'>=</span> <span class='fl'>0.25</span>,save<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>
+
+<span class='co'>#fin data by frame</span>
+<span class='va'>fin.pos</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>,<span class='fl'>.55</span><span class='op'>)</span>
+<span class='va'>fin.dat</span> <span class='op'>&lt;-</span> <span class='fu'>fin.kin</span><span class='op'>(</span>kin<span class='op'>=</span><span class='va'>kin</span>,fin.pos <span class='op'>=</span> <span class='va'>fin.pos</span>,smooth.n<span class='op'>=</span><span class='fl'>1</span>,ml.smooth<span class='op'>=</span><span class='fl'>0.3</span><span class='op'>)</span>
+
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/ggplot.html'>ggplot</a></span><span class='op'>(</span>dat<span class='op'>=</span><span class='va'>fin.dat</span><span class='op'>$</span><span class='va'>amp</span>,<span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/aes.html'>aes</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>frame</span>,y<span class='op'>=</span><span class='va'>amp2</span>,col<span class='op'>=</span><span class='va'>side</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/geom_path.html'>geom_line</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/ggtheme.html'>theme_classic</a></span><span class='op'>(</span><span class='fl'>15</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>p</span><span class='op'>)</span>
 
 
-<span class='co'>## plot body and fin contours of frame 1</span>
-<span class='va'>cont</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>kin</span><span class='op'>$</span><span class='va'>cont</span><span class='op'>[</span><span class='va'>frame</span><span class='op'>==</span><span class='fl'>2</span>,<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span><span class='op'>)</span><span class='op'>]</span><span class='op'>$</span><span class='va'>x</span>,y<span class='op'>=</span><span class='va'>kin</span><span class='op'>$</span><span class='va'>cont</span><span class='op'>[</span><span class='va'>frame</span><span class='op'>==</span><span class='fl'>2</span>,<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>]</span><span class='op'>$</span><span class='va'>y</span><span class='op'>)</span>
-<span class='va'>fins</span> <span class='op'>&lt;-</span> <span class='fu'>fin.kin</span><span class='op'>(</span><span class='va'>cont</span>,fin.pos <span class='op'>=</span><span class='va'>fin.pos</span>,x.bins<span class='op'>=</span><span class='fl'>100</span><span class='op'>)</span>
+<span class='co'>## plot body and fin contours of a frame</span>
 
 <span class='co'>#plot body contour and fins</span>
-<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/qplot.html'>qplot</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fins</span><span class='op'>$</span><span class='va'>body</span>,x<span class='op'>=</span><span class='va'>x</span>,y<span class='op'>=</span><span class='va'>y</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fins</span><span class='op'>$</span><span class='va'>fin</span>,<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span><span class='op'>)</span>,col<span class='op'>=</span><span class='st'>"red"</span>,size<span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span>
-<span class='va'>p</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fins</span><span class='op'>$</span><span class='va'>fin.pts</span>,<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span>,shape<span class='op'>=</span><span class='va'>pos</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/lims.html'>xlim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/lims.html'>ylim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>fr</span> <span class='op'>&lt;-</span> <span class='fl'>8</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/qplot.html'>qplot</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fin.dat</span><span class='op'>$</span><span class='va'>cont</span><span class='op'>[</span><span class='va'>frame</span><span class='op'>==</span><span class='va'>fr</span><span class='op'>]</span>,x<span class='op'>=</span><span class='va'>x</span>,y<span class='op'>=</span><span class='va'>y</span><span class='op'>)</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='va'>p</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/geom_point.html'>geom_point</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fin.dat</span><span class='op'>$</span><span class='va'>fin</span><span class='op'>[</span><span class='va'>frame</span><span class='op'>==</span><span class='va'>fr</span><span class='op'>]</span>,<span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span><span class='op'>)</span>,col<span class='op'>=</span><span class='st'>"red"</span>,size<span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='va'>p</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/geom_point.html'>geom_point</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fin.dat</span><span class='op'>$</span><span class='va'>fin.pts</span><span class='op'>[</span><span class='va'>frame</span><span class='op'>==</span><span class='va'>fr</span><span class='op'>]</span>,<span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span>,shape<span class='op'>=</span><span class='va'>pos</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>p</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/lims.html'>xlim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/lims.html'>ylim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+
 
 <span class='co'>#plot body contour minus fins and the body midline</span>
-<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/qplot.html'>qplot</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fins</span><span class='op'>$</span><span class='va'>comp</span>,x<span class='op'>=</span><span class='va'>x</span>,y<span class='op'>=</span><span class='va'>y</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fins</span><span class='op'>$</span><span class='va'>midline</span>,<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>ml.pred</span><span class='op'>)</span>,col<span class='op'>=</span><span class='st'>"red"</span>,size<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>p</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/lims.html'>xlim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/lims.html'>ylim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/qplot.html'>qplot</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fin.dat</span><span class='op'>$</span><span class='va'>comp</span><span class='op'>[</span><span class='va'>frame</span><span class='op'>==</span><span class='va'>fr</span><span class='op'>]</span>,x<span class='op'>=</span><span class='va'>x</span>,y<span class='op'>=</span><span class='va'>y</span><span class='op'>)</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='va'>p</span><span class='op'>+</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/geom_point.html'>geom_point</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>fin.dat</span><span class='op'>$</span><span class='va'>midline</span><span class='op'>[</span><span class='va'>frame</span><span class='op'>==</span><span class='va'>fr</span><span class='op'>]</span>,<span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span><span class='op'>)</span>,col<span class='op'>=</span><span class='st'>"red"</span>,size<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>p</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/lims.html'>xlim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/lims.html'>ylim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='va'>kin</span><span class='op'>$</span><span class='va'>dim</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
 
+<span class='co'># now the whole sequence with gg.overlay()</span>
+ <span class='fu'><a href='gg.overlay.html'>gg.overlay</a></span><span class='op'>(</span>dat<span class='op'>=</span><span class='va'>fin.dat</span>,
+ under<span class='op'>=</span><span class='st'>"cont"</span>,
+ over<span class='op'>=</span><span class='st'>"fin.pts"</span>,
+ size<span class='op'>=</span><span class='fl'>5</span>,
+ animate<span class='op'>=</span><span class='cn'>TRUE</span>,
+ fps<span class='op'>=</span><span class='fl'>5</span>,
+ alph<span class='op'>=</span><span class='fl'>0.05</span><span class='op'>)</span>
+ 
+<span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span><span class='op'>(</span><span class='va'>ti</span>,recursive<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='op'>}</span>
-
 
 
 </div></pre>
