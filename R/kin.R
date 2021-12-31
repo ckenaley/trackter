@@ -279,8 +279,7 @@ kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.0
              ") does not exist")
       
     }
-    
-    proc.dir <- out.dir
+
     
     images <- list.files(image.dir, full.names = TRUE)
     
@@ -414,7 +413,7 @@ kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.0
       
       if (save) {
         jpeg(
-          paste0(proc.dir, "/", trial, "_", sprintf("%03d", frame), ".jpg"),
+          paste0(out.dir, "/", trial, "_", sprintf("%03d", frame), ".jpg"),
           quality = out.qual * 100,
           width = roi$dim[1],
           height = roi$dim[2]

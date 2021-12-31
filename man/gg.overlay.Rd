@@ -48,7 +48,7 @@ gg.overlay(
 \item{...}{other arguments to be passed to midline and head point geometries, e.g. 'size', 'color'.}
 }
 \value{
-A \code{ggplot} plotted to the graphics device, a \code{gganimate} object plotted to graphics device, or a GIF file saved to a local directory specified in \code{out.dir}.
+A \code{ggplot} printed to the graphics device, a \code{gganimate} object plotted to graphics device, or a GIF file saved to a local directory specified in \code{out.dir}.
 }
 \description{
 Plots data output from one of \code{trackter}'s \code{kin} functions using \code{ggplot2}. Useful for quickly visualizing results from \code{kin} functions. Data and geometries include body-contour polygons with midline points, head or fin points, both midline and head points, or none or all of these. Optionally builds and saves an animation of data with reference to frame from \code{kin} data.

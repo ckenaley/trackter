@@ -1,8 +1,10 @@
 ---
-title: "tutorial"
+title: "Short Tutorial"
 output: rmarkdown::html_vignette
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
 vignette: >
-  %\VignetteIndexEntry{tutorial}
+  %\VignetteIndexEntry{Short Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,26 +17,26 @@ vignette: >
 The release version of *trackter* can be installed with:
 
 
-```r
+```{r,eval=FALSE}
 install.packages("trackter")
 ```
 
 The current development version can be installed with:
 
 
-```r
+```{r,eval=FALSE}
     require(devtools)
     install_github("ckenaley/trackter")
     require(trackter)
 ```
-    
+
 
 ## External dependencies
 
-The core functions of *trackter* that extract shape and contour data from images (the `kin` functions: `kin.simple`, `kin.search`, and `kin.free`) depend upon *EBImage*, available on the Bioconductor repository. The current build and development versions of *trackter* install this dependency. If it does not install, it can be done so easily with just a few lines of code: 
+The core functions of *trackter* that extract shape and contour data from images (the `kin` functions: `kin.simple`, `kin.search`, and `kin.free`) depend upon *EBImage*, available on the Bioconductor repository. The current build and development versions of *trackter* install this dependency. If it does not install, it can be done so easily with just a few lines of code:
 
 
-```r
+```{r,eval=FALSE}
   if (!requireNamespace("BiocManager", quietly = TRUE))
    install.packages("BiocManager")
    BiocManager::install("EBImage")
@@ -70,7 +72,7 @@ __Other miscellaneous, low-level tools for kinematic analysis__
 ## Examples
 
 
-```r
+```{r}
 library(trackter)
 library(ggplot2)
 library(data.table)
@@ -79,93 +81,70 @@ library(data.table)
 
 ### Analyzing a single image
 
-*trackter* was developed to analyze image data from videos of swimming fishes, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish included with the package in a directory named "img" and displaying it.
+*trackter* was developed to analyze image data from videos of swimming organisms, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish included with the package in a directory named "img" and displaying it.
 
 
-```r
-
+```{r}
 i <- system.file("extdata/img","sunfish_BCF.jpg",package="trackter")
 y <- EBImage::readImage(i)
-
 
 EBImage::display(y,method="raster")
 ```
 
-<img src="sunfishimage-1.png" title="plot of chunk sunfish image" alt="plot of chunk sunfishimage" width="50%" />
 
 Here, `kin.simple` is used to extract contour and shape information from the image above by referring to the directory that contains it. An image with a midline overlay is saved to the working directory (see below).
 
 
-```r
+```{r}
 
 dir <- system.file("extdata","img",package="trackter")
 
 im <- list.files(system.file("extdata/img", package = "trackter"),full.names = TRUE)
-im<- im[grepl("sun",im)]
+im<- im[grepl("sunfish.jpg",im)]
 im.dir <-paste0(getwd(),"/images")
 dir.create(im.dir)
 
 file.copy(im,paste0(im.dir,"/",basename(im)))
 
-kin.y <- kin.simple(image.dir = im.dir,out.dir = getwd())
+kin.y <- kin.simple(image.dir = im.dir,save=TRUE,out.dir = getwd())
 
-#clean up
-unlink(im.dir,recursive=TRUE)
 
 ```
 
 The `kin` functions in *trackter* return a list of data tables/data frames:
 
-```r
+```{r}
 print(sapply(kin.y,class))
-#> $kin.dat
-#> [1] "data.table" "data.frame"
-#> 
-#> $midline
-#> [1] "data.table" "data.frame"
-#> 
-#> $cont
-#> [1] "data.table" "data.frame"
-#> 
-#> $all.classes
-#> [1] "data.table" "data.frame"
-#> 
-#> $dim
-#> [1] "integer"
 ```
 
-Most will be interested in the "kin.dat" and "midline" data for the calculation of body shape and position parameters (e.g., amplitude, wavelength, etc.). For example, the "kin.dat" table includes, among other things, frame-specific trailing-edge (rightmost) amplitude ("x", "y"), head (leftmost) position ("head.x", "head.y") which may be used to calculate position and trailing-edge amplitude.
+Most will be interested in the "kin.dat" and "midline" data for the calculation of body position parameters (e.g., amplitude, wavelength, etc.). For example, the "kin.dat" table includes, among other things, frame-specific trailing-edge (rightmost) amplitude ("x", "y"), head (leftmost) position ("head.x", "head.y") which may be used to calculate position and trailing-edge amplitude.
 
 
-```r
+```{r}
 print(kin.y$kin.dat)
 ```
 
-The "midline" table is composed of frame-specific midline data, including, among other things, calculated midline position ("y.m"), smoothed midline position ("y.pred") and midline position relative to the head ("wave.y"). Here we see the difference between them.
+The "midline" table is composed of frame-specific midline data, including, among other things, calculated midline position ("y"), smoothed midline position ("y.sm") and midline position relative to the head ("wave.y"). Here we see the difference between them.
 
 
-```r
-
-print(kin.y$midline)
-ml <- melt(kin.y$midline[,.(x,y.m,y.pred,wave.y)],"x")
+```{r}
+print(head(kin.y$midline))
+ml <- melt(kin.y$midline[,.(x,y,y.sm,wave.y)],"x")
 qplot(data=ml,x=x,y=value)+facet_wrap(variable~.)
 ```
 
-<img src="midline-1.png" title="plot of chunk midline" alt="plot of chunk midline" width="50%" />
 
-When "save=TRUE" (the default), the `kin` functions write images to a user-defined directory that include midline overlays.
+When "save=TRUE", the `kin` functions write images to a user-defined directory that include midline overlays.
 
 
-```r
-
-y2 <- EBImage::readImage("sunfish_BCF_000.jpg")
+```{r}
+y2 <- EBImage::readImage("sunfish_000.jpg")
 EBImage::display(y2,method="raster")
+#clean up
+unlink(im.dir,recursive=TRUE)
 ```
 
-<img src="sunfishoverlay-1.png" title="plot of chunk sunfishoverlay" alt="plot of chunk sunfishoverlay" width="50%" />
-
-```r
-
+```{r,include=FALSE}
 #clean up
 unlink("sunfish_BCF_000.jpg")
 ```
@@ -173,10 +152,10 @@ unlink("sunfish_BCF_000.jpg")
 
 ### Analyzing a video and multiple images
 
-Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video in the package's "vid" directory of a swimming fish to a new directory named "img2". 
+Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The `kin` functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the `FFmpeg` wrappers `vid.to.images` or `vid.to.images2` to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, `vid.to.images` extracts images from a video in the package's "vid" directory of a swimming fish to a new directory named "img2".
 
 
-```r
+```{r}
 
 #construct video file path
 v <- system.file("extdata/vid","sunfish_BCF_red.avi",package="trackter")
@@ -185,46 +164,43 @@ v <- system.file("extdata/vid","sunfish_BCF_red.avi",package="trackter")
 dir.create(paste0(getwd(),"/img2"))
 
 #extract images from video and output to new "img2" directory
-vid.to.images(v,out.dir=paste0(getwd(),"/img2"))  
+vid.to.images(v,out.dir=paste0(getwd(),"/img2"))
 ```
 
-The images are then passed through `kin.simple`. The threshold value for segmenting is set to 0.6 and the head section ("ant.per") set to 0.2 in this case.
+The images are then passed through `kin.simple`. The threshold value for segmenting is set automatically.  The head section ("ant.per") set to 0.2 in this case.
 
 
-```r
-  kin.y2 <- kin.simple(image.dir =paste0(getwd(),"/img2"),thr=0.6,ant.per = 0.2,save = FALSE)
+```{r}
+  kin.y2 <- kin.simple(image.dir=paste0(getwd(),"/img2"),ant.per = 0.2,save = FALSE)
 
 #clean up
 unlink(paste0(getwd(),"/img2"),recursive = TRUE)
 ```
 
 
-Now we can have a look at trailing-edge position and amplitude (relative to the head path) across the frames. 
+Now we can have a look at trailing-edge position and amplitude (relative to the head path) across the frames.
 
 
-```r
-qplot(data=kin.y2$kin.dat,x=frame,y=y) #position
+```{r}
+#position
+qplot(data=kin.y2$kin.dat,x=frame,y=y)
 ```
 
-<img src="posamp-1.png" title="plot of chunk posamp" alt="plot of chunk posamp" width="50%" />
 
-```r
-qplot(data=kin.y2$kin.dat,x=frame,y=amp) #amplitude relative to a theoretical midline established by head
+```{r}
+#amplitude relative to a theoretical midline established by head
+qplot(data=kin.y2$kin.dat,x=frame,y=amp) 
 ```
-
-<img src="posamp-2.png" title="plot of chunk posamp" alt="plot of chunk posamp" width="50%" />
 
 The midline data can be accessed to assess the waveform. Here, midline x position is standardized.
 
 
-```r
+```{r}
 kin.y2$midline[,x2:=x-x[1],by=frame]
 
-#wave form plot
+#waveform plot
 qplot(data=kin.y2$midline,x=x2,y=wave.y,col=frame)
 ```
-
-<img src="midline2-1.png" title="plot of chunk midline2" alt="plot of chunk midline2" width="50%" />
 
 
 ### Downstream analyses of kinematic data
@@ -232,30 +208,22 @@ qplot(data=kin.y2$midline,x=x2,y=wave.y,col=frame)
 *trackter* supplies several functions for downstream analysis of kinematic data extracted from image frames. For instance, `half.wave` computes the midline half wavelength (i.e., propulsive wavelength in pixels) from a data table of x and y position data. These and other functions are intended for use with output from the `kin` functions.
 
 
-```r
+```{r}
 w <- halfwave(x=kin.y$midline$x,y=kin.y$midline$wave.y,method="zeros")
 print(w)
-#> $method
-#> [1] "zeros"
-#> 
-#> $names
-#> 
-#> $dat
 ```
 Using a "zeros" method, `half.wave` determines two half waves from the ROI in the single image above, described in the "dat" table from the output. The "names" table can be used to visualize the half wavelengths.
 
 
 
-```r
+```{r}
 qplot(data=w$names,x=x,y=y,col=wave)
 ```
-
-<img src="wavenumber-1.png" title="plot of chunk wavenumber" alt="plot of chunk wavenumber" width="50%" />
 
 We could extend this framework using `data.table` to calculate half waves in each of the 11 frames from the example video.
 
 
-```r
+```{r}
  wave.dat <- kin.y2$midline[, { w <- halfwave(x,wave.y,method="zeros")$dat;
  list(l=as.numeric(w$l),
  	amp=as.numeric(w$amp1),
@@ -266,6 +234,3 @@ We could extend this framework using `data.table` to calculate half waves in eac
 
 qplot(data=wave.dat,x=pos,y=l)
 ```
-
-<img src="wavelengthplot-1.png" title="plot of chunk wavelengthplot" alt="plot of chunk wavelengthplot" width="50%" />
-

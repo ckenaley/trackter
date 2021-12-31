@@ -50,25 +50,30 @@ __Automated kinematic analysis__
 
 * Fast and accurate contour and shape analysis of ROIs.
 * ROI detection with search parameters including position and size.
-* Relevant functions: `kin.search` and `kin.simple`.
+* Relevant functions: `kin.search()`, `kin.simple()`, `kin.free().
+
+__2D Manual digitization of image and video data__
+
+* Interactive digitization of shape and position data. 
+* Relevant function: `pick.pts()`.
 
 __Tools for kinematic analysis of swimming animals__
 
 * Calculate midline (propulsive) wavelength, trailing-edge frequency, paired-fin position.
-* Relevant functions: `amp.freq`, `halfwave`, `wave`, and `fin.kin`
+* Relevant functions: `amp.freq()`, `halfwave()`, `wave()`, and `fin.kin()`
 
-__Tools for image and video processing using FFmpeg__
+__Tools for image and video processing__
 
-* Access `FFmpeg` functionality, including filters and codecs, to extract frames, stitch videos, and edit images and videos.
+* Crop images and access `FFmpeg` functionality, including filters and codecs, to extract frames, stitch videos, and edit images and videos. 
 
-* Relevant functions: `images.to.videos`, `images.to.videos2`, `vid.to.images`, and `vid.to.images2`
+* Relevant functions: `crop.img()`, `images.to.videos()`, `images.to.videos2()`, `vid.to.images()`, and `vid.to.images2()`
 
 __Other miscellaneous, low-level tools for kinematic analysis__
 
-* Compute distances in 2d space, angles, heading/bearing, convert radians to degrees and vice versa.
-* Relevant functions: `dist.2d`, `cosine.ang`, `bearing.xy`, `deg`, `rad`
+* Compute distances waveform cycles, in 2d space, angles, heading/bearing, convert radians to degrees and vice versa.
+* Relevant functions: `cyclize()`, `dist.2d()`, `dist.2d.line()`, point.ang.orig()`,`cosine.ang()`, `bearing.xy()`, `deg()`, `rad()`
 
-
+ 
 ## Examples
 
 ```{r setup}
@@ -125,7 +130,7 @@ Most will be interested in the "kin.dat" and "midline" data for the calculation 
 print(kin.y$kin.dat)
 ```
 
-The "midline" table is composed of frame-specific midline data, including, among other things, calculated midline position ("y.m"), smoothed midline position ("y.pred") and midline position relative to the head ("wave.y"). Here we see the difference between them.
+The "midline" table is composed of frame-specific midline data, including, among other things, calculated midline position, smoothed midline position ("y.sm,") and midline position relative to the head ("wave.y"). Here we see the difference between them.
 
 ```{r midline, fig.pos="center",fig.width=5}
 

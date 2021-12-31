@@ -41,17 +41,17 @@ A list with the following components:
  
 \code{dat} a data table describing each wave detected.
 \itemize{
-\item 'zeros': x value where y crosses zero. Returns NA if \code{method} is 'p2p' or 't2t', value is NA.
-\item 'wave.begin': x value where each wave begins.
-\item 'wave.end': x value where each wave ends.
-\item 'begin.index': x index of where each wave begins.
-\item 'end.index': x index of where each  wave ends.
-\item 'wave': numeric name of each wave.
-\item 'l': the length of each  wave.
-\item 'amp1': the peak amplitude of each wave. If method is set to 'p2p' or 't2t' this is the begin amplitude. If "method='zeros'" this is the peak amplitude between internodes. 
-\item 'amp2': If method is set to 'p2p' or 't2t' this is the end amplitude. If "method='zeros'" this is the minimum amplitude between internodes. 
-\item 'pos1': If method is set to 'p2p' or 't2t' the x position of begin amplitude for each half wave and identical to 'begin'. If "method='zeros'", the position of peak amplitude between the internodes. 
-\item 'pos2': If method is set to 'p2p' or 't2t' the x position of end amplitude for each half wave and identical to 'end'. If "method='zeros'", the position of minimum amplitude between the internodes.
+\item \code{zeros}: x value where y crosses zero. Returns NA if \code{method} is 'p2p' or 't2t', value is NA.
+\item \code{wave.begin}: x value where each wave begins.
+\item \code{wave.end}: x value where each wave ends.
+\item \code{begin.index}: x index of where each wave begins.
+\item \code{end.index}: x index of where each  wave ends.
+\item \code{wave}: numeric name of each wave.
+\item \code{l}: the length of each  wave.
+\item \code{amp1}: the peak amplitude of each wave. If method is set to 'p2p' or 't2t' this is the begin amplitude. If "method='zeros'" this is the peak amplitude between internodes. 
+\item \code{amp2}: If method is set to 'p2p' or 't2t' this is the end amplitude. If "method='zeros'" this is the minimum amplitude between internodes. 
+\item \code{pos1}: If method is set to 'p2p' or 't2t' the x position of begin amplitude for each half wave and identical to 'begin'. If "method='zeros'", the position of peak amplitude between the internodes. 
+\item \code{pos2}: If method is set to 'p2p' or 't2t' the x position of end amplitude for each half wave and identical to 'end'. If "method='zeros'", the position of minimum amplitude between the internodes.
 }
 
 If  'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by \code{smoothing},\code{smooth}, and \code{dens}.

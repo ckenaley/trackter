@@ -12,7 +12,9 @@ output:
     -set knit to `fig.path=""`
     - manually move figures from trackter root to vignette with code below
     - add r code for users with `knitr::purl("vignettes/tutorial.Rmd.orig", output = "vignettes/tutorial.R")`
-
+    - see (this)[https://github.com/r-lib/pkgdown/issues/1157] for SSL error workaround
+    -`httr::set_config(httr::config(ssl_verifypeer = 0L)); 
+pkgdown::build_site(pkg = ".", new_process = FALSE)`
 ```{r, compile vignette, eval=FALSE}
 
 knitr::knit("vignettes/tutorial.Rmd.orig", output = "vignettes/tutorial.Rmd")

@@ -1,4 +1,4 @@
-#' @title Computes new position of a point rotating about an orgin.
+#' @title Computes new position of a point rotating about an origin
 #' @description Computes the coordinate position of a point after rotation about an origin.
 #' @param p numeric vector of length 2, the x and y coordinates of the point that will rotate
 #' @param o numeric vector of length 2, the x and y coordinates of the origin
@@ -22,7 +22,7 @@ point.ang.orig<- function(p,o,theta){
   return(c(xrot,yrot))
 }
 
-#' @title Computes orthogonal distance between a point and a line.
+#' @title Computes orthogonal distance between a point and a line
 #' @description Computes 2D orthogonal distance between a point and a line given the points coordinates and the line's slope and intercept or model formula
 #' @param x numeric, the x coordinate of the point
 #' @param y numeric, the y coordinate of the point
@@ -66,7 +66,7 @@ dist.2d.line <- function(x=NULL, y=NULL, slope=NULL, intercept=NULL,form=NULL) {
 }
 
 
-#' @title Computes distance between two points in Cartesian space.
+#' @title Computes distance between two points in Cartesian space
 #'
 #' @description Computes distance between two points in Cartesian space using simple trigonometry functions
 #'

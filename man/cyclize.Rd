@@ -19,8 +19,8 @@ cyclize(x, y, start = "peak", ...)
 A a data table including the following: 
 
 \itemize{
-\item 'cyc': The cycle number.
-\item 'pos': the position/index values of the x data (not the x values themselves).
+\item \code{cyc}: The cycle number.
+\item \code{pos}: the position/index values of the x data (not the x values themselves).
 }
 }
 \description{

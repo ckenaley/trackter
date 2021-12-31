@@ -95,7 +95,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/tutorial.html">tutorial</a>
+      <a href="../articles/image_processing.html">Video and Image Processing</a>
+    </li>
+    <li>
+      <a href="../articles/kin_functions.html">Image Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/kinematic_analysis.html">Kinematic Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/tutorial.html">Short Tutorial</a>
+    </li>
+    <li>
+      <a href="../articles/visualization.html">Vizualization</a>
     </li>
   </ul>
 </li>
@@ -181,17 +193,17 @@
 <p><code>method</code> the method chosen to find full waves</p>
 <p><code>names</code> a data table with columns 'x', 'y', and 'wave' describing the x and y positions of the wave and a numeric name of each wave detected, respectively. If  'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by <code>smoothing</code>, <code>smooth</code>, and <code>dens</code>.</p> 
 <p><code>dat</code> a data table describing each wave detected.</p><ul>
-<li><p>'zeros': x value where y crosses zero. Returns NA if <code>method</code> is 'p2p' or 't2t', value is NA.</p></li>
-<li><p>'wave.begin': x value where each wave begins.</p></li>
-<li><p>'wave.end': x value where each wave ends.</p></li>
-<li><p>'begin.index': x index of where each wave begins.</p></li>
-<li><p>'end.index': x index of where each  wave ends.</p></li>
-<li><p>'wave': numeric name of each wave.</p></li>
-<li><p>'l': the length of each  wave.</p></li>
-<li><p>'amp1': the peak amplitude of each wave. If method is set to 'p2p' or 't2t' this is the begin amplitude. If "method='zeros'" this is the peak amplitude between internodes.</p></li>
-<li><p>'amp2': If method is set to 'p2p' or 't2t' this is the end amplitude. If "method='zeros'" this is the minimum amplitude between internodes.</p></li>
-<li><p>'pos1': If method is set to 'p2p' or 't2t' the x position of begin amplitude for each half wave and identical to 'begin'. If "method='zeros'", the position of peak amplitude between the internodes.</p></li>
-<li><p>'pos2': If method is set to 'p2p' or 't2t' the x position of end amplitude for each half wave and identical to 'end'. If "method='zeros'", the position of minimum amplitude between the internodes.</p></li>
+<li><p><code>zeros</code>: x value where y crosses zero. Returns NA if <code>method</code> is 'p2p' or 't2t', value is NA.</p></li>
+<li><p><code>wave.begin</code>: x value where each wave begins.</p></li>
+<li><p><code>wave.end</code>: x value where each wave ends.</p></li>
+<li><p><code>begin.index</code>: x index of where each wave begins.</p></li>
+<li><p><code>end.index</code>: x index of where each  wave ends.</p></li>
+<li><p><code>wave</code>: numeric name of each wave.</p></li>
+<li><p><code>l</code>: the length of each  wave.</p></li>
+<li><p><code>amp1</code>: the peak amplitude of each wave. If method is set to 'p2p' or 't2t' this is the begin amplitude. If "method='zeros'" this is the peak amplitude between internodes.</p></li>
+<li><p><code>amp2</code>: If method is set to 'p2p' or 't2t' this is the end amplitude. If "method='zeros'" this is the minimum amplitude between internodes.</p></li>
+<li><p><code>pos1</code>: If method is set to 'p2p' or 't2t' the x position of begin amplitude for each half wave and identical to 'begin'. If "method='zeros'", the position of peak amplitude between the internodes.</p></li>
+<li><p><code>pos2</code>: If method is set to 'p2p' or 't2t' the x position of end amplitude for each half wave and identical to 'end'. If "method='zeros'", the position of minimum amplitude between the internodes.</p></li>
 </ul>
 
 <p>If  'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by <code>smoothing</code>,<code>smooth</code>, and <code>dens</code>.</p>

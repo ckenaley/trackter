@@ -28,7 +28,7 @@ A list of one or two data tables, always \code{pts} with the picked points and, 
 }
 }
 \description{
-Uses the active graphics device for interactive digitization of shape data.
+Uses the active graphics device for interactive digitization of shape and position data.
 }
 \details{
 Users interact with each frame using the \code{\link{locator}} function. Although the maximum number of points for each frame is determined by \code{n}, the user may advance to the next frame by double-clicking on the last point. If \code{review=TRUE}, the user is asked to review the points and, if satisfied, a "return"/"enter" key stroke will advance the graphics device to the next frame. After double clicking in the last frame and a "return"/"enter" key stroke if \code{review=TRUE}, the results are returned. If \code{smooth=NULL}, only the clicked points are returned. If \code{smooth="spline"} or \code{smooth="loess"}, interpolated smoothed points are returned.

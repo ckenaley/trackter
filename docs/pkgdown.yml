@@ -1,7 +1,11 @@
-pandoc: 2.7.3
+pandoc: 2.14.0.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
+  image_processing: image_processing.html
+  kin_functions: kin_functions.html
+  kinematic_analysis: kinematic_analysis.html
   tutorial: tutorial.html
-last_built: 2021-11-03T19:24Z
+  visualization: visualization.html
+last_built: 2021-12-09T17:58Z
 

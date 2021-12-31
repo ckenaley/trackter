@@ -114,14 +114,14 @@ thr.check <-
 
 #' @title Crop an image
 
-#' @description Crops an image with a rectangle and saves it
+#' @description Crops an image or images with a rectangle
 #'
-#' @param img character, a path to an image file.
+#' @param img character, a path to an image file or directory containing images.
 #' @param ul numeric, the upper-left xy position of the rectangle in pixels.
 #' @param br numeric, the bottom-right xy position in pixel.
 #' @param out.dir character, the directory to which the image will be saved.
-#' @param type character, image type (optional). Must be: "jpeg", "png", or "tiff (case ignored)." If missing, file format is automatically determined by file name extension.
-#' @param locate logical, if TRUE, the original image is printed to the graphics device and the user picks \code{ul} and \code{br} (in that order) with the cursor and two clicks of the mouse. If TRUE, the coordinates of the points picked by the user are returned.
+#' @param type character, image type (optional). Must be: "jpeg", "png", or "tiff (case ignored)." If missing, file format is automatically determined by file name extension(s).
+#' @param locate logical, if TRUE and the 'img' is a single file path, the original image is printed to the graphics device and the user picks \code{ul} and \code{br} (in that order) with the cursor and two clicks of the mouse. If TRUE, the coordinates of the points picked by the user are returned. Ignored is 'img' is a directory containing images.
 #' 
 #' @export
 #'
@@ -136,11 +136,10 @@ thr.check <-
 #' #display original
 #' EBImage::display(EBImage::readImage(y),method="raster")
 #' 
-#' 
 #' # crop and save as orignal format
 #' crop.img(img=y,ul=c(5,30),br=c(100,200),out.dir=od)
 #' 
-#' # crop and save as pnng
+#' # crop and save as png
 #' crop.img(img=y,ul=c(5,30),br=c(200,200),out.dir=od,type="png")
 #' 
 #'#display cropped images
@@ -163,8 +162,9 @@ crop.img <-
            out.dir = NULL,
            type = NULL,
            locate = FALSE) {
-    if (!grepl(".jpeg|.jpg|.png|.tiff", img, ignore.case = TRUE))
-      stop("file in file path doesn't appear to be an image.")
+    
+    one <- length(list.files(img))==0
+    many <- length(list.files(img))>0
     
     if (is.null(out.dir))
       stop("`out.dir` is NULL")
@@ -172,15 +172,26 @@ crop.img <-
     if (!dir.exists(out.dir))
       stop("`out.dir` doesn't exist")
     
+    if(one){
+    if (!grepl(".jpeg|.jpg|.png|.tiff", img, ignore.case = TRUE))
+      stop("file in file path doesn't appear to be an image.")
+  
+    
     if(any(sapply(list(ul,br), is.null)) && !locate)
       stop("both 'ul' and 'br' must be specified or 'locate=TRUE'")
-    
-    
+  
     x <- EBImage::readImage(img, all = FALSE)
     
     
-    if(!locate) xcrop <- x[ul[1]:br[1], ul[2]:br[2], ]
-    
+    if(!locate){
+      
+      dim.x <- dim(x)
+      
+      if(!all(ul[1]<=dim.x[1],ul[2]<=dim.x[2],br[1]<=dim.x[1],br[2]<=dim.x[2]))
+        stop("cropping region set by 'ul' or 'br' beyond image bounds")
+      
+      xcrop <- x[ul[1]:br[1], ul[2]:br[2], ]
+    }
     if (locate) {
       message("select two points, upper left then lower right")
       x2 <- x
@@ -210,6 +221,141 @@ crop.img <-
                             files = paste0(out.dir, "/", n, ".", type))
       }
     
+    }
+    
+    if(many){
+      if (any(!grepl(".jpeg|.jpg|.png|.tiff", list.files(img), ignore.case = TRUE)))
+        stop("not all files in the directory appear to be an image.")
+     
+      
+      if(any(sapply(list(ul,br), is.null)))
+        stop("both 'ul' and 'br' must be specified")
+     
+       imgs <- list.files(img,full.names = TRUE)
+      
+      for(i in imgs){
+      x <- EBImage::readImage(i, all = FALSE)
+      dim.x <- dim(x)
+      if(!all(ul[1]<=dim.x[1],ul[2]<=dim.x[2],br[1]<=dim.x[1],br[2]<=dim.x[2]))
+        stop("cropping region set by 'ul' or 'br' beyond image bounds")
+      
+      xcrop <- x[ul[1]:br[1], ul[2]:br[2], ]
+      
+      
+      if (is.null(type))
+        EBImage::writeImage(xcrop, files = paste0(out.dir, "/", basename(i)))
+      if (!is.null(type)) {
+        n <- gsub('\\..[^\\.]*$', '', basename(i))
+        if (!grepl("jpeg|jpg|png|tiff", type, ignore.case = TRUE))
+          stop("invalid 'type'")
+        
+        EBImage::writeImage(xcrop,
+                            type = type,
+                            files = paste0(out.dir, "/", n, ".", type))
+      }
+      
+    }
+    }
+}
+
+#' @title Change image contrast
+
+#' @description Changes the contrast of an image or images
+#'
+#' @param img character, a path to an image file or directory containing images.
+#' @param c numeric, the factor by which to change the contrast. 'c'>1 enhances, 'c'<1 reduces.
+#' @param out.dir character, the directory to which the image will be saved.
+#' @param type character, image type (optional). Must be: "jpeg", "png", or "tiff (case ignored)." If missing, file format is automatically determined by file name extension(s).
+#' 
+#' @export
+#'
+#' @examples
+#'
+#'
+#' #retrieve image in system
+#'  y <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+#' od <- paste0(tempdir(),"/cropimg")
+#' dir.create(od)
+#' 
+#' #display original
+#' EBImage::display(EBImage::readImage(y),method="raster")
+#'
+#' 
+#' # crop and save as original format
+#' contrast.img(img=y,c=0.5,out.dir=od)
+#' 
+#'#display modified image
+#'EBImage::display(EBImage::readImage(paste0(od,"/sunfish_BCF.jpg")),method="raster")
+#'
+#' #clean up
+#' unlink(od,recursive=TRUE)
+
+
+contrast.img <-
+  function(img = NULL,
+           c = 2,
+           out.dir = NULL,
+           type = NULL) {
+    
+    one <- length(list.files(img))==0
+    many <- length(list.files(img))>0
+    
+    if (is.null(out.dir))
+      stop("`out.dir` is NULL")
+    
+    if (!dir.exists(out.dir))
+      stop("`out.dir` doesn't exist")
+    
+    if(one){
+      if (!grepl(".jpeg|.jpg|.png|.tiff", img, ignore.case = TRUE))
+        stop("file in file path doesn't appear to be an image.")
+
+      
+      x <- EBImage::readImage(img, all = FALSE)
+      
+      x2 <- x*c
+      
+  
+      if (is.null(type))
+        EBImage::writeImage(x2, files = paste0(out.dir, "/", basename(img)))
+      if (!is.null(type)) {
+        n <- gsub('\\..[^\\.]*$', '', basename(img))
+        if (!grepl("jpeg|jpg|png|tiff", type, ignore.case = TRUE))
+          stop("invalid 'type'")
+        
+        EBImage::writeImage(x2,
+                            type = type,
+                            files = paste0(out.dir, "/", n, ".", type))
+      }
+      
+    }
+    
+    if(many){
+      if (any(!grepl(".jpeg|.jpg|.png|.tiff", list.files(img), ignore.case = TRUE)))
+        stop("not all files in the directory appear to be an image.")
+      
+      
+      imgs <- list.files(img,full.names = TRUE)
+      
+      for(i in imgs){
+        x <- EBImage::readImage(i, all = FALSE)
+        
+        x2 <- x*c
+        
+        if (is.null(type))
+          EBImage::writeImage(x2, files = paste0(out.dir, "/", basename(i)))
+        if (!is.null(type)) {
+          n <- gsub('\\..[^\\.]*$', '', basename(i))
+          if (!grepl("jpeg|jpg|png|tiff", type, ignore.case = TRUE))
+            stop("invalid 'type'")
+          
+          EBImage::writeImage(x2,
+                              type = type,
+                              files = paste0(out.dir, "/", n, ".", type))
+        }
+        
+      }
+    }
   }
 
 
@@ -516,6 +662,7 @@ if(!"fin" %in% names(kin))  stopifnot(class(kin)=="list",c("midline","kin.dat","
   
   #midline data
   m <- kin$midline[frame%in%frames]
+  if(!"x.sm" %in% colnames(m)) m[,x.sm:=x]
   
   if(!"fin" %in% names(kin)) {
   c <- kin$cont[frame%in%frames]

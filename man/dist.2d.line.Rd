@@ -2,7 +2,7 @@
 % Please edit documentation in R/trig.funs.R
 \name{dist.2d.line}
 \alias{dist.2d.line}
-\title{Computes orthogonal distance between a point and a line.}
+\title{Computes orthogonal distance between a point and a line}
 \usage{
 dist.2d.line(x = NULL, y = NULL, slope = NULL, intercept = NULL, form = NULL)
 }

@@ -94,7 +94,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/tutorial.html">tutorial</a>
+      <a href="articles/image_processing.html">Video and Image Processing</a>
+    </li>
+    <li>
+      <a href="articles/kin_functions.html">Image Analysis</a>
+    </li>
+    <li>
+      <a href="articles/kinematic_analysis.html">Kinematic Analysis</a>
+    </li>
+    <li>
+      <a href="articles/tutorial.html">Short Tutorial</a>
+    </li>
+    <li>
+      <a href="articles/visualization.html">Vizualization</a>
     </li>
   </ul>
 </li>
@@ -126,13 +138,13 @@
 <ul>
 <li>use precompiled .Rmd for vignettes (<a href="https://ropensci.org/blog/2019/12/08/precompute-vignettes/">a la</a>) because of build fails on win-builder.
 <ul>
-<li>knit tutorial with <code><a href="https://rdrr.io/pkg/knitr/man/knit.html">knitr::knit("vignettes/tutorial.Rmd.orig", output = "vignettes/tutorial.Rmd")</a></code>
+<li>knit tutorial with <code><a href="https://rdrr.io/pkg/knitr/man/knit.html">knitr::knit("vignettes/tutorial.Rmd.orig",     output = "vignettes/tutorial.Rmd")</a></code>
 </li>
 <li>add *.Rmd.orig to Rbuildignore</li>
 <li>update and reknit on new submission/commit/release -set knit to <code>fig.path=""</code>
 </li>
 <li>manually move figures from trackter root to vignette with code below</li>
-<li>add r code for users with <code><a href="https://rdrr.io/pkg/knitr/man/knit.html">knitr::purl("vignettes/tutorial.Rmd.orig", output = "vignettes/tutorial.R")</a></code>
+<li>add r code for users with <code><a href="https://rdrr.io/pkg/knitr/man/knit.html">knitr::purl("vignettes/tutorial.Rmd.orig", output =     "vignettes/tutorial.R")</a></code>
 </li>
 </ul>
 </li>
@@ -179,9 +191,9 @@
 </ul>
 </li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>Error<span class="op">:</span><span class="st"> `</span><span class="dt">github_token()</span><span class="st">`</span> was deprecated <span class="cf">in</span> usethis <span class="dv">2</span>.<span class="fl">0.0</span> and is now defunct.</span>
-<span id="cb3-2"><a href="#cb3-2"></a>Call <span class="st">`</span><span class="dt">gh::gh_token()</span><span class="st">`</span> to retrieve a GitHub personal access token</span>
-<span id="cb3-3"><a href="#cb3-3"></a>Call <span class="st">`</span><span class="dt">gh_token_help()</span><span class="st">`</span> <span class="cf">if</span> you need help getting or configuring your token</span></code></pre></div>
+<!-- end list --><div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Error<span class="sc">:</span> <span class="st">`</span><span class="at">github_token()</span><span class="st">`</span> was deprecated <span class="cf">in</span> usethis <span class="dv">2</span>.<span class="fl">0.0</span> and is now defunct.</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Call <span class="st">`</span><span class="at">gh::gh_token()</span><span class="st">`</span> to retrieve a GitHub personal access token</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Call <span class="st">`</span><span class="at">gh_token_help()</span><span class="st">`</span> <span class="cf">if</span> you need help getting or configuring your token</span></code></pre></div>
 </div>
 
 

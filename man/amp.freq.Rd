@@ -14,10 +14,19 @@ amp.freq(x = NULL, y, sf = 100)
 \item{sf}{numeric; sample frequency (i.e., how often was x and y sampled) in Hz}
 }
 \value{
-a list with amplitude "a", frequency "f", amplitude returned from a smoothed sign function "a.f" based on output from \code{features}, signal to noise ratio "snr".
+a list with of the following:
+\itemize{
+\item \code{a}: a numeric vector of amplitudes ('a').
+\item \code{pos}: a numeric vector of the position of critical points.
+\item \code{f}: a numeric vector of the peak-to-peak frequencies (if the first critical point is a peak) or trough-to-trough frequencies (if the first critical point is a trough).
+\item \code{snr}:a numeric value of the signal to noise ratio.
+}
 }
 \description{
-Computes amplitude(s) and wavelength(s) of a wave form, amongst other things, based on a sampling frequency
+Computes amplitude(s) and frequencies(s) of a wave form, amongst other things, based on a sampling frequency
+}
+\details{
+computes amplitudes as half the distance between each successive pair of critical points (i.e., points where the derivative is zero).
 }
 \examples{
 

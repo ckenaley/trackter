@@ -2,6 +2,7 @@
 
 export(amp.freq)
 export(bearing.xy)
+export(contrast.img)
 export(cosine.ang)
 export(crop.img)
 export(cyclize)

@@ -215,17 +215,17 @@ halfwave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smoot
 #'  
 #' \code{dat} a data table describing each wave detected.
 #' \itemize{
-#' \item 'zeros': x value where y crosses zero. Returns NA if \code{method} is 'p2p' or 't2t', value is NA.
-#' \item 'wave.begin': x value where each wave begins.
-#' \item 'wave.end': x value where each wave ends.
-#' \item 'begin.index': x index of where each wave begins.
-#' \item 'end.index': x index of where each  wave ends.
-#' \item 'wave': numeric name of each wave.
-#' \item 'l': the length of each  wave.
-#' \item 'amp1': the peak amplitude of each wave. If method is set to 'p2p' or 't2t' this is the begin amplitude. If "method='zeros'" this is the peak amplitude between internodes. 
-#' \item 'amp2': If method is set to 'p2p' or 't2t' this is the end amplitude. If "method='zeros'" this is the minimum amplitude between internodes. 
-#' \item 'pos1': If method is set to 'p2p' or 't2t' the x position of begin amplitude for each half wave and identical to 'begin'. If "method='zeros'", the position of peak amplitude between the internodes. 
-#' \item 'pos2': If method is set to 'p2p' or 't2t' the x position of end amplitude for each half wave and identical to 'end'. If "method='zeros'", the position of minimum amplitude between the internodes.
+#' \item \code{zeros}: x value where y crosses zero. Returns NA if \code{method} is 'p2p' or 't2t', value is NA.
+#' \item \code{wave.begin}: x value where each wave begins.
+#' \item \code{wave.end}: x value where each wave ends.
+#' \item \code{begin.index}: x index of where each wave begins.
+#' \item \code{end.index}: x index of where each  wave ends.
+#' \item \code{wave}: numeric name of each wave.
+#' \item \code{l}: the length of each  wave.
+#' \item \code{amp1}: the peak amplitude of each wave. If method is set to 'p2p' or 't2t' this is the begin amplitude. If "method='zeros'" this is the peak amplitude between internodes. 
+#' \item \code{amp2}: If method is set to 'p2p' or 't2t' this is the end amplitude. If "method='zeros'" this is the minimum amplitude between internodes. 
+#' \item \code{pos1}: If method is set to 'p2p' or 't2t' the x position of begin amplitude for each half wave and identical to 'begin'. If "method='zeros'", the position of peak amplitude between the internodes. 
+#' \item \code{pos2}: If method is set to 'p2p' or 't2t' the x position of end amplitude for each half wave and identical to 'end'. If "method='zeros'", the position of minimum amplitude between the internodes.
 #' }
 #' 
 #' If  'method="zeros"' and 'fit=TRUE', these values reflect the predicted, more dense data as determined by \code{smoothing},\code{smooth}, and \code{dens}.
@@ -397,12 +397,21 @@ wave <-function(x,y,method = "zeros", zero.begin=TRUE,fit=TRUE,dens=10,smooth=0.
 }
 
 #' @title Computes amplitude and frequency of wave-like data
-#' @description Computes amplitude(s) and wavelength(s) of a wave form, amongst other things, based on a sampling frequency
+#' @description Computes amplitude(s) and frequencies(s) of a wave form, amongst other things, based on a sampling frequency
 #'
 #' @param x Numeric; x position (or sample number)
 #' @param y numeric; y position
 #' @param sf numeric; sample frequency (i.e., how often was x and y sampled) in Hz
-#' @return a list with amplitude "a", frequency "f", amplitude returned from a smoothed sign function "a.f" based on output from \code{features}, signal to noise ratio "snr".
+#' @details computes amplitudes as half the distance between each successive pair of critical points (i.e., points where the derivative is zero).
+#' 
+#' @return a list with of the following:
+#' \itemize{
+#' \item \code{a}: a numeric vector of amplitudes ('a').
+#' \item \code{pos}: a numeric vector of the position of critical points.
+#' \item \code{f}: a numeric vector of the peak-to-peak frequencies (if the first critical point is a peak) or trough-to-trough frequencies (if the first critical point is a trough).
+#' \item \code{snr}:a numeric value of the signal to noise ratio.
+#' }
+#' 
 #' @export
 #' @import features
 #' @seealso \code{\link{features}}
@@ -424,15 +433,14 @@ amp.freq <- function(x = NULL, y, sf = 100) {
   x.n <- unlist(sapply(amp.n$cpts, function(z)
     which.min(abs(z - x))))
   amp <- abs(diff(y[x.n]) / 2)
-  amp.f <- abs(diff(attributes(amp.n)$fits$fn[x.n]) / 2)
   snr <- fget(amp.n)$f["snr"]
   names(snr) <- NULL
   freq <-
     1 / (s * diff(amp.n$cpts[seq(1, length(amp.n$cpts), 2)])) #peak to peak or trough to trough freq
  dat <-
-    list(a = amp,
+    list(a=amp,
+         pos=x.n,
          f = freq,
-         a.f = amp.f,
          snr = snr) #a.f is amp according to function
   
   return(dat)
@@ -451,8 +459,8 @@ amp.freq <- function(x = NULL, y, sf = 100) {
 #' @return A a data table including the following: 
 #' 
 #' \itemize{
-#' \item 'cyc': The cycle number.
-#' \item 'pos': the position/index values of the x data (not the x values themselves).
+#' \item \code{cyc}: The cycle number.
+#' \item \code{pos}: the position/index values of the x data (not the x values themselves).
 #' }
 #' 
 #' @import features

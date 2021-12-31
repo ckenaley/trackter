@@ -14,7 +14,7 @@ crop.img(
 )
 }
 \arguments{
-\item{img}{character, a path to an image file.}
+\item{img}{character, a path to an image file or directory containing images.}
 
 \item{ul}{numeric, the upper-left xy position of the rectangle in pixels.}
 
@@ -22,12 +22,12 @@ crop.img(
 
 \item{out.dir}{character, the directory to which the image will be saved.}
 
-\item{type}{character, image type (optional). Must be: "jpeg", "png", or "tiff (case ignored)." If missing, file format is automatically determined by file name extension.}
+\item{type}{character, image type (optional). Must be: "jpeg", "png", or "tiff (case ignored)." If missing, file format is automatically determined by file name extension(s).}
 
-\item{locate}{logical, if TRUE, the original image is printed to the graphics device and the user picks \code{ul} and \code{br} (in that order) with the cursor and two clicks of the mouse. If TRUE, the coordinates of the points picked by the user are returned.}
+\item{locate}{logical, if TRUE and the 'img' is a single file path, the original image is printed to the graphics device and the user picks \code{ul} and \code{br} (in that order) with the cursor and two clicks of the mouse. If TRUE, the coordinates of the points picked by the user are returned. Ignored is 'img' is a directory containing images.}
 }
 \description{
-Crops an image with a rectangle and saves it
+Crops an image or images with a rectangle
 }
 \examples{
 
@@ -40,11 +40,10 @@ dir.create(od)
 #display original
 EBImage::display(EBImage::readImage(y),method="raster")
 
-
 # crop and save as orignal format
 crop.img(img=y,ul=c(5,30),br=c(100,200),out.dir=od)
 
-# crop and save as pnng
+# crop and save as png
 crop.img(img=y,ul=c(5,30),br=c(200,200),out.dir=od,type="png")
 
 #display cropped images

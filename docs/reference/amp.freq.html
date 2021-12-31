@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Computes amplitude and frequency of wave-like data — amp.freq" />
-<meta property="og:description" content="Computes amplitude(s) and wavelength(s) of a wave form, amongst other things, based on a sampling frequency" />
+<meta property="og:description" content="Computes amplitude(s) and frequencies(s) of a wave form, amongst other things, based on a sampling frequency" />
 
 
 
@@ -95,7 +95,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/tutorial.html">tutorial</a>
+      <a href="../articles/image_processing.html">Video and Image Processing</a>
+    </li>
+    <li>
+      <a href="../articles/kin_functions.html">Image Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/kinematic_analysis.html">Kinematic Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/tutorial.html">Short Tutorial</a>
+    </li>
+    <li>
+      <a href="../articles/visualization.html">Vizualization</a>
     </li>
   </ul>
 </li>
@@ -124,7 +136,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Computes amplitude(s) and wavelength(s) of a wave form, amongst other things, based on a sampling frequency</p>
+    <p>Computes amplitude(s) and frequencies(s) of a wave form, amongst other things, based on a sampling frequency</p>
     </div>
 
     <pre class="usage"><span class='fu'>amp.freq</span><span class='op'>(</span>x <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>y</span>, sf <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span></pre>
@@ -148,7 +160,16 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a list with amplitude "a", frequency "f", amplitude returned from a smoothed sign function "a.f" based on output from <code>features</code>, signal to noise ratio "snr".</p>
+    <p>a list with of the following:</p><ul>
+<li><p><code>a</code>: a numeric vector of amplitudes ('a').</p></li>
+<li><p><code>pos</code>: a numeric vector of the position of critical points.</p></li>
+<li><p><code>f</code>: a numeric vector of the peak-to-peak frequencies (if the first critical point is a peak) or trough-to-trough frequencies (if the first critical point is a trough).</p></li>
+<li><p><code>snr</code>:a numeric value of the signal to noise ratio.</p></li>
+</ul>
+
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>computes amplitudes as half the distance between each successive pair of critical points (i.e., points where the derivative is zero).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>features</code></p></div>
@@ -164,11 +185,11 @@
 </div><div class='output co'>#&gt; $a
 #&gt; [1] 0.9936235 0.9906554 0.9931397
 #&gt; 
+#&gt; $pos
+#&gt; [1]  7 15 21 27
+#&gt; 
 #&gt; $f
 #&gt; [1] 69.44444
-#&gt; 
-#&gt; $a.f
-#&gt; [1] 0.9904598 0.9862815 0.9879148
 #&gt; 
 #&gt; $snr
 #&gt; [1] 38.76

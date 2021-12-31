@@ -95,7 +95,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/tutorial.html">tutorial</a>
+      <a href="../articles/image_processing.html">Video and Image Processing</a>
+    </li>
+    <li>
+      <a href="../articles/kin_functions.html">Image Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/kinematic_analysis.html">Kinematic Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/tutorial.html">Short Tutorial</a>
+    </li>
+    <li>
+      <a href="../articles/visualization.html">Vizualization</a>
     </li>
   </ul>
 </li>
@@ -159,7 +171,7 @@
     </tr>
     <tr>
       <th>smooth.n</th>
-      <td><p>numeric, the number of smoothing operations undertaken by coo_smooth on the contour described by 'x'. See Details.</p></td>
+      <td><p>numeric, the number of smoothing operations undertaken by <a href='https://rdrr.io/pkg/Momocs/man/coo_smooth.html'>coo_smooth</a> on the contour described by 'x'. See Details.</p></td>
     </tr>
     <tr>
       <th>ml.meth</th>
@@ -205,7 +217,7 @@
 <p><code>amp</code> a data table describing the estimated fin amplitudes based on each method of finding the fin tip. 'amp1', the amplitude of the fin positions based on the maximum euclidean distance from the fin base and 'amp2', the distance of the fin points (based on distance inflections) from the fin base.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>If <code>red</code> is specified, the contour <code>out</code> is sampled with <code>coo_interpolate</code> from the <code>Momocs</code> package. The number of points sampled (n) equals <code>red</code> times the number of points in <code>out</code></p>
+    <p>If <code>red</code> is specified, the contour <code>out</code> is sampled with <code><a href='https://rdrr.io/pkg/Momocs/man/coo_interpolate.html'>coo_interpolate</a></code> from the <code>Momocs</code> package. The number of points sampled (n) equals <code>red</code> times the number of points in <code>out</code></p>
 <p>To establish the contour positions that are within <code>fin.pos</code>, a midline is estimated using one of two methods specified by <code>ml.meth</code>, "ang" for <code><a href='free.ml.ang.html'>free.ml.ang</a></code> or "hull" for  <code><a href='free.ml.ang.html'>free.ml.hull</a></code>. Midline points are indexed by position along the body length by calculating the cumulative distance between midline coordinates in pixels. This midline distance is then used to estimate the position of the fin about the contour using the parameter <code>fin.pos</code>.</p>
 <p>The positions of the tip of the fin appendages is estimated in two ways. The first is simply the point in each appendage that is farthest from the base of the fin. The base is estimated as a straight line between the contour coordinates that match <code>fin.pos</code>.  The second is a little more complicated and starts with calculation the distance between each fin contours coordinates and the midpoint of the fin base. <code>features</code> from the <code>features</code> package is then use to calculate an inflection in this distance and the point of this inflection is used to estimate the fin position. Amplitudes of each method are calculated based on the orthogonal euclidean distance from the fin bases.</p>
 <p>In addition to fin amplitude and contour extraction, this function also produces a composite contour of the body minus the fin area described by <code>fin.pos</code>. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by <code>fin.pos</code>, that is, the fin bases. The result is a straight line between the start and end of each fin.</p>
@@ -213,7 +225,7 @@
 <p>#' For midline smoothing, <code>smooth_spline</code> from the <code>smoothr</code> package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times the value of <code>ml.smooth</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='kin.search.html'>kin.simple</a></code>, <code><a href='kin.search.html'>kin.search</a></code>, <code><a href='kin.search.html'>kin.free</a></code>, <code>coo_sample</code>, <code>coo_smooth</code>, <code>smooth_spline</code></p></div>
+    <div class='dont-index'><p><code><a href='kin.search.html'>kin.simple</a></code>, <code><a href='kin.search.html'>kin.search</a></code>, <code><a href='kin.search.html'>kin.free</a></code>, <code><a href='https://rdrr.io/pkg/Momocs/man/coo_sample.html'>coo_sample</a></code>, <code><a href='https://rdrr.io/pkg/Momocs/man/coo_smooth.html'>coo_smooth</a></code>, <code>smooth_spline</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>###plot pectoral-fin amplitudes of a swimming sunfish</span>

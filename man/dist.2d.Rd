@@ -2,7 +2,7 @@
 % Please edit documentation in R/trig.funs.R
 \name{dist.2d}
 \alias{dist.2d}
-\title{Computes distance between two points in Cartesian space.}
+\title{Computes distance between two points in Cartesian space}
 \usage{
 dist.2d(x1, x2, y1, y2)
 }

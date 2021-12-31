@@ -2,7 +2,7 @@
 % Please edit documentation in R/trig.funs.R
 \name{point.ang.orig}
 \alias{point.ang.orig}
-\title{Computes new position of a point rotating about an orgin.}
+\title{Computes new position of a point rotating about an origin}
 \usage{
 point.ang.orig(p, o, theta)
 }
