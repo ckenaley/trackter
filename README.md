@@ -24,7 +24,7 @@ Please report any bugs or performance issues.
 
 ## Getting started
 
-Please check out *trackter*’s [github
+For tutorial and tips on usage, please check out *trackter*’s [github
 page](https://ckenaley.github.io/trackter/)
 
 ## Installation
@@ -68,27 +68,27 @@ useful](https://trac.ffmpeg.org/wiki/CompilationGuide).
 
 **Automated kinematic analysis**
 
-  - Fast and accurate contour and shape analysis of ROIs.
-  - ROI detection with search parameters including position and size.
-  - Relevant functions: `kin.search` and `kin.simple`.
+-   Fast and accurate contour and shape analysis of ROIs.
+-   ROI detection with search parameters including position and size.
+-   Relevant functions: `kin.search` and `kin.simple`.
 
 **Tools for kinematic analysis of swimming animals**
 
-  - Calculate midline (propulsive) wavelength, trailing-edge frequency,
+-   Calculate midline (propulsive) wavelength, trailing-edge frequency,
     paired-fin position.
-  - Relevant functions: `amp.freq`, `halfwave`, `wave`, and `fin.kin`
+-   Relevant functions: `amp.freq`, `halfwave`, `wave`, and `fin.kin`
 
 **Tools for image and video processing using FFmpeg**
 
-  - Access `FFmpeg` functionality, including filters and codecs, to
+-   Access `FFmpeg` functionality, including filters and codecs, to
     extract frames, stitch videos, and edit images and videos.
 
-  - Relevant functions: `images.to.videos`, `images.to.videos2`,
+-   Relevant functions: `images.to.videos`, `images.to.videos2`,
     `vid.to.images`, and `vid.to.images2`
 
 **Other miscellaneous, low-level tools for kinematic analysis**
 
-  - Compute distances in 2d space, angles, heading/bearing, convert
+-   Compute distances in 2d space, angles, heading/bearing, convert
     radians to degrees and vice versa.
-  - Relevant functions: `dist.2d`, `cosine.ang`, `bearing.xy`, `deg`,
+-   Relevant functions: `dist.2d`, `cosine.ang`, `bearing.xy`, `deg`,
     `rad`

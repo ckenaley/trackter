@@ -36,7 +36,7 @@ Please report any bugs or performance issues.
 
 ## Getting started
 
-Please check out *trackter*'s [github page](https://ckenaley.github.io/trackter/)
+For tutorial and tips on usage, please check out *trackter*'s [github page](https://ckenaley.github.io/trackter/)
 
 
 ## Installation
