@@ -490,6 +490,9 @@ amp.freq <- function(x = NULL, y, sf = 100) {
 #' @export
 #' 
 cyclize <- function(x,y,start="peak",...){
+  
+  end <- cyc <- NULL #to avoid NSE notes in R CMD check
+  
   x <- unlist(x)
   y <- unlist(y)
   #ft <- features(x,y)
@@ -499,7 +502,7 @@ cyclize <- function(x,y,start="peak",...){
   if(start=="peak") pt.dat <- data.table(pt=pt,start=pt.x)[pt=="peak"]
   if(start=="trough") pt.dat <- data.table(pt=pt,start=pt.x)[pt=="trough"]
   pt.dat[,c("end","cyc"):=list(dplyr::lead(start)-1,1:.N)]
-  pt.dat2 <- pt.dat[!is.na(end),.(pos=start:end),by=cyc]
+  pt.dat2 <- pt.dat[!is.na(end),list(pos=start:end),by=cyc]
   if(pt.dat2[1,2]!=1) {pt.dat2 <- rbind(data.table(cyc=0,pos=1:(unlist(pt.dat2[1,2])-1)),pt.dat2)}
   if(max(pt.dat2[,2])!=length(x)) {pt.dat2 <- rbind(pt.dat2,
                                                       data.table(cyc=max(pt.dat2[,1])+1,pos=(max(pt.dat2[,2])+1):length(x)))}
