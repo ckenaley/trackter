@@ -66,7 +66,7 @@
 #' fml <- free.ml.hull(o)
 #' points(fml$ml$x,fml$ml$y,col="red")
 #' #note the difference
-#' fml2 <- free.ml.ang(o)
+#' fml2 <- free.ml.ang(o) 
 #' points(fml2$ml$x,fml2$ml$y,col="blue")
 #' 
 #' # with free.ml.del, a poorer choice
