@@ -1,15 +1,11 @@
 ---
-title: "Vizualization"
+title: "Visualization"
 output: rmarkdown::html_vignette
-params:
-  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
 vignette: >
   %\VignetteIndexEntry{Visualization}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-
 
 `trackter` offers users several simple plotting functions for the visualizations of ROI contours, midlines, and position data. 
 
@@ -17,7 +13,7 @@ vignette: >
 
 The `kin` functions `kin.search()`, `kin.simple()`, and `kin.free()` all allow users to overlay midline data over original images with if `save=TRUE` and an output directory is specified with the argument `out.dir`. 
 
-Here, the frames from a video of a swimming juvenile rainbow trout loaded with the package is are extracted with `video.to.images()` and saved to an appropriately named directory.
+Here, the frames from a video of a swimming juvenile rainbow trout loaded with the package are extracted with `video.to.images()` and saved to an appropriately named directory.
 
 ```{r,message=FALSE,warning=FALSE}
 library(trackter)
@@ -38,6 +34,7 @@ Images, complete with midline data, are now stored in the output directory.
 ```{r displlay}
 EBImage::display(EBImage::readImage(list.files("./trout_midline",full.names = TRUE)[1]),method = "raster")
 ```
+
 By default, the overlayed output image includes three lines. Red indicates the smoothed midline position ("x.sm' and "y.sm" in the `midline` table), green the anterior section defined by the `ant.per` argument, and blue the linear prediction based on the anterior section.
 Should users want to compile the outputted images into a video, `
 `images.to.video()` or `images.to.video2()` can be used. The latter, like `vid.to.images2()` allows users to use `FFmpegs` fllexible filtering system. 
@@ -52,11 +49,16 @@ In this example, `data.overlay()` is used to plot the trailing edge position ('x
 data.overlay(img = "./trout_images/trout_00001.jpg",over=trout.kin$kin.dat[frame==0,.(x,y)],col="red",cex=2,pch=8)
 ```
 
-Using `gg.overlay()` users can plot a single frame of data or series of frames as a facetted plot. The function takes tables returned by the `kin` functions to plot contours and midline, head, or trailing edge data. In addition, `gg.overlay()` can access the results from `fin.kin()` to plot the position of fin-like extension. Here, the midline results for the first full tailbeat cycle is projected over the smoothed body contours is produced with `gg.overlay()`. Notice `under="cont.sm"` and `over="midline"` which specify the smooth contour as the underlying data and midline as the overlay data. 
+Using `gg.overlay()` users can plot a single frame of data or series of frames as a facetted plot. The function takes tables returned by the `kin` functions to plot contours and midline, head, or trailing edge data. In addition, `gg.overlay()` can access the results from `fin.kin()` to plot the position of fin-like extension. 
 
-```{r ggoverlay,eval=FALSE}
+Here, the midline results for the first full tailbeat cycle of the swimming trout is projected over the smoothed body contours with `gg.overlay()`. Notice `under="cont.sm"` and `over="midline"` which specify the smoothed contour as the underlying data and midline as the overlay data. 
+
+```{r ggoverlay}
 gg.overlay(kin = trout.kin,under = "cont.sm",over="midline",frames=seq(0,55,5),size=0.1,col="red",zoom=TRUE)
 ```
+
+Optionally, users may produce GIF animations of frame-specific overlayed data. To do so, users must specify `animate=TRUE`. The animation can be save with `save=TRUE` and specifying a file name with the `filename` argument.
+
 ```{r gif,results=FALSE}
 gg.overlay(kin = trout.kin,under = "cont.sm",over="midline",size=0.1,col="red",animate = TRUE,save = TRUE,filename = "trout.gif")
 ```
@@ -65,6 +67,13 @@ gg.overlay(kin = trout.kin,under = "cont.sm",over="midline",size=0.1,col="red",a
 knitr::include_graphics("trout.gif")
 ```
 
-```{r cleanup,echo=FALSE}
+
+```{r remimages,include=FALSE}
+
 unlink("./trout_midline",recursive = TRUE)
+
+im.rem <- list.files(pattern = "images")
+
+sapply(im.rem,function(x) if(dir.exists(x)) unlink(x,recursive = TRUE))
+
 ```

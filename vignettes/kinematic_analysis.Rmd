@@ -1,8 +1,6 @@
 ---
 title: "Kinematic Analysis"
 output: rmarkdown::html_vignette
-params:
-  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
 vignette: >
   %\VignetteIndexEntry{Kinematic Analysis}
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,7 +11,8 @@ vignette: >
 
 If the starting point of analysis is a video file, `trackter`'s `video.to.images()` or `video.to.images2()` can be used to extract images to a user-defined directory. Supported video formats include .avi and .mp4 files. For example, the following will extract images from an 56-frame video shot at 100 fps of a swimming rainbow trout included with the package. 
 
-```{r,message=FALSE,warning=FALSE}
+
+```{r vidproc,message=FALSE,warning=FALSE}
 library(trackter)
 trout.vid <- system.file("extdata/vid", "trout.avi", package = "trackter")
 dir.create("./trout_images")
@@ -22,13 +21,13 @@ vid.to.images(vid.path = trout.vid, out.dir = "./trout_images")
 
 Here, the first image stored in the output directory is displayed to see what we're dealing with.
 
-```{r}
+```{r displayimg}
 EBImage::display(EBImage::readImage(list.files("./trout_images",full.names = TRUE)[1]),method = "raster")
 ```
 
 After image extraction, position and shape data can be retrieved using one of the `kin` functions: `kin.simple()`, `kin.search()` or `kin.free()`. Because this is a simple case of a fish swimming horizontally in the image field, `kin.simple()` works just fine. Users should consult [this article](kin_functions.html) to get a sense of which function may apply to their experiments.
 
-```{r}
+```{r runkin}
 trout.kin <- kin.simple(image.dir = "./trout_images")
 ```
 
@@ -37,7 +36,7 @@ trout.kin <- kin.simple(image.dir = "./trout_images")
 Once shape and position data are retrieved, users can move on to downstream kinematic analysis with several functions included with `trackter`. Here, the `kin.dat` data table returned by `kin.simple()`, which includes frame-specific trailing edge position (the "x" and "y" columns), is passed to the function `amp.freq()`. This function computes amplitude as half the distance between each successive pairs of critical points (i.e., points where the derivative is zero). Frequencies are calculated as the inverse of the the peak-to-peak periods (if the first critical point is a peak) or trough-to-trough periods (if the first critical point is a trough) given a certain sampling frequency defined by `sf`. In addition, ``amp.freq()` returns a vector of the positions of the critical points (`pos`) with respect to the `x` value the signal-to-noise ration (`snr`).
 
 
-```{r}
+```{r kintable}
 with(trout.kin$kin.dat,amp.freq(x=frame,y=y,sf=100))
 ```
 
@@ -47,7 +46,7 @@ Propulsive wavelength can be calculated with one of two functions in `trackter`,
 
 The `midldine` data table returned from the `kin` functions includes "wave.y", the amplitude of the midline relative to a linear prediction the head. A classic midline waveform plot of frame-specific "wave.y" versus body position ("per.bl") follows.
 
-```{r}
+```{r midlineplot}
 library(ggplot2)
 qplot(data=trout.kin$midline,x=per.bl,y=wave.y,col=frame)
 ```
@@ -55,7 +54,7 @@ qplot(data=trout.kin$midline,x=per.bl,y=wave.y,col=frame)
 As the path of the head can be thought of as an axis of progression of the propulsive wave, the example below computes the half wavelength with "wave.y" and plots half wavelength versus body position. 
 
 
-```{r}
+```{r waveplot}
  wave.dat <-trout.kin$midline[, { w <- halfwave(per.bl,wave.y,method="zeros")$dat;
  list(l=as.numeric(w$l),
  	amp=as.numeric(w$amp1),
@@ -77,7 +76,7 @@ From the isolated and smoothed right and left fin outlines, the positions of the
 
 For the following example, we begin by extracting images from a 120-frame video of a pumpkinseed sunfish swimming with its pectoral fins that's included with the package. For this we'll use `trackter`'s `vid.to.images2()` function.
 
-```{r results=FALSE,eval=FALSE}
+```{r vidproc2}
 #get file path
 pseed.vid <- system.file("extdata/vid", "sunfish_pect.avi", package = "trackter")
 #create directory to store images
@@ -90,12 +89,12 @@ To extract body and fin contours from the image data, `kin.simple()` can be used
 
 Therefore, users are advised to begin fin analysis with an inspection of the threshold values using `trackter`'s [`thr.check()` function](kinematic_analysis.html#thresholding). Here, the binary results of 9 separate threshold values (from 0.1--0.9) for the first image of the sequence is evaluated using `thr.check()`. In addition, `thr.check()` returns the Otsu value for comparison.
 
-```{r}
+```{r thrcheck}
 thr.check("./pect_images/sunfish_pect_00001.jpg")
 ```
 From these results, it appears that a threshold value of 0.8 captures the fin contours but doesn't introduce too much noise. Note that this  is much higher than the Otsu value of 0.55. With this more appropriate threshold value, segmentation and contour extraction can commence. The contour of the first frame (contained in the `cont` data table returned by `kin.simple()`) is plotted to confirm that the fins were captured well enough.
 
-```{r}
+```{r kinsearch}
 #run kin.search()
 pect.kin <- kin.search(image.dir = "pect_images",thr = 0.8)
 
@@ -107,7 +106,7 @@ qplot(data=pect.kin$cont[frame==0],x,y)
 
 Now, `fin.kin()` is run by passing the tables returned by `kin.simple()` to the `kin` argument and specifying that the fins begin and end at 25% and 50% of the of the body length (`fin.pos = c(0.25, 0.55)`). The contour resolution is reduced by 50% (`red=0.5`) to hasten the run time.
 
-```{r}
+```{r finkin}
 # run fin.kin()
 fin.dat <- fin.kin(kin=pect.kin,fin.pos = c(0.25, 0.55),red=0.5)
 ```
@@ -125,13 +124,13 @@ Like the `kin` functions, `fin.kin()` returns a list of tables.
 From the `amp` table retrieved by `fin.kin()`, we can plot the frame-specific fin amplitude in pixels. Here, "amp1" is used, an amplitude determined based on a point in each appendage that is farthest from the base of the fin.
 
 
-```{r}
+```{r amp1}
 qplot(data=fin.dat$amp,x=frame,y=amp1,col=side,geom="line")
 ```
 
 Here's "amp2", amplitude based on a sharp feature of the fin, is plotted for comparison.
 
-```{r}
+```{r amp2}
 qplot(data=fin.dat$amp,x=frame,y=amp2,col=side,geom="line")
 ```
 
@@ -140,7 +139,7 @@ In addition to fin amplitude and contour extraction, `fin.kin()` also produces a
 
 Here, the contour of the frame 96 is plotted with the tracked fin tips and composite midline.
 
-```{r example2plots,eval=FALSE}
+```{r finplot}
 fin.90 <- lapply(fin.dat, function(x) x[frame==96])
 
 p.fin <- ggplot(data = fin.90$cont)+geom_point(aes(x = x, y = y),size=1,col="gray")
@@ -154,3 +153,9 @@ p.fin <- p.fin + geom_point(data = fin.90$fin.pts[pos=="tip2"], aes(x, y), size 
 print(p.fin)
 ```
 
+```{r remimages,include=FALSE}
+im.rem <- list.files(pattern = "images")
+
+sapply(im.rem,function(x) if(dir.exists(x)) unlink(x,recursive = TRUE))
+
+```

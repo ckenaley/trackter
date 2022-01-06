@@ -37,6 +37,8 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
+    markdown,
+    kableExtra,
 SystemRequirements: FFmpeg
 VignetteBuilder: knitr
 Language: en-US

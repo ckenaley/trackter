@@ -95,19 +95,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/image_processing.html">Video and Image Processing</a>
-    </li>
-    <li>
-      <a href="../articles/kin_functions.html">Image Analysis</a>
+      <a href="../articles/image_analysis.html">Image Analysis</a>
     </li>
     <li>
       <a href="../articles/kinematic_analysis.html">Kinematic Analysis</a>
     </li>
     <li>
-      <a href="../articles/tutorial.html">Short Tutorial</a>
+      <a href="../articles/startup.html">Starting Up</a>
     </li>
     <li>
-      <a href="../articles/visualization.html">Vizualization</a>
+      <a href="../articles/visualization.html">Visualization</a>
     </li>
   </ul>
 </li>
@@ -178,7 +175,23 @@
     <div class='dont-index'><p><code>features</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"></pre>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
+<span class='va'>d</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span><span class='op'>)</span>,
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>0.2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span>, sd<span class='op'>=</span><span class='fl'>0.05</span><span class='op'>)</span>
+<span class='op'>)</span>
+<span class='co'>#start at peaks</span>
+<span class='va'>c</span> <span class='op'>&lt;-</span> <span class='fu'>cyclize</span><span class='op'>(</span><span class='va'>d</span><span class='op'>$</span><span class='va'>x</span>,<span class='va'>d</span><span class='op'>$</span><span class='va'>y</span><span class='op'>)</span>
+<span class='va'>d</span><span class='op'>$</span><span class='va'>cyc</span> <span class='op'>&lt;-</span> <span class='va'>c</span><span class='op'>$</span><span class='va'>cyc</span>
+<span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/qplot.html'>qplot</a></span><span class='op'>(</span>d<span class='op'>=</span><span class='va'>d</span>,<span class='va'>x</span>,<span class='va'>y</span>,col<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>cyc</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='cyclize-1.png' alt='' width='700' height='433' /></div><div class='input'>
+ <span class='co'>#start at troughs</span>
+<span class='va'>c</span> <span class='op'>&lt;-</span> <span class='fu'>cyclize</span><span class='op'>(</span><span class='va'>d</span><span class='op'>$</span><span class='va'>x</span>,<span class='va'>d</span><span class='op'>$</span><span class='va'>y</span>,start<span class='op'>=</span><span class='st'>"trough"</span><span class='op'>)</span>
+<span class='va'>d</span><span class='op'>$</span><span class='va'>cyc</span> <span class='op'>&lt;-</span> <span class='va'>c</span><span class='op'>$</span><span class='va'>cyc</span>
+<span class='fu'><a href='https://rdrr.io/pkg/ggplot2/man/qplot.html'>qplot</a></span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>d</span>,<span class='va'>x</span>,<span class='va'>y</span>,col<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>cyc</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='cyclize-2.png' alt='' width='700' height='433' /></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

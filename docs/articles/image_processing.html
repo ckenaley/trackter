@@ -54,19 +54,19 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/image_processing.html">Video and Image Processing</a>
+      <a href="../articles/image_analysis.html">Image Analysis</a>
     </li>
     <li>
-      <a href="../articles/kin_functions.html">Image Analysis</a>
+      <a href="../articles/image_processing.html">Video and Image Processing</a>
     </li>
     <li>
       <a href="../articles/kinematic_analysis.html">Kinematic Analysis</a>
     </li>
     <li>
-      <a href="../articles/tutorial.html">Short Tutorial</a>
+      <a href="../articles/startup.html">Starting Up</a>
     </li>
     <li>
-      <a href="../articles/visualization.html">Vizualization</a>
+      <a href="../articles/visualization.html">Visualization</a>
     </li>
   </ul>
 </li>
@@ -119,7 +119,11 @@
 ## [11] "sunfish_BCF_red_00011.jpg"</code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="st">"./sunfish_images"</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,method <span class="op">=</span> <span class="st">"raster"</span><span class="op">)</span></code></pre></div>
-<p><img src="image_processing_files/figure-html/unnamed-chunk-2-1.png" width="700"> ## Filter extracted images</p>
+<p><img src="image_processing_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+</div>
+<div id="filter-extracted-images" class="section level2">
+<h2 class="hasAnchor">
+<a href="#filter-extracted-images" class="anchor"></a>Filter extracted images</h2>
 <p><code>video.to.images2()</code> supports added <code>FFmpeg</code> functionality, allowing users to specify filters that may, for example crop, rotate, or adjust the size of the images. Filters can be passed to the <code>filt</code> argument as a character string. For example, one can extract images from the same video and crop around their center at 900 pixels wide and 400 pixels deep with the following.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#Crop the central input area with size 900x300:</span>
@@ -150,17 +154,16 @@
 <p>For those who simply want to crop images or change their contrast without using <code>FFmpeg</code> filters, <code>trackter</code> offers <code><a href="../reference/crop.img.html">crop.img()</a></code> and <code><a href="../reference/contrast.img.html">contrast.img()</a></code>, respectively. Continuing with the same image sequence, <code><a href="../reference/crop.img.html">crop.img()</a></code> is used here to crop the images with a rectangle described the arguments <code>ul</code> (the lower left xy position) and <code>br</code> (the bottom right xy position) and save them the a directory specified by <code>out.dir</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#create the out.dir</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="st">"./sunfish_images2"</span><span class="op">)</span></code></pre></div>
-<pre><code>## Warning in dir.create("./sunfish_images2"): './sunfish_images2' already exists</code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">#crop at pixels 5,150 and 900,400</span>
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="st">"./sunfish_images2"</span><span class="op">)</span>
+
+<span class="co">#crop at pixels 5,150 and 900,400</span>
 <span class="fu"><a href="../reference/crop.img.html">crop.img</a></span><span class="op">(</span>img<span class="op">=</span><span class="st">"./sunfish_images"</span>,out.dir <span class="op">=</span><span class="st">"./sunfish_images2"</span>,ul<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">150</span><span class="op">)</span>,br<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">900</span>,<span class="fl">400</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">#display the first cropped image in the sequence</span>
 <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="st">"./sunfish_images2/sunfish_BCF_red_00001.jpg"</span><span class="op">)</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
 <p><img src="image_processing_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <p>Here, the same image sequence has its contrast enhanced with <code><a href="../reference/contrast.img.html">contrast.img()</a></code>. Contrast is doubled in this case with the argument <code>c=2</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#contrast and overwrite imgages in out.dir</span>
 <span class="fu"><a href="../reference/contrast.img.html">contrast.img</a></span><span class="op">(</span>img<span class="op">=</span><span class="st">"./sunfish_images"</span>,out.dir <span class="op">=</span><span class="st">"./sunfish_images2"</span>,c<span class="op">=</span><span class="fl">2</span><span class="op">)</span>
 

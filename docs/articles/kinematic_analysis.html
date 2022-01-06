@@ -54,19 +54,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/image_processing.html">Video and Image Processing</a>
-    </li>
-    <li>
-      <a href="../articles/kin_functions.html">Image Analysis</a>
+      <a href="../articles/image_analysis.html">Image Analysis</a>
     </li>
     <li>
       <a href="../articles/kinematic_analysis.html">Kinematic Analysis</a>
     </li>
     <li>
-      <a href="../articles/tutorial.html">Short Tutorial</a>
+      <a href="../articles/startup.html">Starting Up</a>
     </li>
     <li>
-      <a href="../articles/visualization.html">Vizualization</a>
+      <a href="../articles/visualization.html">Visualization</a>
     </li>
   </ul>
 </li>
@@ -109,7 +106,7 @@
 <p>Here, the first image stored in the output directory is displayed to see what we’re dealing with.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="st">"./trout_images"</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,method <span class="op">=</span> <span class="st">"raster"</span><span class="op">)</span></code></pre></div>
-<p><img src="kinematic_analysis_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p><img src="kinematic_analysis_files/figure-html/displayimg-1.png" width="700"></p>
 <p>After image extraction, position and shape data can be retrieved using one of the <code>kin</code> functions: <code><a href="../reference/kin.search.html">kin.simple()</a></code>, <code><a href="../reference/kin.search.html">kin.search()</a></code> or <code><a href="../reference/kin.search.html">kin.free()</a></code>. Because this is a simple case of a fish swimming horizontally in the image field, <code><a href="../reference/kin.search.html">kin.simple()</a></code> works just fine. Users should consult <a href="kin_functions.html">this article</a> to get a sense of which function may apply to their experiments.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">trout.kin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.search.html">kin.simple</a></span><span class="op">(</span>image.dir <span class="op">=</span> <span class="st">"./trout_images"</span><span class="op">)</span></code></pre></div>
@@ -142,7 +139,7 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">trout.kin</span><span class="op">$</span><span class="va">midline</span>,x<span class="op">=</span><span class="va">per.bl</span>,y<span class="op">=</span><span class="va">wave.y</span>,col<span class="op">=</span><span class="va">frame</span><span class="op">)</span></code></pre></div>
-<p><img src="kinematic_analysis_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="kinematic_analysis_files/figure-html/midlineplot-1.png" width="700"></p>
 <p>As the path of the head can be thought of as an axis of progression of the propulsive wave, the example below computes the half wavelength with “wave.y” and plots half wavelength versus body position.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"> <span class="va">wave.dat</span> <span class="op">&lt;-</span><span class="va">trout.kin</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>, <span class="op">{</span> <span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/halfwave.html">halfwave</a></span><span class="op">(</span><span class="va">per.bl</span>,<span class="va">wave.y</span>,method<span class="op">=</span><span class="st">"zeros"</span><span class="op">)</span><span class="op">$</span><span class="va">dat</span>;
@@ -154,7 +151,7 @@
      by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">frame</span><span class="op">)</span><span class="op">]</span>
 
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">wave.dat</span>,x<span class="op">=</span><span class="va">pos</span>,y<span class="op">=</span><span class="va">l</span><span class="op">)</span></code></pre></div>
-<p><img src="kinematic_analysis_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="kinematic_analysis_files/figure-html/waveplot-1.png" width="700"></p>
 <p>Both <code><a href="../reference/wave.html">wave()</a></code> and <code><a href="../reference/halfwave.html">halfwave()</a></code> compute the wavelength according to one of several methods defined by the argument <code>method</code>. In <code><a href="../reference/halfwave.html">halfwave()</a></code>, if <code>method='p2t'</code>, half waves are calculated as the distance between critical points, i.e., between each successive peak-to-trough and trough-to-peak pairs. If <code>method='zeros'</code>, nodes where the waveform crosses the <code>x</code> value vector are determined and the half waves are calculated as the internodal distances. In <code><a href="../reference/wave.html">wave()</a></code>, full wavelengths are calculated similarly as the peak-to-peak (<code>method='p2p'</code>), trough-to-trough (<code>method='t2t'</code>) or internodal distances (<code>method='zeros'</code>).</p>
 </div>
 <div id="analysis-of-fin-like-extensions" class="section level2">
@@ -174,7 +171,7 @@
 <p>Therefore, users are advised to begin fin analysis with an inspection of the threshold values using <code>trackter</code>’s <a href="kinematic_analysis.html#thresholding"><code>thr.check()</code> function</a>. Here, the binary results of 9 separate threshold values (from 0.1–0.9) for the first image of the sequence is evaluated using <code><a href="../reference/thr.check.html">thr.check()</a></code>. In addition, <code><a href="../reference/thr.check.html">thr.check()</a></code> returns the Otsu value for comparison.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/thr.check.html">thr.check</a></span><span class="op">(</span><span class="st">"./pect_images/sunfish_pect_00001.jpg"</span><span class="op">)</span></code></pre></div>
-<p><img src="kinematic_analysis_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="kinematic_analysis_files/figure-html/thrcheck-1.png" width="700"></p>
 <pre><code>## [1] 0.5527344</code></pre>
 <p>From these results, it appears that a threshold value of 0.8 captures the fin contours but doesn’t introduce too much noise. Note that this is much higher than the Otsu value of 0.55. With this more appropriate threshold value, segmentation and contour extraction can commence. The contour of the first frame (contained in the <code>cont</code> data table returned by <code><a href="../reference/kin.search.html">kin.simple()</a></code>) is plotted to confirm that the fins were captured well enough.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -183,7 +180,7 @@
 
 <span class="co">#plot the contour</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">pect.kin</span><span class="op">$</span><span class="va">cont</span><span class="op">[</span><span class="va">frame</span><span class="op">==</span><span class="fl">0</span><span class="op">]</span>,<span class="va">x</span>,<span class="va">y</span><span class="op">)</span></code></pre></div>
-<p><img src="kinematic_analysis_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="kinematic_analysis_files/figure-html/kinsearch-1.png" width="700"></p>
 <p>Now, <code><a href="../reference/fin.kin.html">fin.kin()</a></code> is run by passing the tables returned by <code><a href="../reference/kin.search.html">kin.simple()</a></code> to the <code>kin</code> argument and specifying that the fins begin and end at 25% and 50% of the of the body length (<code>fin.pos = c(0.25, 0.55)</code>). The contour resolution is reduced by 50% (<code>red=0.5</code>) to hasten the run time.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># run fin.kin()</span>
@@ -205,11 +202,11 @@
 <p>From the <code>amp</code> table retrieved by <code><a href="../reference/fin.kin.html">fin.kin()</a></code>, we can plot the frame-specific fin amplitude in pixels. Here, “amp1” is used, an amplitude determined based on a point in each appendage that is farthest from the base of the fin.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">fin.dat</span><span class="op">$</span><span class="va">amp</span>,x<span class="op">=</span><span class="va">frame</span>,y<span class="op">=</span><span class="va">amp1</span>,col<span class="op">=</span><span class="va">side</span>,geom<span class="op">=</span><span class="st">"line"</span><span class="op">)</span></code></pre></div>
-<p><img src="kinematic_analysis_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="kinematic_analysis_files/figure-html/amp1-1.png" width="700"></p>
 <p>Here’s “amp2”, amplitude based on a sharp feature of the fin, is plotted for comparison.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">fin.dat</span><span class="op">$</span><span class="va">amp</span>,x<span class="op">=</span><span class="va">frame</span>,y<span class="op">=</span><span class="va">amp2</span>,col<span class="op">=</span><span class="va">side</span>,geom<span class="op">=</span><span class="st">"line"</span><span class="op">)</span></code></pre></div>
-<p><img src="kinematic_analysis_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="kinematic_analysis_files/figure-html/amp2-1.png" width="700"></p>
 <p>In addition to fin amplitude and contour extraction, <code><a href="../reference/fin.kin.html">fin.kin()</a></code> also produces a composite contour of the body minus the fin area described by the <code>fin.pos</code> argument. Fin contours are replaced by a simple linear prediction constructed from the coordinates of the first and last values covered by <code>fin.pos</code>. The result is a straight line between the start and end of each fin. From this composite body contour, a midline prediction is made based on a smooth spline with the amount of smoothing controlled by the argument <code>ml.smooth</code>.</p>
 <p>Here, the contour of the frame 96 is plotted with the tracked fin tips and composite midline.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -224,6 +221,7 @@
 <span class="va">p.fin</span> <span class="op">&lt;-</span> <span class="va">p.fin</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">fin.90</span><span class="op">$</span><span class="va">fin.pts</span><span class="op">[</span><span class="va">pos</span><span class="op">==</span><span class="st">"tip2"</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">4</span>,shape<span class="op">=</span><span class="fl">10</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">p.fin</span><span class="op">)</span></code></pre></div>
+<p><img src="kinematic_analysis_files/figure-html/finplot-1.png" width="700"></p>
 </div>
   </div>
 

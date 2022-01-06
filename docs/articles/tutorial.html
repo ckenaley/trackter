@@ -170,18 +170,16 @@
 <span class="va">im</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/img"</span>, package <span class="op">=</span> <span class="st">"trackter"</span><span class="op">)</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="va">im</span><span class="op">&lt;-</span> <span class="va">im</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"sunfish.jpg"</span>,<span class="va">im</span><span class="op">)</span><span class="op">]</span>
 <span class="va">im.dir</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/images"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="va">im.dir</span><span class="op">)</span></code></pre></div>
-<pre><code>## Warning in dir.create(im.dir): '/Users/biology/Documents/R.scripts/trackter/
-## vignettes/images' already exists</code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span><span class="va">im</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">im.dir</span>,<span class="st">"/"</span>,<span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span><span class="op">(</span><span class="va">im</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="va">im.dir</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span><span class="va">im</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">im.dir</span>,<span class="st">"/"</span>,<span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span><span class="op">(</span><span class="va">im</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">kin.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.search.html">kin.simple</a></span><span class="op">(</span>image.dir <span class="op">=</span> <span class="va">im.dir</span>,save<span class="op">=</span><span class="cn">TRUE</span>,out.dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning: `data_frame()` was deprecated in tibble 1.1.0.
 ## Please use `tibble()` instead.</code></pre>
 <p>The <code>kin</code> functions in <em>trackter</em> return a list of data tables/data frames:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="va">kin.y</span>,<span class="va">class</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## $kin.dat
 ## [1] "data.table" "data.frame"
@@ -204,31 +202,30 @@
 ## $dim
 ## [1] "integer"</code></pre>
 <p>Most will be interested in the “kin.dat” and “midline” data for the calculation of body position parameters (e.g., amplitude, wavelength, etc.). For example, the “kin.dat” table includes, among other things, frame-specific trailing-edge (rightmost) amplitude (“x”, “y”), head (leftmost) position (“head.x”, “head.y”) which may be used to calculate position and trailing-edge amplitude.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">kin.dat</span><span class="op">)</span></code></pre></div>
-<pre><code>##    frame roi   x        y head.x   head.y       amp head.pval
-## 1:     0   a 754 175.5444     22 131.5611  40.08771 0.1743595
-## 2:     1   a 868 198.8922     66 285.7500 -72.60059 0.9967486</code></pre>
+<pre><code>##    frame roi   x        y head.x head.y       amp head.pval
+## 1:     0   a 868 198.8922     66 285.75 -72.60059 0.9967486</code></pre>
 <p>The “midline” table is composed of frame-specific midline data, including, among other things, calculated midline position (“y”), smoothed midline position (“y.sm”) and midline position relative to the head (“wave.y”). Here we see the difference between them.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##    frame roi n  x        y     y.sm     wave.y      per.bl
-## 1:     0   a 1 15 131.0000 132.1384 -0.4828577 0.000000000
-## 2:     0   a 2 16 131.0000 132.1560 -0.4681818 0.001315830
-## 3:     0   a 3 17 134.0000 132.1742 -0.4529716 0.002631672
-## 4:     0   a 4 18 128.0000 132.1928 -0.4373000 0.003947525
-## 5:     0   a 5 19 137.2500 132.2118 -0.4212398 0.005263388
-## 6:     0   a 6 20 127.3333 132.2312 -0.4048641 0.006579259</code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+## 1:     0   a 1 58 286.5000 285.5285 0.10847708 0.000000000
+## 2:     0   a 2 59 287.3333 285.4907 0.10638200 0.001200104
+## 3:     0   a 3 60 287.0000 285.4530 0.10433325 0.002400205
+## 4:     0   a 4 61 280.7500 285.4153 0.10232499 0.003600305
+## 5:     0   a 5 62 289.0000 285.3777 0.10035140 0.004800404
+## 6:     0   a 6 63 286.5000 285.3401 0.09840665 0.006000501</code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ml</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html">melt</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>,<span class="fu">.</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,<span class="va">y.sm</span>,<span class="va">wave.y</span><span class="op">)</span><span class="op">]</span>,<span class="st">"x"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">ml</span>,x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">value</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="va">variable</span><span class="op">~</span><span class="va">.</span><span class="op">)</span></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>When “save=TRUE”, the <code>kin</code> functions write images to a user-defined directory that include midline overlays.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="st">"sunfish_000.jpg"</span><span class="op">)</span>
 <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="va">y2</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#clean up</span>
 <span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span><span class="op">(</span><span class="va">im.dir</span>,recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
@@ -236,7 +233,7 @@
 <h3 class="hasAnchor">
 <a href="#analyzing-a-video-and-multiple-images" class="anchor"></a>Analyzing a video and multiple images</h3>
 <p>Of course, the primary utility of automated tracking routines is to process many images (i.e., frames). The <code>kin</code> functions analyze all the images in a subdirectory and assume they are ordered by a numbered suffix. One can use the <code>FFmpeg</code> wrappers <code>vid.to.images</code> or <code>vid.to.images2</code> to extract a numbered sequence from a video. Users may otherwise produce an image sequence from their videos using other software (e.g., ImageJ). Here, <code>vid.to.images</code> extracts images from a video in the package’s “vid” directory of a swimming fish to a new directory named “img2”.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#construct video file path</span>
 <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/vid"</span>,<span class="st">"sunfish_BCF_red.avi"</span>,package<span class="op">=</span><span class="st">"trackter"</span><span class="op">)</span>
 
@@ -246,22 +243,22 @@
 <span class="co">#extract images from video and output to new "img2" directory</span>
 <span class="fu"><a href="../reference/vid.to.images.html">vid.to.images</a></span><span class="op">(</span><span class="va">v</span>,out.dir<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/img2"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The images are then passed through <code>kin.simple</code>. The threshold value for segmenting is set automatically. The head section (“ant.per”) set to 0.2 in this case.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R">  <span class="va">kin.y2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.search.html">kin.simple</a></span><span class="op">(</span>image.dir<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/img2"</span><span class="op">)</span>,ant.per <span class="op">=</span> <span class="fl">0.2</span>,save <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="co">#clean up</span>
 <span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/img2"</span><span class="op">)</span>,recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>Now we can have a look at trailing-edge position and amplitude (relative to the head path) across the frames.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#position</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">kin.y2</span><span class="op">$</span><span class="va">kin.dat</span>,x<span class="op">=</span><span class="va">frame</span>,y<span class="op">=</span><span class="va">y</span><span class="op">)</span></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#amplitude relative to a theoretical midline established by head</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">kin.y2</span><span class="op">$</span><span class="va">kin.dat</span>,x<span class="op">=</span><span class="va">frame</span>,y<span class="op">=</span><span class="va">amp</span><span class="op">)</span> </code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>The midline data can be accessed to assess the waveform. Here, midline x position is standardized.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">kin.y2</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>,<span class="va">x2</span><span class="op">:=</span><span class="va">x</span><span class="op">-</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,by<span class="op">=</span><span class="va">frame</span><span class="op">]</span>
 
 <span class="co">#waveform plot</span>
@@ -272,37 +269,39 @@
 <h3 class="hasAnchor">
 <a href="#downstream-analyses-of-kinematic-data" class="anchor"></a>Downstream analyses of kinematic data</h3>
 <p><em>trackter</em> supplies several functions for downstream analysis of kinematic data extracted from image frames. For instance, <code>half.wave</code> computes the midline half wavelength (i.e., propulsive wavelength in pixels) from a data table of x and y position data. These and other functions are intended for use with output from the <code>kin</code> functions.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/halfwave.html">halfwave</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">$</span><span class="va">x</span>,y<span class="op">=</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">$</span><span class="va">wave.y</span>,method<span class="op">=</span><span class="st">"zeros"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">w</span><span class="op">)</span></code></pre></div>
 <pre><code>## $method
 ## [1] "zeros"
 ## 
 ## $names
-##               x            y wave
-##    1:  50.68485 0.0004549743    1
-##    2:  50.73983 0.0009528502    1
-##    3:  50.79481 0.0014499721    1
-##    4:  50.84980 0.0019463405    1
-##    5:  50.90478 0.0024419560    1
+##              x             y wave
+##    1: 103.7497 -9.568675e-05    1
+##    2: 103.8496 -3.812126e-04    1
+##    3: 103.9494 -6.666841e-04    1
+##    4: 104.0493 -9.520930e-04    1
+##    5: 104.1492 -1.237431e-03    1
 ##   ---                            
-## 1405: 127.88288 0.0027960213    1
-## 1406: 127.93786 0.0021519574    1
-## 1407: 127.99285 0.0015075328    1
-## 1408: 128.04783 0.0008627701    1
-## 1409: 128.10282 0.0002176918    1
+## 5166: 619.6820  8.046804e-02    2
+## 5167: 619.7819  6.227005e-02    2
+## 5168: 619.8818  4.403002e-02    2
+## 5169: 619.9817  2.574768e-02    2
+## 5170: 620.0816  7.422796e-03    2
 ## 
 ## $dat
-##    wave zeros wave.begin wave.end begin.index end.index        l      amp1 amp2
-## 1:    1   650   50.68485 127.1578         650      2058 77.47295 0.1879444   NA
-##        pos1 pos2
-## 1: 96.37684   NA</code></pre>
+##    wave zeros wave.begin wave.end begin.index end.index         l      amp1
+## 1:    1   459   103.7497 192.4510         459      1356  89.70131 0.1126977
+## 2:    2  1357   193.4510 619.1815        1357      5628 426.73049 8.2753048
+##    amp2     pos1 pos2
+## 1:   NA 158.7891   NA
+## 2:   NA 496.0181   NA</code></pre>
 <p>Using a “zeros” method, <code>half.wave</code> determines two half waves from the ROI in the single image above, described in the “dat” table from the output. The “names” table can be used to visualize the half wavelengths.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">w</span><span class="op">$</span><span class="va">names</span>,x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span>,col<span class="op">=</span><span class="va">wave</span><span class="op">)</span></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
 <p>We could extend this framework using <code>data.table</code> to calculate half waves in each of the 11 frames from the example video.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"> <span class="va">wave.dat</span> <span class="op">&lt;-</span> <span class="va">kin.y2</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>, <span class="op">{</span> <span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/halfwave.html">halfwave</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">wave.y</span>,method<span class="op">=</span><span class="st">"zeros"</span><span class="op">)</span><span class="op">$</span><span class="va">dat</span>;
  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>l<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">w</span><span class="op">$</span><span class="va">l</span><span class="op">)</span>,
     amp<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">w</span><span class="op">$</span><span class="va">amp1</span><span class="op">)</span>,

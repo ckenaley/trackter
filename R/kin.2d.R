@@ -473,10 +473,9 @@ amp.freq <- function(x = NULL, y, sf = 100) {
 #' library(ggplot2)
 #' n <- 200
 #' d <- data.frame(
-#' x <- sort(runif(n))
+#' x <- sort(runif(n)),
 #' y <- exp(-0.2 * sin(10*pi*x)) + rnorm(n, sd=0.05)
 #' )
-#' 
 #' #start at peaks
 #' c <- cyclize(d$x,d$y)
 #' d$cyc <- c$cyc
@@ -485,7 +484,7 @@ amp.freq <- function(x = NULL, y, sf = 100) {
 #'  #start at troughs
 #' c <- cyclize(d$x,d$y,start="trough")
 #' d$cyc <- c$cyc
-#' qplot(d=d,x,y,col=as.factor(cyc))
+#' qplot(data=d,x,y,col=as.factor(cyc))
 #' 
 #' @export
 #' 

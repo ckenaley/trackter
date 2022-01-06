@@ -281,7 +281,7 @@ crop.img <-
 #' EBImage::display(EBImage::readImage(y),method="raster")
 #'
 #' 
-#' # crop and save as original format
+#' # adjust contrast and save as original format
 #' contrast.img(img=y,c=0.5,out.dir=od)
 #' 
 #'#display modified image
@@ -634,6 +634,7 @@ data.overlay <- function(img,over,...){
 #' col="red",
 #' fps=10)
 #' 
+#' #clean up 
 #' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 #'}
 #'

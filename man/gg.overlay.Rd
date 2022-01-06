@@ -94,6 +94,7 @@ animate=TRUE,
 col="red",
 fps=10)
 
+#clean up 
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 }
 

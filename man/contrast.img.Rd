@@ -30,7 +30,7 @@ dir.create(od)
 EBImage::display(EBImage::readImage(y),method="raster")
 
 
-# crop and save as original format
+# adjust contrast and save as original format
 contrast.img(img=y,c=0.5,out.dir=od)
 
 #display modified image

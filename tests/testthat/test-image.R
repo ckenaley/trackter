@@ -46,6 +46,9 @@ test_that("crop.img works fine", {
   
   z <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
   
+  expect_true("sunfish_BCF.png" %in% list.files(od))
+  
+  
   
   expect_error(crop.img(img=z,ul=c(5,30),br=c(200,200),out.dir=od),"file in file path doesn't appear to be an image" )
   
@@ -59,4 +62,83 @@ test_that("crop.img works fine", {
   
   expect_true(dimA[1]>dimB[1]&& dimA[1]>dimC[1] &&  dimB[1]<dimC[1])
 
+  unlink(od,recursive = TRUE)
 })
+
+
+test_that("contrast.img works fine", {
+  
+  y <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+  
+  od <- paste0(tempdir(),"/cropimg")
+  dir.create(od)
+  
+  contrast.img(img=y,c=0.5,out.dir=od)
+  
+  expect_true(list.files(od)=="sunfish_BCF.jpg")
+  
+  contrast.img(img=y,c=0.5,out.dir=od,type="png")
+  
+  expect_true("sunfish_BCF.png" %in% list.files(od))
+  
+  z <- system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
+  
+  
+  expect_error(contrast.img(img=z,c=0.5,out.dir=od),"file in file path doesn't appear to be an image" )
+  
+  expect_error(contrast.img(img=y,c=0.5,out.dir=od,type="foo"),"invalid" )
+  
+  unlink(od,recursive = TRUE)
+  
+})
+
+
+test_that("data.overlay works fine", {
+  
+f <-system.file("extdata/img", "sunfish_BCF.jpg", package = "trackter")
+
+d <- dim(EBImage::readImage(f))
+x <- runif(10,1,d[1])
+y <- runif(10,1,d[2])
+pts <- cbind(x,y)
+
+recPlot <- function(expr) {
+  pdf(NULL)
+  on.exit(dev.off())
+  dev.control(displaylist="enable")
+  expr
+  recordPlot()
+}
+
+
+expect_identical(
+  recPlot(data.overlay(img=f,over=pts,col="red",type="p")),
+  recPlot(data.overlay(img=f,over=pts,col="red",type="p"))
+  ) 
+
+expect_error(expect_identical(
+  recPlot(data.overlay(img=f,over=pts,col="red",type="p")),
+  recPlot(data.overlay(img=f,over=pts,col="blue",type="p"))
+),"not identical to") 
+
+
+
+  
+})
+
+test_that("gg.overlay works fine", {
+  
+  f <-system.file("extdata", "sunfish_kin.RDS", package = "trackter")
+  
+  kin <- readRDS(f)
+
+  p <- gg.overlay(kin=kin,under="cont.sm", over="midline")
+  
+  expect_length(p$layers,2) 
+  
+  gg.overlay(kin=kin,under="cont.sm", over="midline", size=1,animate=TRUE, frames=0:1,col="red",fps=10,save=TRUE,out.dir = tempdir(),filename = "foo.gif")
+  
+  expect_true("foo.gif" %in% list.files(tempdir()))
+  
+})
+
