@@ -62,13 +62,21 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
-      - name: Install system dependencies
+      # - name: Install system dependencies
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     while read -r cmd
+      #     do
+      #       eval sudo $cmd
+      #     done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "18.04"))')
+
+      - name: "[Stage] [Linux] Install required system libs"
         if: runner.os == 'Linux'
-        run: |
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "18.04"))')
+        run: sudo apt install libcurl4-openssl-dev libgit2-dev libfftw3-dev
+      
+      - name: "[Stage] [macOS] Install ffmpeg"
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
 
       - name: Install dependencies
         run: |
