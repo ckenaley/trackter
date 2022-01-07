@@ -68,9 +68,10 @@ colnames(o) <- c("x","y")
 plot(o)
 fml <- free.ml.hull(o)
 points(fml$ml$x,fml$ml$y,col="red")
+
 #note the difference
-fml2 <- free.ml.ang(o)
-points(fml2$ml$x,fml2$ml$y,col="blue")
+#fml2 <- free.ml.ang(o) 
+#points(fml2$ml$x,fml2$ml$y,col="blue")
 
 # with free.ml.del, a poorer choice
 fml3 <- free.ml.del(o)
