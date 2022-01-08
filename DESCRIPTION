@@ -13,23 +13,18 @@ Imports:
   data.table,
   dplyr,
   Momocs,
-  raster,
-  plyr,
   features,
-  jpeg,
   smoothr,
   foreach,
   doParallel,
   ggplot2,
   gganimate,
-  transformr,
   deldir,
   igraph,
   rgeos,
   sf,
   sp,
-  methods,
-  animation
+  methods
 RoxygenNote: 7.1.1
 Suggests:
     spelling, 
