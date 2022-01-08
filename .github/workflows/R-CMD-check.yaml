@@ -43,6 +43,14 @@ jobs:
         with:
           extra-packages: rcmdcheck
 
+      - name: "[Stage] [Linux] Install required system libs"
+        if: runner.os == 'Linux'
+        run: sudo apt install libcurl4-openssl-dev libgit2-dev libfftw3-dev
+      
+      - name: "[Stage] [macOS] Install ffmpeg"
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+
       - uses: r-lib/actions/check-r-package@v1
 
       - name: Show testthat output
