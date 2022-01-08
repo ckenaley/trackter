@@ -601,7 +601,7 @@ data.overlay <- function(img,over,...){
 #' 
 #'
 #' @import ggplot2 
-#' @import gganimate
+#' @import gganimate animation
 #'
 #' @examples
 #' 

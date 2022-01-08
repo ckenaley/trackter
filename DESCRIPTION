@@ -13,6 +13,7 @@ Imports:
   data.table,
   dplyr,
   Momocs,
+  animation,
   features,
   smoothr,
   foreach,
