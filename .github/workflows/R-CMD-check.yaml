@@ -1,6 +1,7 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-# jan 22, GHA r cmd check build vignettes fail, "polygon edge not found"
+# jan 22, GHA r cmd check build vignettes fail, polygon edge not found
+
 on:
   push:
     branches: [main, master]
