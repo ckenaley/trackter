@@ -50,7 +50,7 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install ffmpeg
         
-       - name: "[Stage] [macOS] Install "
+      - name: "[Stage] [macOS] Install "
         if: runner.os == 'macOS'
         run: brew install ffmpeg
         
