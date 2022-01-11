@@ -42,7 +42,7 @@ jobs:
       
       - name: "[Stage] [Linux] Install required system libs"
         if: runner.os == 'Linux'
-        run: sudo apt install libcurl4-openssl-dev libgit2-dev libfftw3-dev
+        run: sudo apt install libcurl4-openssl-dev libgit2-dev libfftw3-dev ffmpeg
       
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
