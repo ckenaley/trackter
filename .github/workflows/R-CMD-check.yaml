@@ -50,7 +50,7 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install ffmpeg
       
-      - name: "[Stage] [macOS] Install fftw"
+      - name: "[Stage] [macOS] Install fftw3"
         if: runner.os == 'macOS'
         run: brew install fftw3
     
