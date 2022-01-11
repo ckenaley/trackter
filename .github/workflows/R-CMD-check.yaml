@@ -39,15 +39,15 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-
-      - uses: r-lib/actions/setup-r-dependencies@v1
-        with:
-          extra-packages: rcmdcheck
-
+      
       - name: "[Stage] [Linux] Install required system libs"
         if: runner.os == 'Linux'
         run: sudo apt install libcurl4-openssl-dev libgit2-dev libfftw3-dev
       
+      - uses: r-lib/actions/setup-r-dependencies@v1
+        with:
+          extra-packages: rcmdcheck
+
       - name: "[Stage] [macOS] Install ffmpeg"
         if: runner.os == 'macOS'
         run: brew install ffmpeg
@@ -55,10 +55,6 @@ jobs:
       - name: "[Stage] [macOS] Install fftw3"
         if: runner.os == 'macOS'
         run: brew install fftw
-        
-      - name: "[Stage] [Linux] Install required system libs"
-        if: runner.os == 'Linux'
-        run: sudo apt install libcurl4-openssl-dev libgit2-dev libfftw3-dev ffmpeg
         
       - name: Check
         run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), build_args = c("--no-manual", "--ignore-vignettes", "--no-build-vignettes"), error_on = "error")
