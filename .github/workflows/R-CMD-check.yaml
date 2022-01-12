@@ -40,7 +40,7 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
       
-       - name: "[Stage] [macOS] Install ffmpeg"
+      - name: "[Stage] [macOS] Install ffmpeg"
         if: runner.os == 'macOS'
         run: brew install libfftw3-dev ffmpeg
       
