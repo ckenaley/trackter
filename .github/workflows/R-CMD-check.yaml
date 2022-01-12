@@ -42,7 +42,7 @@ jobs:
       
       - name: "[Stage] [macOS] Install ffmpeg"
         if: runner.os == 'macOS'
-        run: brew install fftw ffmpeg imagemagick@6
+        run: brew install fftw ffmpeg imagemagick
       
       - name: "[Stage] [Linux] Install required system libs"
         if: runner.os == 'Linux'
