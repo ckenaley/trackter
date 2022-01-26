@@ -72,9 +72,9 @@ These choices will be made on ROI sets that are not on the edge of the field if 
 \examples{
 
 library(data.table)
-#download example video of a sunfish swimming and establish directories
+#acces example video of a sunfish swimming and establish directories
+
 f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
-download.file(f, paste0(tempdir(),"/sunfish.avi"))
 
 dir.create(paste0(tempdir(),"/images"))
 dir.create(paste0(tempdir(),"/out"))

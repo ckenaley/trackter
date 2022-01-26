@@ -8,6 +8,7 @@ output:
     - see (this)[https://github.com/r-lib/pkgdown/issues/1157] for SSL error workaround
     -`httr::set_config(httr::config(ssl_verifypeer = 0L)); 
 pkgdown::build_site(pkg = ".", new_process = FALSE)`
+    - Vignettes building to site on CI deploy with GHA
 
 # Notes for testing/CI
 
@@ -26,6 +27,7 @@ pkgdown::build_site(pkg = ".", new_process = FALSE)`
   * For biocon dependencies: https://github.com/r-lib/actions/actions/runs/100691291/workflow
   * Now editing 'workflow.yml' directly.
   * Error with R Devel on Linux and Mac: see https://github.com/r-hub/rhub/issues/471
+  * Now editing 'R-CMD-check.yaml'
   
   
   
@@ -39,13 +41,8 @@ pkgdown::build_site(pkg = ".", new_process = FALSE)`
   * abandoned deploy, now going with static, but often builds of site locally with push to git [a la](https://sahirbhatnagar.com/blog/2020/03/03/creating-a-website-for-your-r-package/)
     - `pkgdown::build_site()` for build
     - `use_travis_deploy()` broken with:
-    
-```
-Error: `github_token()` was deprecated in usethis 2.0.0 and is now defunct.
-Call `gh::gh_token()` to retrieve a GitHub personal access token
-Call `gh_token_help()` if you need help getting or configuring your token
-```
-  
+  * deploying with GHA for CI
+
 # Versioning
 
   * Follow: https://yihui.org/en/2013/06/r-package-versioning/
