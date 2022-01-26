@@ -33,6 +33,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: FedericoCarboni/setup-ffmpeg@v1
+        id: setup-ffmpeg
 
       - uses: r-lib/actions/setup-pandoc@v1
 
