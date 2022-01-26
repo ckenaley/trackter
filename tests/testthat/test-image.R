@@ -136,6 +136,7 @@ test_that("gg.overlay works fine", {
   
   expect_length(p$layers,2) 
   
+  library(transformr)
   gg.overlay(kin=kin,under="cont.sm", over="midline", size=1,animate=TRUE, frames=0:1,col="red",fps=10,save=TRUE,out.dir = tempdir(),filename = "foo.gif")
   
   expect_true("foo.gif" %in% list.files(tempdir()))
