@@ -74,13 +74,13 @@ These choices will be made on ROI sets that are not on the edge of the field if 
 library(data.table)
 #acces example video of a sunfish swimming and establish directories
 
-f <- "https://github.com/ckenaley/exampledata/blob/master/sunfish_pect.avi?raw=true"
+v <-system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
 
 dir.create(paste0(tempdir(),"/images"))
 dir.create(paste0(tempdir(),"/out"))
 
 #extract images
-vid.to.images(paste0(tempdir(),"/sunfish.avi"), out.dir = paste0(tempdir(),"/images"))
+vid.to.images(v, out.dir = paste0(tempdir(),"/images"))
 
 #find ROIs and extract contours
 
