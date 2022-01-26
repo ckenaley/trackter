@@ -20,6 +20,7 @@ Imports:
   doParallel,
   ggplot2,
   gganimate,
+  transformr,
   deldir,
   igraph,
   rgeos,
