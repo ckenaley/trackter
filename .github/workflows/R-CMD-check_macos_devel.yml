@@ -18,11 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel'}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: windows-latest, r: 'devel'}
+          - {os: macOS-latest, r: 'devel'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -35,13 +31,13 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v1
         with:
-          r-version: ${{ matrix.config.r }}
+          r-version: ${{ matrix.config.r}}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
       
-      - name: "[Stage] [Linux] Install required system libs"
-        if: runner.os == 'Linux'
-        run: sudo apt-get install libavfilter-dev libfftw3-dev
+      - name: "[Stage] [MacOs] Install required system libs"
+        if: runner.os == 'macOS'
+        run: brew intall ffmpeg
       
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
