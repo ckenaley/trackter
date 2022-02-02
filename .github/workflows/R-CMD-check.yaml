@@ -41,7 +41,7 @@ jobs:
       
       - name: "[Stage] [Linux] Install required system libs"
         if: runner.os == 'Linux'
-        run: sudo apt-get install libavfilter-dev
+        run: sudo apt-get install libavfilter-dev libfftw3-dev
         
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
