@@ -152,8 +152,9 @@ test_that("kin.free works fine", {
   expect_error(invisible(capture.output( kin.free(image.dir=ti,save=FALSE,ml.smooth=list("spline",1.1)))),"'smooth' must <1")
   
 
-  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+ 
   
+ 
   if (nzchar(chk) && chk == "TRUE") {
     # use 2 cores in CRAN/Travis/AppVeyor
     cor.n <- 2L
@@ -162,13 +163,18 @@ test_that("kin.free works fine", {
     cor.n <- parallel::detectCores()
   }
   
+  #for win builder
+  n.cor <- parallel::detectCores()
+  if (.Platform$OS.type == "windows" && n.cor > 1) {
+    skip("mc.cores > 1 is not supported on Windows.")
+  }
+  
 
   invisible(capture.output( kin.yp <- kin.free(image.dir = ti,save = TRUE,out.dir =tp,red=0.5,par=TRUE,cores.n = cor.n)))
   
   expect_identical(kin.y,kin.yp)
   
 
-  
   dir.create(paste0(tempdir(),"/test_images2"))
   
   
