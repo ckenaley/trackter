@@ -13,7 +13,7 @@ The image analysis functions `kin.search()`, `kin.simple()`, and `kin.free()` (i
 
 Users can start analysis with images extracted from videos using some other software program (e.g., imageJ). However, they must be given unique file names that end in a sequence number. For example "image_01.jpeg", "image_02.jpeg", etc.
 
-If the starting point of analysis is a video file, `trackter`'s `video.to.images()` or `video.to.images2()` can be used to extract images to a user-defined directory. Supported video formats include .avi and .mp4 files. For example, the following with extract images from an 11-frame video of a swimming pumpkinseed sunfish included with the package. 
+If the starting point of analysis is a video file, `trackter`'s `video.to.images()` can be used to extract images to a user-defined directory. This function is a wrapper for the `av` package's `av_video_code()`. For example, the following with extract images from an 11-frame video of a swimming pumpkinseed sunfish included with the package. 
 
 ```{r load,message=FALSE,warning=FALSE}
 library(trackter)
@@ -33,15 +33,15 @@ EBImage::display(EBImage::readImage(list.files("./sunfish_images",full.names = T
 
 ## Filter extracted images
 
-`video.to.images2()` supports added `FFmpeg` functionality, allowing users to specify filters that may, for example crop, rotate, or adjust the size of the images. Filters can be passed to the `filt` argument as a character string.  For example, one can extract images from the same video and crop around their center at 900 pixels wide and 400 pixels deep with the following.
+`video.to.images()` supports added `FFmpeg` functionality, allowing users to specify filters that may, for example crop, rotate, or adjust the size of the images. Filters can be passed to the `vfilter` argument as a character string, which in turn is passed to `av`s `av_vidoe_encode()`.  For example, one can extract images from the same video and crop around their center at 900 pixels wide and 400 pixels deep with the following.
 
 ```{r crop1}
 #Crop the central input area with size 900x300:
-filt.crop <- ' -vf crop=900:300 '
-#creat the directory again
+filt.crop <- 'crop=900:300'
+
 
 #will overwrite images in the directory
-vid.to.images2(vid.path = sunfish.vid, out.dir = "./sunfish_images", filt = filt.crop,silent = ) # extract
+vid.to.images(vid.path = sunfish.vid, out.dir = "./sunfish_images", vfilter=filt.crop,overwrite = TRUE) # extract
 ```
 
 Now, display one of the cropped images.
@@ -49,17 +49,16 @@ Now, display one of the cropped images.
 ```{r dispcrop}
 EBImage::display(EBImage::readImage(list.files("./sunfish_images",full.names = TRUE)[1]),method = "raster")
 ```
-
-Notice that the character string passed to `filt` begins and ends with a white space and the first part of the string contains " -vf" which implements a video filter in `FFmpeg`. To learn more about filters, users can check out the [`FFmpeg` wiki site](https://ffmpeg.org/ffmpeg-filters.html).
+To learn more about filters, users can check out the [`FFmpeg` wiki site](https://ffmpeg.org/ffmpeg-filters.html).
 
 Here's another example with a filter that doubles the contrast.
 
 ```{r cont}
 #boost the contrast
-filt.br <- ' -vf "eq=contrast=2" '
+filt.br <- 'eq=contrast=2'
 
 #extract and filter (overwriting the previous extraction)
-vid.to.images2(vid.path = sunfish.vid, out.dir = "./sunfish_images", filt = filt.br) 
+vid.to.images(vid.path = sunfish.vid, out.dir = "./sunfish_images", vfilter = filt.br,overwrite = TRUE) 
 
 #display
 EBImage::display(EBImage::readImage(list.files("./sunfish_images",full.names = TRUE)[1]),method = "raster")
@@ -78,7 +77,7 @@ dir.create("./sunfish_images2")
 crop.img(img="./sunfish_images",out.dir ="./sunfish_images2",ul=c(5,150),br=c(900,400))
 
 #display the first cropped image in the sequence
-EBImage::display(EBImage::readImage("./sunfish_images2/sunfish_BCF_red_00001.jpg"),method="raster")
+EBImage::display(EBImage::readImage("./sunfish_images2/sunfish_BCF_red_000001.jpg"),method="raster")
 
 ```
 
@@ -89,7 +88,7 @@ Here, the same image sequence has its contrast enhanced with `contrast.img()`. C
 contrast.img(img="./sunfish_images",out.dir ="./sunfish_images2",c=2)
 
 #display the first cropped image in the sequence
-EBImage::display(EBImage::readImage("./sunfish_images2/sunfish_BCF_red_00001.jpg"),method="raster")
+EBImage::display(EBImage::readImage("./sunfish_images2/sunfish_BCF_red_000001.jpg"),method="raster")
 
 ```
 
@@ -287,7 +286,7 @@ To demonstrate the similar results, yet increased processing time, `kin.simple()
 ```{r}
 sunfish.vid <- system.file("extdata/vid", "sunfish_BCF_red.avi", package = "trackter")
 dir.create("./sunfish_images")
-vid.to.images2(vid.path = sunfish.vid, out.dir = "./sunfish_images")
+vid.to.images(vid.path = sunfish.vid, out.dir = "./sunfish_images")
 
 system.time(sunfish.kin.sim <- kin.simple(image.dir = "./sunfish_images",ml.meth = list("spline",0.2)))
 

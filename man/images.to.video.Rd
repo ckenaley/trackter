@@ -8,10 +8,8 @@ images.to.video(
   image.dir = NULL,
   out.dir = NULL,
   vid.name = NULL,
-  qual = 50,
-  frame.rate = 10,
   overwrite = FALSE,
-  silent = TRUE
+  ...
 )
 }
 \arguments{
@@ -19,21 +17,17 @@ images.to.video(
 
 \item{out.dir}{character; directory in which to store video.}
 
-\item{vid.name}{character; file name given to video including extension.  mp4 currently works best.}
+\item{vid.name}{character; file name given to video including extension.}
 
-\item{qual}{numeric; the quality of the video rendered from 1-100\%. Defaults to 50\%.}
+\item{overwrite}{logical; should path described by \code{vid.name} be overwritten if it exists.}
 
-\item{frame.rate}{numeric; video frame rate in fps.}
-
-\item{overwrite}{logical; should path described by vid.name  be overwritten if it exists.}
-
-\item{silent}{logical; should output of \code{system} call for ffmpeg operation be suppressed.}
+\item{...}{other arguments to be passed to \code{av::av_encode_video}.}
 }
 \value{
 Outputs a video of name "video.name+vid.ext".
 }
 \description{
-Stitches images into a video file of type indicated by "vid.ext"
+Uses ffmpeg through the \code{av} package to stitch images into a video.
 }
 \details{
 Assumes images are appended with a numeric sequence.
@@ -56,9 +50,7 @@ for(i in seq(1,length(theta),30)) {
   dev.off()
   }
 
-images.to.video(image.dir=paste0(tempdir(),"/images"),
-vid.name="spiral.mp4",out.dir=tempdir(),
-frame.rate=5,qual=100,silent=TRUE,overwrite=TRUE)
+images.to.video(image.dir=paste0(tempdir(),"/images"),vid.name="spiral.mp4",out.dir=tempdir())
 
 file.exists(paste0(tempdir(),"/spiral.mp4"))
 
@@ -68,5 +60,5 @@ unlink(paste0(tempdir(),"/images"),recursive=TRUE)
 }
 }
 \seealso{
-\code{\link{vid.to.images}}
+\code{\link{vid.to.images}}, \code{\link[av]{encoding}} \code{\link[av]{av_video_images}}.
 }

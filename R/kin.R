@@ -193,11 +193,9 @@
 #' qplot(data=kin.both,x=x,y=y.sm,col=fun)
 #' 
 #' #' #plot midline over original image from kin.simple()
-#' i2 <- EBImage::readImage(paste0(t,"/sunfish001_000.jpg"))
+#' i2 <- EBImage::readImage(paste0(t,"/sunfish001.jpg"))
 #' EBImage::display(i2,method="raster")
 #'
-#' #clean up
-#' unlink(paste0(t,"/images"),recursive=TRUE)
 #'
 #' ##A somewhat long example using kin.free()
 #' #### plot midline waveform on images of swimming ropefish
@@ -245,9 +243,6 @@
 #' col="red",
 #' fps=10)
 #' 
-#' #clean up
-#' unlink(paste0(tempdir(),"/images"),recursive=TRUE)
-#' unlink(paste0(tempdir(),"/out"),recursive=TRUE)
 #' 
 #' 
 #'}
@@ -297,8 +292,6 @@ kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.0
     smoothing <- unlist(ml.smooth[which(sapply(ml.smooth,class)=="character")])
     smooth <- unlist(ml.smooth[which(sapply(ml.smooth,class)=="numeric")])
     
-    
-    
     trial <- gsub("\\.[^.]*$", "", basename(images[1]))
     
     kin.l <- list()
@@ -307,7 +300,7 @@ kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.0
     lms <- list()
     conts <- list()
     conts.sm <- list()
-   
+  
     
     roi.outs <- list() #store the rois for each image
     
@@ -412,8 +405,7 @@ kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.0
       
       
       if (save) {
-        jpeg(
-          paste0(out.dir, "/", trial, "_", sprintf("%03d", frame), ".jpg"),
+        jpeg(filename = file.path(out.dir,basename(im)),
           quality = out.qual * 100,
           width = roi$dim[1],
           height = roi$dim[2]
@@ -850,9 +842,6 @@ kin.free <-
     mid.pred2 <- mid.pred2[keep == TRUE, ]
     
     
-    #qplot(d=cont.dat[frame==36],x,y)+geom_point(d=midline.dat2[frame==36],aes(x,y,col=n))+geom_point(d=mid.pred2[frame==36],aes(x,mid.pred))
-    #add head.p to kin.dat
-    
     kin.dat[, head.pval := head.p]
     
     
@@ -887,9 +876,6 @@ kin.free <-
     cont.sm.dat2 <- cont.sm.dat2[,{c <- Momocs::coo_slide(as.matrix(data.frame(x=x,y=y)),close.n[1]);list(x=c[,1],y=c[,2])},by=frame]
     
     cont.sm.dat2[,n:=1:.N,by=frame]
-    #qplot(d=cont.sm.dat2,x,y,col=n)+facet_wrap(frame~.)
-    
-    #qplot(d=cont.sm.dat2[frame==7],x,y,col=n)+geom_point(d=cont.sm.dat2[frame==7&flip==T],aes(x,y),col="re")
     
     setkeyv(cont.sm.dat,c("frame","n"))
     
@@ -898,9 +884,8 @@ kin.free <-
     if (save) {
       for (xx in images) {
         frame2 <- which(xx == images)
-        trial2 <- gsub("(.*)_\\d+", "\\1", trial)
         img2 <-  EBImage::readImage(xx)
-        jpeg(paste0(proc.dir, "/", trial2, "_", sprintf("%03d", frame2), ".jpg"),
+        jpeg(file.path(proc.dir,basename(xx)),
              quality = out.qual * 100)
         suppressMessages(EBImage::display(img2, method = "raster"))
         

@@ -241,11 +241,9 @@ data.table(kin.simp$midline,fun="simple"))
 qplot(data=kin.both,x=x,y=y.sm,col=fun)
 
 #' #plot midline over original image from kin.simple()
-i2 <- EBImage::readImage(paste0(t,"/sunfish001_000.jpg"))
+i2 <- EBImage::readImage(paste0(t,"/sunfish001.jpg"))
 EBImage::display(i2,method="raster")
 
-#clean up
-unlink(paste0(t,"/images"),recursive=TRUE)
 
 ##A somewhat long example using kin.free()
 #### plot midline waveform on images of swimming ropefish
@@ -293,9 +291,6 @@ alpha=0.01,
 col="red",
 fps=10)
 
-#clean up
-unlink(paste0(tempdir(),"/images"),recursive=TRUE)
-unlink(paste0(tempdir(),"/out"),recursive=TRUE)
 
 
 }

@@ -2,52 +2,53 @@
 % Please edit documentation in R/ffmpeg.R
 \name{vid.to.images}
 \alias{vid.to.images}
-\title{Extracts images from a video file with ffmpeg}
+\title{Extracts images from a video file}
 \usage{
-vid.to.images(vid.path = NULL, out.dir = NULL, overwrite = FALSE, qual = 50)
+vid.to.images(
+  vid.path = NULL,
+  out.dir = NULL,
+  format = "jpg",
+  vfilter = NULL,
+  overwrite = FALSE,
+  ...
+)
 }
 \arguments{
-\item{vid.path}{Character; path of video file to be processed.}
+\item{vid.path}{character; path of video file to be processed.}
 
 \item{out.dir}{character; directory path in which to store images.}
 
-\item{overwrite}{logical; should path described by 'out.dir' be overwritten if it exists.}
+\item{format}{character; image format such as "png" or "jpg"; must be available from \code{\link[av]{av_encoders}}.}
 
-\item{qual}{numeric; the quality of the jpeg images to be rendered from 1-100\%. Defaults to 50\%.}
+\item{vfilter}{character; a string defining an ffmpeg filter, the \code{-vf} argument in the ffmpeg command line utility. Passed to \code{\link[av]{av_encode_video}}}
+
+\item{overwrite}{logical; should images in path described by 'out.dir' be overwritten if they exists.}
+
+\item{...}{other arguments to be passed to \code{\link[av]{av_encode_video}}.}
 }
 \value{
-Extracts all the images of the video and saves them to an "images" directory with appended number sequence
+Extracts all the images of the video and saves them to an "images" directory with appended number sequence.
 }
 \description{
-Uses ffmpeg systems calls to extract images from a video.
+Uses ffmpeg through the \code{av} package to extract images from a video.
 }
 \examples{
 
-#make a video with animation package
-\donttest{
-require(animation)
-fun <- function(){
-y <- sin(1:50)
-x <- 1:50
-for(i in 1:50) {
-  plot(x[i],y[i],col="red",xlim=c(0,50),ylim=range(y))
-  animation::ani.pause()
-  }
-}
-animation::saveVideo(fun(),video.name=paste0(tempdir(),"/wave.mp4"),interval = 0.2)
+#access video that loads with package
+v <-system.file("extdata/vid", "sunfish_BCF.avi", package = "trackter")
 
 #create directory in which to store images
 dir.create(paste0(tempdir(),"/images"))
-vid.to.images(vid.path=paste0(tempdir(),"/wave.mp4"),
-out.dir= paste0(tempdir(),"/images"),qual=100)
+
+vid.to.images(vid.path=v,out.dir= paste0(tempdir(),"/images"))
 
 #see the images in the "images" subdirectory
 list.files( paste0(tempdir(),"/images"))
 
 #clean up
 unlink(paste0(tempdir(),"/images"),recursive=TRUE)
-}
+
 }
 \seealso{
-\code{\link{images.to.video}}
+\code{\link{images.to.video}}, \code{\link[av]{av_encode_video}} \code{\link[av]{av_video_images}}.
 }

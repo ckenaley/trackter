@@ -13,7 +13,6 @@ Imports:
   data.table,
   dplyr,
   Momocs,
-  animation,
   features,
   smoothr,
   foreach,
@@ -26,8 +25,9 @@ Imports:
   rgeos,
   sf,
   sp,
-  methods
-RoxygenNote: 7.1.1
+  methods,
+  av
+RoxygenNote: 7.1.2
 Suggests:
     spelling, 
     testthat (>= 3.0.1),
@@ -36,6 +36,5 @@ Suggests:
     rmarkdown,
     markdown,
     kableExtra,
-SystemRequirements: FFmpeg
 VignetteBuilder: knitr
 Language: en-US
