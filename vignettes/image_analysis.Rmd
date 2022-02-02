@@ -210,7 +210,7 @@ This, of course, isn't a condition met for many experimental conditions, especia
 Take for instance, a 50-frame video of a crawling roundworm (*C. elegans*) from the supplementary material in @pierce2008genetic is analyzed. After image extraction, both `kin.search()` and `kin.free()` are run on the image sequence in a new directory. Notice that, for `kin.free()`, the chosen midline method is Delaunay triangulation (`ml.meth = 'del'`, see [below](#midline_estimation)). Not that, due to the worm's small size in the image field, the minimum size argument is set to `size.min=0.01`.
 
 ```{r celexample,cache=FALSE}
-cel.vid <- system.file("extdata/vid", "celegans3.AVI", package = "trackter")
+cel.vid <- system.file("extdata/vid", "celegans3.avi", package = "trackter")
 dir.create("./cel_images")
 vid.to.images(vid.path = cel.vid, out.dir = "./cel_images")
 ```
