@@ -37,7 +37,7 @@ jobs:
       
       - name: "[Stage] [MacOs] Install required system libs"
         if: runner.os == 'macOS'
-        run: brew isntall ffmpeg
+        run: brew install ffmpeg
       
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
