@@ -12,7 +12,7 @@ There were no ERRORs, WARNINGs, or NOTEs.
 There are currently no downstream dependencies for this package.
 
 ## Comments
-This is an update of a trackter 0.1.1
+This is an update of a trackter 0.1.1/
 
 # Submission of 0.1.1
 

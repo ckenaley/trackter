@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check macOS-latest devel
+name: R-CMD-check macOS-devel
 
 jobs:
   R-CMD-check:
