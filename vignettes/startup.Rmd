@@ -38,7 +38,9 @@ The core functions of *trackter* that extract shape and contour data from images
    BiocManager::install("EBImage")
 ```
 
-*trackter* also contains several functions for image and video processing. These functions depend on the popular `FFmpeg` package and it must be installed if the user intends to use them. Installation is platform-dependent. The [`FFmpeg` wiki installation and compilation guide](https://trac.ffmpeg.org/wiki/CompilationGuide) provides some great guidance here.
+*trackter* also contains several functions for image and video processing. These functions depend on the `av` package, which interfaces directly with an FFMPEG C API. Thus, there is no need to install FFMPEG separately. 
+
+**UPDATE (Jan '22)** When installing `av` on MacOS running the development version of R, `FFMPEG` and `fftw` must be indeed be installed. `brew install ffmpeg fftw`.
 
 ## Workflow
 
