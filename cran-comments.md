@@ -1,9 +1,8 @@
 # Submission of 0.1.2
 
 ## Test environments
-* local OS X install, R 4.0.2
-* OS X and linux (on travis-ci, devel and  release)
-* win-builder (on appveyor-ci, devel and release)
+* local OS X install, R 4.1.2
+* OS X, Windows and Linux (on github actions, devel and  release)
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -13,15 +12,7 @@ There were no ERRORs, WARNINGs, or NOTEs.
 There are currently no downstream dependencies for this package.
 
 ## Comments
-This is an update of a trackter 0.1.0 that was archived on 2019-12-21 due to the following issue that was unaddressed:
-
-There was a fail in testing due to a change in `Momocs:::Out.array()` in the latest version of that package which now requires a list of matrices. Lists now used and checks/tests pass.
-
-win-builder throws one NOTE: 'Possibly mis-spelled words in DESCRIPTION:
-  ROIs (5:69)
-  midline (5:109)'. 
-  
-These are words common to the image analysis lexicon.
+This is an update of a trackter 0.1.1
 
 # Submission of 0.1.1
 
