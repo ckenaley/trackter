@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: R-CMD-check macOS-devel
+name: R-CMD-check macOS-latest devel
 
 jobs:
   R-CMD-check:
@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macOS, r: 'devel'}
+          - {os: , r: 'devel'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -34,6 +34,10 @@ jobs:
           r-version: ${{ matrix.config.r}}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+      
+      - name: "[Stage] [MacOs] Install required system libs"
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg fftw
       
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
