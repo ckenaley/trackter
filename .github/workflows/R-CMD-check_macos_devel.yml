@@ -37,9 +37,9 @@ jobs:
       
       - name: "[Stage] [MacOs] Install required system libs"
         if: runner.os == 'macOS'
-        run: brew install ffmpeg fftw
         run: |
-        Rscript -e 'remotes::install_github("rspatial/terra")'
+          brew install ffmpeg fftw
+          Rscript -e 'remotes::install_github("rspatial/terra")'
       
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
