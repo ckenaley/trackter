@@ -1,10 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-    ## Warning in register(): Can't find generic `scale_type` in package ggplot2 to
-    ## register S3 method.
-
-# *trackter*
 
 ## trackter (0.0.1)
 

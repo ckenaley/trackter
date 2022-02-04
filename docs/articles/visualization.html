@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trackter</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -81,7 +77,7 @@
 
       
 
-      </header><script src="visualization_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Visualization</h1>
@@ -95,41 +91,43 @@
     
     
 <p><code>trackter</code> offers users several simple plotting functions for the visualizations of ROI contours, midlines, and position data.</p>
-<div id="visualizing-results-from-kin-functions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#visualizing-results-from-kin-functions" class="anchor"></a>Visualizing results from <code>kin</code> functions</h2>
+<div class="section level2">
+<h2 id="visualizing-results-from-kin-functions">Visualizing results from <code>kin</code> functions<a class="anchor" aria-label="anchor" href="#visualizing-results-from-kin-functions"></a>
+</h2>
 <p>The <code>kin</code> functions <code><a href="../reference/kin.search.html">kin.search()</a></code>, <code><a href="../reference/kin.search.html">kin.simple()</a></code>, and <code><a href="../reference/kin.search.html">kin.free()</a></code> all allow users to overlay midline data over original images with if <code>save=TRUE</code> and an output directory is specified with the argument <code>out.dir</code>.</p>
 <p>Here, the frames from a video of a swimming juvenile rainbow trout loaded with the package are extracted with <code>video.to.images()</code> and saved to an appropriately named directory.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span>
-<span class="va">trout.vid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/vid"</span>, <span class="st">"trout.avi"</span>, package <span class="op">=</span> <span class="st">"trackter"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="st">"./trout_images"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span>
+<span class="va">trout.vid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/vid"</span>, <span class="st">"trout.avi"</span>, package <span class="op">=</span> <span class="st">"trackter"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"./trout_images"</span><span class="op">)</span>
 <span class="fu"><a href="../reference/vid.to.images.html">vid.to.images</a></span><span class="op">(</span>vid.path <span class="op">=</span> <span class="va">trout.vid</span>, out.dir <span class="op">=</span> <span class="st">"./trout_images"</span><span class="op">)</span></code></pre></div>
 <p>Next, an output directory is created for storing the original images with the midline overlay. Then, position and shape data are retrieved using <code><a href="../reference/kin.search.html">kin.simple()</a></code> with <code>save=TRUE</code> and the output directory specified by <code>out.dir</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="st">"./trout_midline"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"./trout_midline"</span><span class="op">)</span>
 <span class="va">trout.kin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.search.html">kin.simple</a></span><span class="op">(</span>image.dir <span class="op">=</span> <span class="st">"./trout_images"</span>,save <span class="op">=</span> <span class="cn">TRUE</span>, out.dir <span class="op">=</span> <span class="st">"./trout_midline"</span><span class="op">)</span></code></pre></div>
-<pre><code>## Warning: `data_frame()` was deprecated in tibble 1.1.0.
-## Please use `tibble()` instead.</code></pre>
+<pre><code><span class="co">## Warning: `data_frame()` was deprecated in tibble 1.1.0.</span>
+<span class="co">## Please use `tibble()` instead.</span>
+<span class="co">## <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span>
+<span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</span></span></code></pre>
 <p>Images, complete with midline data, are now stored in the output directory.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="st">"./trout_midline"</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,method <span class="op">=</span> <span class="st">"raster"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html" class="external-link">display</a></span><span class="op">(</span><span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html" class="external-link">readImage</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"./trout_images"</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,method <span class="op">=</span> <span class="st">"raster"</span><span class="op">)</span></code></pre></div>
 <p><img src="visualization_files/figure-html/displlay-1.png" width="700"></p>
-<p>By default, the overlayed output image includes three lines. Red indicates the smoothed midline position (“x.sm’ and”y.sm” in the <code>midline</code> table), green the anterior section defined by the <code>ant.per</code> argument, and blue the linear prediction based on the anterior section. Should users want to compile the outputted images into a video, <code></code>images.to.video()<code>or</code>images.to.video2()<code>can be used. The latter, like</code>vid.to.images2()<code>allows users to use</code>FFmpegs` fllexible filtering system.</p>
+<p>By default, the overlayed output image includes three lines. Red indicates the smoothed midline position (“x.sm’ and”y.sm” in the <code>midline</code> table), green the anterior section defined by the <code>ant.per</code> argument, and blue the linear prediction based on the anterior section. Should users want to compile the outputted images into a video, <code></code>images.to.video()<code>can be used. Like</code>vid.to.images()<code>, this function allows users to use</code>FFmpegs<code>fllexible filtering system through the</code>av` package.</p>
 </div>
-<div id="data-overlay-and-gg-overlay" class="section level2">
-<h2 class="hasAnchor">
-<a href="#data-overlay-and-gg-overlay" class="anchor"></a><code>data.overlay()</code> and <code>gg.overlay()</code>
+<div class="section level2">
+<h2 id="data-overlay-and-gg-overlay">
+<code>data.overlay()</code> and <code>gg.overlay()</code><a class="anchor" aria-label="anchor" href="#data-overlay-and-gg-overlay"></a>
 </h2>
 <p>For plotting outside of the <code>kin</code> functions, <code>trackter</code> offers <code><a href="../reference/data.overlay.html">data.overlay()</a></code> and <code><a href="../reference/gg.overlay.html">gg.overlay()</a></code>. <code><a href="../reference/data.overlay.html">data.overlay()</a></code> is a simple wrapper for R’s base graphics routines that plots specified position data over a single image. <code><a href="../reference/gg.overlay.html">gg.overlay()</a></code> plots position data over contour data using <code>ggplot2</code> and optionally builds and saves a GIF animation for multi-frame sequences.</p>
 <p>In this example, <code><a href="../reference/data.overlay.html">data.overlay()</a></code> is used to plot the trailing edge position (‘x’ and ‘y’ in the <code>kin.dat</code> table returned by <code><a href="../reference/kin.search.html">kin.simple()</a></code> above) over a single image frame. The function requires that an image be specified with the argument <code>img</code> and the overlay data is specified with <code>over</code>. The overlay data is subsetted with <code>data.table</code> (<code>trout.kin$kin.dat[frame==0,.(x,y)]</code>). Base graphics arguments can also be passed through <code><a href="../reference/data.overlay.html">data.overlay()</a></code>, in this case <code>cex=2</code> and <code>pch=8</code> for expanding the symbol size and specifying the symbol.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/data.overlay.html">data.overlay</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"./trout_images/trout_00001.jpg"</span>,over<span class="op">=</span><span class="va">trout.kin</span><span class="op">$</span><span class="va">kin.dat</span><span class="op">[</span><span class="va">frame</span><span class="op">==</span><span class="fl">0</span>,<span class="fu">.</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span><span class="op">]</span>,col<span class="op">=</span><span class="st">"red"</span>,cex<span class="op">=</span><span class="fl">2</span>,pch<span class="op">=</span><span class="fl">8</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/data.overlay.html">data.overlay</a></span><span class="op">(</span>img <span class="op">=</span> <span class="st">"./trout_images/trout_000001.jpg"</span>,over<span class="op">=</span><span class="va">trout.kin</span><span class="op">$</span><span class="va">kin.dat</span><span class="op">[</span><span class="va">frame</span><span class="op">==</span><span class="fl">0</span>,<span class="fu">.</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span><span class="op">]</span>,col<span class="op">=</span><span class="st">"red"</span>,cex<span class="op">=</span><span class="fl">2</span>,pch<span class="op">=</span><span class="fl">8</span><span class="op">)</span></code></pre></div>
 <p><img src="visualization_files/figure-html/dataoverlay-1.png" width="700"></p>
 <p>Using <code><a href="../reference/gg.overlay.html">gg.overlay()</a></code> users can plot a single frame of data or series of frames as a facetted plot. The function takes tables returned by the <code>kin</code> functions to plot contours and midline, head, or trailing edge data. In addition, <code><a href="../reference/gg.overlay.html">gg.overlay()</a></code> can access the results from <code><a href="../reference/fin.kin.html">fin.kin()</a></code> to plot the position of fin-like extension.</p>
 <p>Here, the midline results for the first full tailbeat cycle of the swimming trout is projected over the smoothed body contours with <code><a href="../reference/gg.overlay.html">gg.overlay()</a></code>. Notice <code>under="cont.sm"</code> and <code>over="midline"</code> which specify the smoothed contour as the underlying data and midline as the overlay data.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/gg.overlay.html">gg.overlay</a></span><span class="op">(</span>kin <span class="op">=</span> <span class="va">trout.kin</span>,under <span class="op">=</span> <span class="st">"cont.sm"</span>,over<span class="op">=</span><span class="st">"midline"</span>,frames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">55</span>,<span class="fl">5</span><span class="op">)</span>,size<span class="op">=</span><span class="fl">0.1</span>,col<span class="op">=</span><span class="st">"red"</span>,zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/gg.overlay.html">gg.overlay</a></span><span class="op">(</span>kin <span class="op">=</span> <span class="va">trout.kin</span>,under <span class="op">=</span> <span class="st">"cont.sm"</span>,over<span class="op">=</span><span class="st">"midline"</span>,frames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">55</span>,<span class="fl">5</span><span class="op">)</span>,size<span class="op">=</span><span class="fl">0.1</span>,col<span class="op">=</span><span class="st">"red"</span>,zoom<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="visualization_files/figure-html/ggoverlay-1.png" width="700"></p>
 <p>Optionally, users may produce GIF animations of frame-specific overlayed data. To do so, users must specify <code>animate=TRUE</code>. The animation can be save with <code>save=TRUE</code> and specifying a file name with the <code>filename</code> argument.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -149,11 +147,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Christopher Kenaley.</p>
+  <p></p>
+<p>Developed by Christopher Kenaley.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -161,6 +161,8 @@
 
   
 
+
+  
 
   </body>
 </html>

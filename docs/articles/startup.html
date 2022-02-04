@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trackter</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -81,7 +77,7 @@
 
       
 
-      </header><script src="startup_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Starting Up</h1>
@@ -94,113 +90,116 @@
 
     
     
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>The release version of <em>trackter</em> can be installed with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"trackter"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"trackter"</span><span class="op">)</span></code></pre></div>
 <p>The current development version can be installed with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R">    <span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/">devtools</a></span><span class="op">)</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"ckenaley/trackter"</span><span class="op">)</span>
-    <span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ckenaley/trackter"</span><span class="op">)</span>
+    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="external-dependencies" class="section level2">
-<h2 class="hasAnchor">
-<a href="#external-dependencies" class="anchor"></a>External dependencies</h2>
+<div class="section level2">
+<h2 id="external-dependencies">External dependencies<a class="anchor" aria-label="anchor" href="#external-dependencies"></a>
+</h2>
 <p>The core functions of <em>trackter</em> that extract shape and contour data from images (the <code>kin</code> functions: <code>kin.simple</code>, <code>kin.search</code>, and <code>kin.free</code>) depend upon <code>EBImage</code>, available on the Bioconductor repository. The current build and development versions of <code>trackter</code> install this dependency. If it does not install, it can be done so easily with just a few lines of code:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R">  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-   <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
-   <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"EBImage"</span><span class="op">)</span></code></pre></div>
-<p><em>trackter</em> also contains several functions for image and video processing. These functions depend on the popular <code>FFmpeg</code> package and it must be installed if the user intends to use them. Installation is platform-dependent. The <a href="https://trac.ffmpeg.org/wiki/CompilationGuide"><code>FFmpeg</code> wiki installation and compilation guide</a> provides some great guidance here.</p>
+<code class="sourceCode R">  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+   <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+   <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"EBImage"</span><span class="op">)</span></code></pre></div>
+<p><em>trackter</em> also contains several functions for image and video processing. These functions depend on the <code>av</code> package, which interfaces directly with an FFMPEG C API. Thus, there is no need to install FFMPEG separately.</p>
+<p><strong>UPDATE (Jan ’22)</strong> When installing <code>av</code> on MacOS running the development version of R, <code>FFMPEG</code> and <code>fftw</code> must be indeed be installed. <code>brew install ffmpeg fftw</code>.</p>
 </div>
-<div id="workflow" class="section level2">
-<h2 class="hasAnchor">
-<a href="#workflow" class="anchor"></a>Workflow</h2>
+<div class="section level2">
+<h2 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
+</h2>
 <p><img src="workflow.png" width="600"></p>
 <p>The workflow diagram above outlines how the functions within <code>trackter</code> may be used. Image analysis, whereby ROIs are detected and their shape information extracted, is the logical starting point. Users can begin with either a directory of images or a video. In the latter case, <code>trackter</code>’s image extraction functions may be used to establish a directory of images. The <a href="#the-kin-functions-1"><code>kin</code> functions</a> (<code><a href="../reference/kin.search.html">kin.simple()</a></code>, <code><a href="../reference/kin.search.html">kin.search()</a></code>, and <code><a href="../reference/kin.search.html">kin.free()</a></code>) perform the shape extraction, returning a series of tables for downstream <a href="kinematic_analysis.html">kinematic analysis</a> and <a href="visualization.html">visualization</a>.</p>
 </div>
-<div id="an-example" class="section level2">
-<h2 class="hasAnchor">
-<a href="#an-example" class="anchor"></a>An Example</h2>
+<div class="section level2">
+<h2 id="an-example">An Example<a class="anchor" aria-label="anchor" href="#an-example"></a>
+</h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></code></pre></div>
 <p><code>trackter</code> was developed to analyze image data from videos of swimming organisms, although any object in an image field has potential for analysis. Here, we start by accessing an image of a swimming fish included with the package in a directory named “img” and displaying it.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/img"</span>,<span class="st">"sunfish_BCF.jpg"</span>,package<span class="op">=</span><span class="st">"trackter"</span><span class="op">)</span>
-<span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/img"</span>,<span class="st">"sunfish_BCF.jpg"</span>,package<span class="op">=</span><span class="st">"trackter"</span><span class="op">)</span>
+<span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html" class="external-link">readImage</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span>
 
-<span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="va">y</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
+<span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html" class="external-link">display</a></span><span class="op">(</span><span class="va">y</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
 <p><img src="startup_files/figure-html/image-1.png" width="700"></p>
 <p>Here, <code>kin.simple</code> is used to extract contour and shape information from the image above by referring to the directory that contains it. An image with a midline overlay is saved to the working directory (see below).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,<span class="st">"img"</span>,package<span class="op">=</span><span class="st">"trackter"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,<span class="st">"img"</span>,package<span class="op">=</span><span class="st">"trackter"</span><span class="op">)</span>
 
-<span class="va">im</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/img"</span>, package <span class="op">=</span> <span class="st">"trackter"</span><span class="op">)</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">im</span><span class="op">&lt;-</span> <span class="va">im</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"sunfish.jpg"</span>,<span class="va">im</span><span class="op">)</span><span class="op">]</span>
-<span class="va">im.dir</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/images"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="va">im.dir</span><span class="op">)</span>
+<span class="va">im</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/img"</span>, package <span class="op">=</span> <span class="st">"trackter"</span><span class="op">)</span>,full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">im</span><span class="op">&lt;-</span> <span class="va">im</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"sunfish.jpg"</span>,<span class="va">im</span><span class="op">)</span><span class="op">]</span>
+<span class="va">im.dir</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/images"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">im.dir</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span><span class="va">im</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">im.dir</span>,<span class="st">"/"</span>,<span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span><span class="op">(</span><span class="va">im</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="va">im</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">im.dir</span>,<span class="st">"/"</span>,<span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">im</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## [1] TRUE</span></code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">kin.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.search.html">kin.simple</a></span><span class="op">(</span>image.dir <span class="op">=</span> <span class="va">im.dir</span>,save<span class="op">=</span><span class="cn">TRUE</span>,out.dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## Warning: `data_frame()` was deprecated in tibble 1.1.0.
-## Please use `tibble()` instead.</code></pre>
+<code class="sourceCode R"><span class="va">kin.y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kin.search.html">kin.simple</a></span><span class="op">(</span>image.dir <span class="op">=</span> <span class="va">im.dir</span>,save<span class="op">=</span><span class="cn">TRUE</span>,out.dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## Warning: `data_frame()` was deprecated in tibble 1.1.0.</span>
+<span class="co">## Please use `tibble()` instead.</span>
+<span class="co">## <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span>
+<span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</span></span></code></pre>
 <p>The <code>kin</code> functions in <em>trackter</em> return a list of data tables:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="va">kin.y</span>,<span class="va">class</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## $kin.dat
-## [1] "data.table" "data.frame"
-## 
-## $midline
-## [1] "data.table" "data.frame"
-## 
-## $cont
-## [1] "data.table" "data.frame"
-## 
-## $cont.sm
-## [1] "data.table" "data.frame"
-## 
-## $mid.pred
-## [1] "data.table" "data.frame"
-## 
-## $all.classes
-## [1] "data.table" "data.frame"
-## 
-## $dim
-## [1] "integer"</code></pre>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">kin.y</span>,<span class="va">class</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## $kin.dat</span>
+<span class="co">## [1] "data.table" "data.frame"</span>
+<span class="co">## </span>
+<span class="co">## $midline</span>
+<span class="co">## [1] "data.table" "data.frame"</span>
+<span class="co">## </span>
+<span class="co">## $cont</span>
+<span class="co">## [1] "data.table" "data.frame"</span>
+<span class="co">## </span>
+<span class="co">## $cont.sm</span>
+<span class="co">## [1] "data.table" "data.frame"</span>
+<span class="co">## </span>
+<span class="co">## $mid.pred</span>
+<span class="co">## [1] "data.table" "data.frame"</span>
+<span class="co">## </span>
+<span class="co">## $all.classes</span>
+<span class="co">## [1] "data.table" "data.frame"</span>
+<span class="co">## </span>
+<span class="co">## $dim</span>
+<span class="co">## [1] "integer"</span></code></pre>
 <p>Most will be interested in the “kin.dat” and “midline” data for the calculation of body position parameters (e.g., amplitude, wavelength, etc.). For example, the “kin.dat” table includes, among other things, frame-specific trailing-edge (rightmost) amplitude (“x”, “y”), head (leftmost) position (“head.x”, “head.y”) which may be used to calculate position and trailing-edge amplitude.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">kin.dat</span><span class="op">)</span></code></pre></div>
-<pre><code>##    frame roi   x        y head.x head.y       amp head.pval
-## 1:     0   a 868 198.8922     66 285.75 -72.60059 0.9967486</code></pre>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">kin.dat</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##    frame roi   x        y head.x head.y       amp head.pval</span>
+<span class="co">## 1:     0   a 868 198.8922     66 285.75 -72.60059 0.9967486</span></code></pre>
 <p>The “midline” table is composed of frame-specific midline data, including, among other things, calculated midline position (“y”), smoothed midline position (“y.sm”) and midline position relative to the head (“wave.y”). Here we see the difference between them.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##    frame roi n  x        y     y.sm     wave.y      per.bl
-## 1:     0   a 1 58 286.5000 285.5285 0.10847708 0.000000000
-## 2:     0   a 2 59 287.3333 285.4907 0.10638200 0.001200104
-## 3:     0   a 3 60 287.0000 285.4530 0.10433325 0.002400205
-## 4:     0   a 4 61 280.7500 285.4153 0.10232499 0.003600305
-## 5:     0   a 5 62 289.0000 285.3777 0.10035140 0.004800404
-## 6:     0   a 6 63 286.5000 285.3401 0.09840665 0.006000501</code></pre>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##    frame roi n  x        y     y.sm     wave.y      per.bl</span>
+<span class="co">## 1:     0   a 1 58 286.5000 285.5285 0.10847708 0.000000000</span>
+<span class="co">## 2:     0   a 2 59 287.3333 285.4907 0.10638200 0.001200104</span>
+<span class="co">## 3:     0   a 3 60 287.0000 285.4530 0.10433325 0.002400205</span>
+<span class="co">## 4:     0   a 4 61 280.7500 285.4153 0.10232499 0.003600305</span>
+<span class="co">## 5:     0   a 5 62 289.0000 285.3777 0.10035140 0.004800404</span>
+<span class="co">## 6:     0   a 6 63 286.5000 285.3401 0.09840665 0.006000501</span></code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ml</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html">melt</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>,<span class="fu">.</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,<span class="va">y.sm</span>,<span class="va">wave.y</span><span class="op">)</span><span class="op">]</span>,<span class="st">"x"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">ml</span>,x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">value</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="va">variable</span><span class="op">~</span><span class="va">.</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">ml</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">kin.y</span><span class="op">$</span><span class="va">midline</span><span class="op">[</span>,<span class="fu">.</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,<span class="va">y.sm</span>,<span class="va">wave.y</span><span class="op">)</span><span class="op">]</span>,<span class="st">"x"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/qplot.html" class="external-link">qplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">ml</span>,x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">value</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="va">variable</span><span class="op">~</span><span class="va">.</span><span class="op">)</span></code></pre></div>
 <p><img src="startup_files/figure-html/plot-1.png" width="700"></p>
 <p>When “save=TRUE”, the <code>kin</code> functions write images to a user-defined directory that include midline overlays.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html">readImage</a></span><span class="op">(</span><span class="st">"sunfish_000.jpg"</span><span class="op">)</span>
-<span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html">display</a></span><span class="op">(</span><span class="va">y2</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/io.html" class="external-link">readImage</a></span><span class="op">(</span><span class="st">"sunfish_000.jpg"</span><span class="op">)</span>
+<span class="fu">EBImage</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EBImage/man/display.html" class="external-link">display</a></span><span class="op">(</span><span class="va">y2</span>,method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
 <p><img src="startup_files/figure-html/res-1.png" width="700"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#clean up</span>
-<span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span><span class="op">(</span><span class="va">im.dir</span>,recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">im.dir</span>,recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
   </div>
 
@@ -215,11 +214,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Christopher Kenaley.</p>
+  <p></p>
+<p>Developed by Christopher Kenaley.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -227,6 +228,8 @@
 
   
 
+
+  
 
   </body>
 </html>

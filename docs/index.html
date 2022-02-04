@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">trackter</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -86,46 +82,46 @@
 
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<div id="trackter" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#trackter" class="anchor"></a><em>trackter</em>
+<div class="section level1">
+<div class="page-header"><h1 id="trackter">
+<em>trackter</em><a class="anchor" aria-label="anchor" href="#trackter"></a>
 </h1></div>
-<div id="description" class="section level2">
-<h2 class="hasAnchor">
-<a href="#description" class="anchor"></a>Description</h2>
+<div class="section level2">
+<h2 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
+</h2>
 <p><em>trackter</em> is an R package for semiautomated tracking and analysis of 2D kinematics from video and image data. The core functions of <em>trackter</em> automatically detect a region of interest (ROI) and compute important kinematic and shape parameters based on the ROI’s contour. These functions use thresholding and segmentation to identify ROIs and, thus, moderately contrasted images are required. Presented below is some of <em>trackter</em>’s functionality in the context of fish locomotion.</p>
 <p>Please report any bugs or performance issues.</p>
 </div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting started</h2>
-<p>For tutorial and tips on usage, please check out <em>trackter</em>’s <a href="https://ckenaley.github.io/trackter/">github page</a></p>
+<div class="section level2">
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<p>For tutorial and tips on usage, please check out <em>trackter</em>’s <a href="https://ckenaley.github.io/trackter/" class="external-link">github page</a></p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>The release version of <em>trackter</em> can be installed with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"trackter"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"trackter"</span><span class="op">)</span></code></pre></div>
 <p>The current development version can be installed with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R">    <span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/">devtools</a></span><span class="op">)</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"ckenaley/trackter"</span><span class="op">)</span>
-    <span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ckenaley/trackter"</span><span class="op">)</span>
+    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">trackter</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="external-dependencies" class="section level2">
-<h2 class="hasAnchor">
-<a href="#external-dependencies" class="anchor"></a>External dependencies</h2>
+<div class="section level2">
+<h2 id="external-dependencies">External dependencies<a class="anchor" aria-label="anchor" href="#external-dependencies"></a>
+</h2>
 <p>The core functions of <em>trackter</em> that extract shape and contour data from images ( <code>kin.simple</code> and <code>kin.search</code>) depend upon <em>EBImage</em>, available on the Bioconductor repository. The current build and development versions of <em>trackter</em> install this dependency. If it does not install, it can be done so easily with just a few lines of code:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R">  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-   <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
-   <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"EBImage"</span><span class="op">)</span></code></pre></div>
-<p><em>trackter</em> also contains several functions for image and video processing. These functions depend on the popular <code>FFmpeg</code> package and it must be installed if the user intends to use them. Installation is platform-dependent. I found the <a href="https://trac.ffmpeg.org/wiki/CompilationGuide"><code>FFmpeg</code> wiki installation and compilation guide to be quite useful</a>.</p>
+<code class="sourceCode R">  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+   <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+   <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"EBImage"</span><span class="op">)</span></code></pre></div>
+<p><em>trackter</em> also contains several functions for image and video processing. These functions depend on the popular <code>FFmpeg</code> package and it must be installed if the user intends to use them. Installation is platform-dependent. I found the <a href="https://trac.ffmpeg.org/wiki/CompilationGuide" class="external-link"><code>FFmpeg</code> wiki installation and compilation guide to be quite useful</a>.</p>
 </div>
-<div id="features" class="section level2">
-<h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
 <p><strong>Automated kinematic analysis</strong></p>
 <ul>
 <li>Fast and accurate contour and shape analysis of ROIs.</li>
@@ -156,44 +152,56 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=trackter">https://​cloud.r-project.org/​package=trackter</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=trackter" class="external-link">View on CRAN</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>GPL (&gt;= 2)</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing trackter</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Christopher Kenaley <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/ckenaley/trackter/actions"><img src="https://github.com/ckenaley/trackter/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://ci.appveyor.com/project/ckenaley/trackter"><img src="https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
-<li><a href="https://cran.r-project.org/package=trackter"><img src="https://www.r-pkg.org/badges/version/trackter?color=orange"></a></li>
-<li><a href="https://codecov.io/gh/ckenaley/trackter?branch=master"><img src="https://codecov.io/gh/ckenaley/trackter/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://github.com/ckenaley/trackter/actions" class="external-link"><img src="https://github.com/ckenaley/trackter/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://ci.appveyor.com/project/ckenaley/trackter" class="external-link"><img src="https://ci.appveyor.com/api/projects/status/github/ckenaley/trackter?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
+<li><a href="https://cran.r-project.org/package=trackter" class="external-link"><img src="https://www.r-pkg.org/badges/version/trackter?color=orange"></a></li>
+<li><a href="https://codecov.io/gh/ckenaley/trackter?branch=master" class="external-link"><img src="https://codecov.io/gh/ckenaley/trackter/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Christopher Kenaley.</p>
+  <p></p>
+<p>Developed by Christopher Kenaley.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -201,6 +209,8 @@
 
   
 
+
+  
 
   </body>
 </html>
