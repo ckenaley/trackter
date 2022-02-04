@@ -128,6 +128,24 @@ thr.check("./images/sunfish_BCF.jpg",min = 0.2,max=0.6)
 
 ## The `kin` functions 
 
+### `kin` functions output
+
+Functionality and output within `trackter` make use of the `data.table` structure. Objects returned by `trackter`'s `kin` functions can be rather large for even modest analyses (e.g., hundreds of rows of midline coordinates from hundreds of frames). All three `kin` functions, `kin.simple()`, `kin.search()`, and `kin.free()`, return data as a list of data tables. Specifically, these include:  
+
+  * `kin.dat`: A data table consisting of frame-by-frame position parameters for the ROI determined by the `search.for` argument (see below).
+  * `midline`: A data table containing, for each frame described by the `frames` argument, the x and y position of the midline. This also includes midline points fit to a smooth spline or loess model.
+  * `cont`: A data table containing x and y positions of the contours used to calculate the data in the `kin.dat` and `midline` tables. 
+  * `cont.sm`: A data table containing the smoothed x and y positions of the contours.
+  * `all.classes`: A data table containing position data for all ROIs detected.
+  * `mid.pred`: A data table containing the theoretical midline based on a linear model of the head. The argument `ant.per` is used to isolate the head and this section of the midline produces the linear prediction that extends the length of the ROI.
+  * `dim`: the x and y dimensions of the images analyzed
+  
+The components of each table are described in detail within the documentation for the `kin` functions (e.g., `?kin.search()`).
+
+In addition to the table output, if the `save` argument is set to `TRUE`, the `'kin` functions will save midline data over the original images in a specified output directory. This capability is outlined in the [Visualization article](visualization.html).
+
+### When to use each of the `kin` functions
+
 Users of `trackter` have three `kin` functions available for the extraction of target ROIs and initial kinematic analysis: `kin.search()`, `kin.simple()`, and `kin.free()`. The choice of which `kin` function to use is not arbitrary and depends on the experimental condition. Suggested uses are summarized here:
 
 ```{r usetable, echo=FALSE,message=FALSE}
