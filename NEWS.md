@@ -30,7 +30,7 @@
 
 -   added functions `thr.check` and `crop.img`
 -   added `out.qual` parameter to `kin` functions
--   removed `smooth.points from`kin\` functions
+-   removed `smooth.points` from `kin` functions
 -   added functions `kin.free`, `free.ml.ang`,`free.ml.hull`,
     `free.ml.del` and `pick.pts`
 -   added functions `gg.overlay`, `data.overlay`, `find.roi`
