@@ -50,8 +50,8 @@ jobs:
       - name: "Install binary dependencies"
         if: runner.os != 'Linux'
         run: |
-          utils::install.packages("sf", type="binary",repo="http://nbcgib.uesc.br/mirrors/cran/"")
-        shell: Rscript {0}
+          utils::install.packages("sf", type="binary",repo="http://nbcgib.uesc.br/mirrors/cran/")
+          shell: Rscript {0}
         
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
