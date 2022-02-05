@@ -47,8 +47,8 @@ jobs:
         if: runner.os == 'MacOS'
         run: brew install pkg-config gdal udunits
       
-   - name: "Install binary dependencies"
-       if: runner.os != 'Linux'
+      - name: "Install binary dependencies"
+        if: runner.os != 'Linux'
         run: |
           utils::install.packages("sf", type="binary")
         shell: Rscript {0}
