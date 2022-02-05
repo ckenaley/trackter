@@ -45,12 +45,6 @@ jobs:
       
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: rcmdcheck devtools
-          
-      - name: "[Stage] Install sf deps"
-        if: runner.os != 'Linux'
-        run: |
-          R -e 'devtools::install_github("r-spatial/sf")'
-  
-        
+          extra-packages: rcmdcheck
+
       - uses: r-lib/actions/check-r-package@v1
