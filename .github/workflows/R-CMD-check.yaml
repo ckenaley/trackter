@@ -51,7 +51,7 @@ jobs:
         if: runner.os != 'Linux'
         run: |
           utils::install.packages("sf", type="binary",repo="https://cloud.r-project.org")
-          shell: Rscript {0}
+        shell: Rscript {0}
         
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
