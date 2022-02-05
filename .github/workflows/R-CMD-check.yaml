@@ -45,7 +45,7 @@ jobs:
       
       - name: "[Stage] [MacOS] Install required system libs"
         if: runner.os == 'MacOS'
-        run: brew install pkg-config gdal udunits
+        run: brew install pkg-config gdal udunits ffmpeg
       
       - name: "Install binary dependencies"
         if: runner.os != 'Linux'
