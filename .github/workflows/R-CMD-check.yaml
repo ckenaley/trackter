@@ -47,11 +47,7 @@ jobs:
         if: runner.os == 'MacOS'
         run: brew install pkg-config gdal udunits
       
-<<<<<<< HEAD
    - name: "Install binary dependencies"
-=======
-      - name: "Install bin dependencies""
->>>>>>> 2fbb7b57f8279e9a8e32ee998166db0c098e60d2
        if: runner.os != 'Linux'
         run: |
           utils::install.packages("sf", type="binary")
