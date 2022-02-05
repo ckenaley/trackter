@@ -43,8 +43,12 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get install libavfilter-dev libfftw3-dev
       
+      - name: "[Stage] [MacOS] Install required system libs"
+        if: runner.os == 'MacOS'
+        run: brew install pkg-config gdal
+      
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: rcmdcheck
+          extra-packages: rcmdcheck Rtools
 
       - uses: r-lib/actions/check-r-package@v1
