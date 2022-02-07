@@ -45,12 +45,12 @@ jobs:
       
       - name: "[Stage] [MacOS] Install required system libs"
         if: runner.os == 'MacOS'
-        run: brew install pkg-config gdal udunits ffmpeg
+        run: brew install pkg-config udunits ffmpeg
       
       - name: "Install binary dependencies"
         if: runner.os != 'Linux'
         run: |
-          utils::install.packages("sf", type="binary",repo="https://cloud.r-project.org")
+          install.packages("sf", type="binary",repo="https://cloud.r-project.org")
         shell: Rscript {0}
         
       - uses: r-lib/actions/setup-r-dependencies@v1
