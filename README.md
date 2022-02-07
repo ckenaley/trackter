@@ -8,6 +8,9 @@ coverage](https://codecov.io/gh/ckenaley/trackter/branch/master/graph/badge.svg)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+    ## Warning in register(): Can't find generic `scale_type` in package ggplot2 to
+    ## register S3 method.
+
 # *trackter*
 
 ## Description
@@ -70,7 +73,7 @@ useful](https://trac.ffmpeg.org/wiki/CompilationGuide).
 
 -   Fast and accurate contour and shape analysis of ROIs.
 -   ROI detection with search parameters including position and size.
--   Relevant functions: `kin.search` and `kin.simple`.
+-   Relevant functions: `kin.search`, `kin.simple`, `kin.free`
 
 **Tools for kinematic analysis of swimming animals**
 
@@ -78,13 +81,12 @@ useful](https://trac.ffmpeg.org/wiki/CompilationGuide).
     paired-fin position.
 -   Relevant functions: `amp.freq`, `halfwave`, `wave`, and `fin.kin`
 
-**Tools for image and video processing using FFmpeg**
+\_\_Tools for image and video processing
 
 -   Access `FFmpeg` functionality, including filters and codecs, to
     extract frames, stitch videos, and edit images and videos.
 
--   Relevant functions: `images.to.videos`, `images.to.videos2`,
-    `vid.to.images`, and `vid.to.images2`
+-   Relevant functions: `images.to.videos`, `vid.to.images`
 
 **Other miscellaneous, low-level tools for kinematic analysis**
 
@@ -92,3 +94,7 @@ useful](https://trac.ffmpeg.org/wiki/CompilationGuide).
     radians to degrees and vice versa.
 -   Relevant functions: `dist.2d`, `cosine.ang`, `bearing.xy`, `deg`,
     `rad`
+
+## Bugs and feedback
+
+Please report issues [here](https://github.com/ckenaley/trackter/issues)
