@@ -22,7 +22,7 @@
 #' @param smooth.n, numeric, the number of contour smoothing iterations. See Details.
 #' @param red numeric, between 0-1 the proportion of contour coordinates to sample for midline estimates. Ignored if \code{ml.meth} is not 'del'. Will speed up midline estimations with Delaunay triangulation. If 'NULL', the full contour retrieved from the ROI will be passed to \code{\link{free.ml.del}}. See Details.
 #' @param red numeric, between 0-1 the proportion of contour coordinates to sample for midline estimates. Ignored if \code{ml.meth} is not 'del'. Will speed up midline estimations with Delaunay triangulation. If 'NULL', the full contour retrieved from the ROI will be passed to \code{\link{free.ml.del}}. See Detail.
-#' @param ml.meth character, the midline detection method. One of 'ang' for bisection using \code{\link{free.ml.ang}}, 'hull' for bisection using \code{\link{free.ml.hull}}, or 'del' for Delaunay triangulation using \code{\link{free.ml.del}}. See Details.
+#' @param ml.meth character, the midline detection method. One of 'ang' for bisection using \code{\link{free.ml.ang}}, 'hull' for bisection using \code{\link{free.ml.hull}}, 'del' for Delaunay triangulation using \code{\link{free.ml.del}}, or \code{\link{free.ml.skel}}.See Details.
 #' @param smooth.n, numeric, the number of contour smoothing iterations. See Details.
 #' @param ml.meth character, the midline detection method. One of 'ang' for bisection using \code{\link{free.ml.ang}}, 'hull' for bisection using \code{\link{free.ml.hull}}, or 'del' for Delaunay triangulation using \code{\link{free.ml.del}}. See Details
 #' @param ml.smooth a list of length two with unnamed components including a character string specifying the midline smoothing method, either 'loess' or "spline", and a numeric value specifying the amount of smoothing. See Details.
@@ -45,7 +45,7 @@
 #'
 #' With \code{kin.free}, the position of the anterior of the ROI (that which is moving forward in the field) is determined by the displacement of the ROI between the first two frames. Thus, \code{frames} must be >1. For analyses of relatively static ROIs in the field (e.g., steadily swimming animals in flumes, etc.), automatically determining the anterior of the ROI may be spurious. In this case, the default automatic determination of the anterior should be overridden by specifying 'l', 'r', 'u', 'd' with \code{ant.pos}. These values specify that the anterior region of the ROI is leftmost, rightmost, upmost, or downmost in the field, respectively, and assumes that the origin of the field (0,0) is the upper left corner of each frame. 
 #' 
-#' Midline estimation in \code{kin.free} is pursued by one of three algorithms: bisection of contours across the long axis defined by the tips using \code{\link{free.ml.ang}} or \code{\link{free.ml.hull}}  or by Delaunay triangulation using \code{\link{free.ml.del}}. The default is 'hull' This choice is not arbitrary. The use of \code{free.ml.ang} and \code{free.ml.hull} can be faster, but perform poorly for tips that snake back on themselves (i.e., a high degree curvature). The use of \code{free.ml.del} can be slower for high resolution outlines, but  produces better results when contour regions overlap (i.e, those that snake back on themselves), but produces less precise midlines for complicated contours. Using Delaunay triangulation can be hastened (but possibly with a trade off in precision) by reducing the the complexity of the contour with the 'red' argument. For example, a contour of 1000 coordinates would be reduced to one of 500 with 'red=0.5'.
+#' Midline estimation in \code{kin.free} is pursued by one of four algorithms: bisection of contours across the long axis defined by the tips using \code{\link{free.ml.ang}}, \code{\link{free.ml.hull}}, Delaunay triangulation using \code{\link{free.ml.del}}, or Voronoi triagulation and skeletonization using \code{\link{free.ml.hull}}. The default is 'hull' This choice is not arbitrary. The use of \code{free.ml.ang} and \code{free.ml.hull} can be faster, but perform poorly for tips that snake back on themselves (i.e., a high degree curvature). The use of \code{free.ml.del} can be slower for high resolution outlines, but  produces better results when contour regions overlap (i.e, those that snake back on themselves), but produces less precise midlines for complicated contours. Using Delaunay triangulation can be hastened (but possibly with a trade off in precision) by reducing the the complexity of the contour with the 'red' argument. For example, a contour of 1000 coordinates would be reduced to one of 500 with 'red=0.5'.
 #' 
 #' For midline smoothing, if \code{ml.smooth} contains 'spline', \code{\link{smooth_spline}} from the \code{smoothr} package is used to interpolate points between a reduced number of vertices using piecewise cubic polynomials. The number of vertices is calculated based on the number of midline coordinates times numeric value of the list in \code{ml.smooth}. If \code{ml.smooth} contains 'loess', \code{loess} is used to fit a polynomial surface. For contours that have a complicated midline with non-unique x values, say an orginisms swimming vertically in the file, loess smoothing can produce poor results. Thus, spline smoothing is usually the advisable option. 
 #' 
@@ -247,7 +247,7 @@
 #' 
 #'}
 #'
-kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.02, smooth.n=0,ml.meth="hull",ml.smooth = list("loess",0.25),save = FALSE,plot.pml = TRUE,out.qual = 1,out.dir = NULL, ...) {
+kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.02, smooth.n=0,ml.meth="simple",ml.smooth = list("loess",0.25),save = FALSE,plot.pml = TRUE,out.qual = 1,out.dir = NULL, ...) {
     
     size <-
       x <-
@@ -327,6 +327,7 @@ kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.0
       conts.sm[[paste0(frame)]] <- data.table(frame = frame, best.cont[,n:=1:.N])
       classes.l[[paste0(frame)]] <- data.table(frame = frame,roi$classes)
       
+      if(meth=="simple"){
       y.df <-
         best.cont[, list(y.min = min(y),
                          y.max = max(y),
@@ -348,7 +349,14 @@ kin.search <-function(image.dir = NULL,frames = NULL, ant.per = 0.10, tips = 0.0
       
       midline <- midline[complete.cases(midline)]
       midline <- data.table(frame, midline)
+    }
+    
+    if(ml.meth=="skel"){
       
+    out <- as.matrix(best.cont[,c("x","y")])
+   midline <-  data.table(frame,free.ml.skel(out)$ml[,c("x","y","n")])
+   if(first(midline$x>last(midline$x))) midline$n <- rev(midline$n) 
+    }
       
       ####which type of lines to be fitted, spline or loess
       if (!any(c("spline", "loess") == smoothing))

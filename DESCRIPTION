@@ -27,7 +27,9 @@ Imports:
   sp,
   methods,
   av,
-RoxygenNote: 7.1.2
+  concaveman,
+  centerline
+RoxygenNote: 7.2.3
 Suggests:
     spelling, 
     testthat (>= 3.0.1),

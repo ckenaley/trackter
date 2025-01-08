@@ -20,6 +20,8 @@ free.ml.del(out = NULL, smooth.n = NULL, red = NULL, dens = NULL)
 \item{dens}{integer,  the factor by which to densify the contour. Will slow down midline estimations but may increase the likelihood of finding a pointed tip. If 'NULL', the original contour in \code{out} will be used See Details.}
 
 \item{red}{numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up midline estimations. If 'NULL', the full contour in \code{out} will be used See Details.}
+
+\item{numeric, }{proportion of points to retain  (0.05-Inf; default 1) in skeletonizing. Applies only to \code{free.ml.skel} See Details.}
 }
 \value{
 A list with the following components:
@@ -38,6 +40,8 @@ Internal functions used in \code{kin} functions for calculating the long-axis mi
 \code{free.ml.hull} estimates a midline by finding the most distant coordinates in the convex hull and then bisects the contour according to these tips.
 
 \code{free.ml.del} estimates a midline through Delaunay triangulation and Voronoi tesselation.
+
+\code{free.ml.skel} estimates a midline through Voronoi skeletonization.
 }
 \details{
 \code{free.ml.ang} estimates the midline by first creating a convex hull of the contour and then finding candidate tips that are farthest from one another with \code{\link{coo_truss}}. This and \code{free.ml.hull} therefore assume the contour is elongate. The candidate tips are then refined by finding coordinates whose index are within the 5% quantiles of the extrema. From the additional coordinates, the final candidate tips are defined as those that form the greatest angle between adjacent coordinates. The function then **bisects** the contour across this axis determined by the tips using \code{\link{coo_slice}}, giving it two sides with coordinates of equal length. The midline is calculated as the midpoints defined between all pairs of coordinates with the same index value.
@@ -46,6 +50,10 @@ Internal functions used in \code{kin} functions for calculating the long-axis mi
 
 
 \code{free.ml.del} estimates the midline by first finding candidate tips of the contour. Midline coordinates are retrieved through Delaunay triangulation and Voronoi tesselation. Triangulated points that lie within the contour are used to build a distance-weighted minimum spanning tree that expands until the the path intersects with the contour. The extrema of the midline path are then indexed as the first and last according to their distance from the candidate tips.
+
+\code{free.ml.skel} estimates the midline (i.e., centerlines) by applying Voronoi diagrams using the \code{\link{cnt_path_guess}} function from the \code{centerlines}. Note this function may simplify or density the original outline. If \code{keep equals} 1, \code{cnt_path_guess} with use the original outline (if \code{dens=NULL}). If \code{keep} value is <1, then the function will simplify the outline and >1 the function will densify. Be ware that the 
+
+If the keep is above 1, then the densification algorithm is applied using the geos::geos_densify() function. This may produce a very large object if keep is set more than 2. However, the resulting skeleton would potentially be more accurate.
 
 The use of \code{free.ml.ang} and \code{free.ml.hull} may be more appropriate for complicated outlines (i.e., those with appendages). The use of \code{free.ml.del} produces better results when contour regions overlap (i.e, kinks or snakes back on itself), but produces less precise midlines for complicated contours and is slower for high resolution outlines. Reducing the resolution with 'red' may hasten the speed. 
 
@@ -91,8 +99,18 @@ out.sm <- Momocs::coo_smooth(out,n=1)
 fml.del <- free.ml.del(out.sm)
 points(fml.del$ml$x,fml.del$ml$y,col="red")
 
+# through skeletonization should yield similar results
+fml.skel <- free.ml.skel(out.sm)
 
+plot(out.sm)
+points(fml.skel$ml$x,fml.skel$ml$y,col="red")
+
+# increase density for a "better" midlin
+fml.skel <- free.ml.skel(out.sm,keep=5)
+
+plot(out.sm)
+points(fml.skel$ml$x,fml.skel$ml$y,col="red")
 }
 \seealso{
-\code{\link{coo_smooth}}, \code{\link{coo_slice}},\code{\link{coo_slide}}, \code{\link{coo_truss}}, \code{\link{kin.free}}, \code{\link{deldir}}, \code{\link{kin.free}}
+\code{\link{coo_smooth}}, \code{\link{coo_slice}},\code{\link{coo_slide}}, \code{\link{coo_truss}}, \code{\link{kin.free}}, \code{\link{deldir}}, \code{\link{kin.free}},\code{\link{cnt_path_guess}}
 }

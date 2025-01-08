@@ -10,11 +10,12 @@
 #' @param border integer, if \code{edges=TRUE}, size of border to add in pixels. Otherwise ignored. Dee details.
 #' @param results logical, should a binary image be printed to the graphics device. Value is forced to FALSE if the length of 'img' is >1.
 #' @param bg character, the background color of the binary images (either 'white' or 'black'). Ignored if \code{results=FALSE}.
+#' @param radius numeric, radius of median filter that will smooth contour of roi.
 #' 
 #' @export
 #'
 #' @details
-#'Thresholding operations can be performed with an arbitrary (user defined, 0-1) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}.
+#'Thresholding operations can be performed with an arbitrary (user defined, 0-1) numeric value or with Otsu's method ('thr="otsu"'). The latter chooses a threshold value by minimizing the combined intra-class variance. See \code{\link{otsu}}. One may want to explore thresholding of an image or image set using \code{\link{thr.check}}.
 #'
 #'
 #' \code{search.for} determines how ROIs are chosen:
@@ -28,6 +29,8 @@
 #' These choices will be made on ROI sets that are not on the edge of the field if 'edges=FALSE'.
 #'
 #' \code{edges} is set by default to 'FALSE'. It is not advisable to include shapes that are on the edge of any frame and are therefore incomplete.	Yet, if set to 'TRUE', the \code{border} adds a border of the background color to the image so that the intended ROI may be distinguished from the edge.
+#' 
+#' If not \code{NULL}, \code{radius} argument implements a median filter smoothing operation to the ROI with \code{\link{EBImage::medianFilter}} with 0 (i.e., no filter) the default.
 #' 
 #' @return A named list or list of lists containing the following:
 #'
@@ -46,6 +49,7 @@
 #' 
 #' \code{dim} the x and y dimensions of the image(s) analyzed. 
 #'
+#'\code{image} an \code{EBImage} image object of class `Image`
 #' @export
 #'
 #' 
@@ -81,7 +85,7 @@
 #' unlink(paste0(tempdir(),"/out"),recursive=TRUE)
 #' 
 
-find.roi <-  function(img=NULL,thr="otsu",search.for="largest",size.min=0.01,bg="white",edges=FALSE,border = 5,results=FALSE){
+find.roi <-  function(img=NULL,thr="otsu",search.for="largest",size.min=0.01,bg="white",edges=FALSE,border = 5,results=FALSE,radius=NULL){
   
   size <- NULL
    
@@ -96,12 +100,18 @@ find.roi <-  function(img=NULL,thr="otsu",search.for="largest",size.min=0.01,bg=
         size.min > 1)
       stop("'size.min' must be >0 and <=1.")
     
-    r <- lapply(img,function(x) {
+
+  if(!is.null(radius)){
+    if(!is.numeric(radius)) stop("`radius` must be numeric and >0")
+    if(radius<0) stop("`radius` must be numeric and >0")
+    
+  }
+  
+    
+  r <- lapply(img,function(x) {
       im <- EBImage::readImage(x, all = FALSE)
-      
       img.dim <- dim(im)[1:2]
       img.n <- basename(x)
-      
       EBImage::colorMode(im) = EBImage::Grayscale
       
       # computes binary mask
@@ -262,6 +272,7 @@ find.roi <-  function(img=NULL,thr="otsu",search.for="largest",size.min=0.01,bg=
         best.class <- classes[which.max(size),]
       }
       
+      if(!is.null(radius)) z.best <- z.best %>% EBImage::medianFilter(radius)
     
       best.cont <- data.table(EBImage::ocontour(z.best)[[1]])
       colnames(best.cont) <- c("x", "y")
@@ -283,7 +294,8 @@ find.roi <-  function(img=NULL,thr="otsu",search.for="largest",size.min=0.01,bg=
         best = best.cont,
         best.class=r.name,
         classes = classes,
-        dim = img.dim
+        dim = img.dim,
+        image=z.best
       )
     }
     )

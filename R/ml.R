@@ -7,11 +7,14 @@
 #' \code{free.ml.hull} estimates a midline by finding the most distant coordinates in the convex hull and then bisects the contour according to these tips.
 #' 
 #' \code{free.ml.del} estimates a midline through Delaunay triangulation and Voronoi tesselation.
+#' 
+#' \code{free.ml.skel} estimates a midline through Voronoi skeletonization.
 #'
 #' @param out a matrix of named x,y values describing a closed outline (contour)
 #' @param smooth.n the number of smoothing iterations. See Details
 #' @param red numeric, between 0-1 the proportion of contour coordinates to sample. Will speed up midline estimations. If 'NULL', the full contour in \code{out} will be used See Details.
 #' @param dens integer,  the factor by which to densify the contour. Will slow down midline estimations but may increase the likelihood of finding a pointed tip. If 'NULL', the original contour in \code{out} will be used See Details.
+#' @param numeric, proportion of points to retain  (0.05-Inf; default 1) in skeletonizing. Applies only to \code{free.ml.skel} See Details.
 #' 
 #' @usage free.ml.ang(out = NULL, smooth.n = NULL, dens = NULL, red = NULL)
 #' 
@@ -33,6 +36,10 @@
 #' 
 #' \code{free.ml.del} estimates the midline by first finding candidate tips of the contour. Midline coordinates are retrieved through Delaunay triangulation and Voronoi tesselation. Triangulated points that lie within the contour are used to build a distance-weighted minimum spanning tree that expands until the the path intersects with the contour. The extrema of the midline path are then indexed as the first and last according to their distance from the candidate tips.
 #' 
+#' \code{free.ml.skel} estimates the midline (i.e., centerlines) by applying Voronoi diagrams using the \code{\link{cnt_path_guess}} function from the \code{centerlines}. Note this function may simplify or density the original outline. If \code{keep equals} 1, \code{cnt_path_guess} with use the original outline (if \code{dens=NULL}). If \code{keep} value is <1, then the function will simplify the outline and >1 the function will densify. Be ware that the 
+#' 
+#' If the keep is above 1, then the densification algorithm is applied using the geos::geos_densify() function. This may produce a very large object if keep is set more than 2. However, the resulting skeleton would potentially be more accurate.
+#' 
 #' The use of \code{free.ml.ang} and \code{free.ml.hull} may be more appropriate for complicated outlines (i.e., those with appendages). The use of \code{free.ml.del} produces better results when contour regions overlap (i.e, kinks or snakes back on itself), but produces less precise midlines for complicated contours and is slower for high resolution outlines. Reducing the resolution with 'red' may hasten the speed. 
 #' 
 #' 'smooth.n' is passed to the 'n' parameter of \code{\link{coo_smooth}}, which smooths coordinates using a simple moving average. Users should be careful not to oversmooth. If the input contour has few points (say just a 100 or so extracted from \code{kin} functions run on low resolution images), much detail will be lost. In general, 'smooth.n' should be <5. 
@@ -52,10 +59,9 @@
 #' @importFrom sp Polygon Polygons SpatialPoints SpatialPolygons over
 #' @importFrom rgeos gDistance
 #' @importFrom igraph get.diameter graph.adjacency minimum.spanning.tree vcount
-#' @importFrom sf as_Spatial
 #' @import methods
 #' 
-#' @seealso \code{\link{coo_smooth}}, \code{\link{coo_slice}},\code{\link{coo_slide}}, \code{\link{coo_truss}}, \code{\link{kin.free}}, \code{\link{deldir}}, \code{\link{kin.free}}
+#' @seealso \code{\link{coo_smooth}}, \code{\link{coo_slice}},\code{\link{coo_slide}}, \code{\link{coo_truss}}, \code{\link{kin.free}}, \code{\link{deldir}}, \code{\link{kin.free}},\code{\link{cnt_path_guess}}
 #' 
 #' @examples
 #' # a lateral midline, but a midline nonetheless
@@ -88,7 +94,18 @@
 #' fml.del <- free.ml.del(out.sm)
 #' points(fml.del$ml$x,fml.del$ml$y,col="red")
 #' 
+#' # through skeletonization should yield similar results
+#' fml.skel <- free.ml.skel(out.sm)
 #' 
+#' plot(out.sm)
+#' points(fml.skel$ml$x,fml.skel$ml$y,col="red")
+#' 
+#' # increase density for a "better" midlin
+#' fml.skel <- free.ml.skel(out.sm,keep=5)
+#' 
+#' plot(out.sm)
+#' points(fml.skel$ml$x,fml.skel$ml$y,col="red")
+
 free.ml.ang <- function(out = NULL,smooth.n=NULL,dens=NULL,red=NULL) {
   
   hull <- bl <- bl2 <- NULL
@@ -644,4 +661,134 @@ free.ml.del <- function(out = NULL,smooth.n=NULL,red=NULL,dens=NULL) {
   return(list(ml=ml2[,list(x,y,n)],cont.sm=coo.dt[,list(n,x,y)],cont.sides=coo.side))
   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+#' @rdname free.ml.skel
+#' @export
+#' 
+free.ml.skel <- function(out = NULL,smooth.n=NULL,red=NULL,dens=NULL,keep=1) {
+  
+  hull <- bl <- bl2 <- NULL
+  
+  if(!"matrix" %in% class(out)) stop("'out' must be a matrix")
+  n <- side <- x <- y <- tip <- n2 <- ang <- is.tip <- dist <- dist2 <- is.tip2 <- tip1.dist <- tip2.dist <- is.tip1 <- ang.rm <- d <- NULL
+  densify <- function(xy,n=5){
+    ## densify a 2-col matrix
+    cbind(Dens(xy[,1],n=n),Dens(xy[,2],n=n))
+  }
+  
+  Dens <- function(x,n=5){
+    ## densify a vector
+    out = rep(NA,1+(length(x)-1)*(n+1))
+    ss = seq(1,length(out),by=(n+1))
+    out[ss]=x
+    for(s in 1:(length(x)-1)){
+      out[(1+ss[s]):(ss[s+1]-1)]=seq(x[s],x[s+1],len=(n+2))[-c(1,n+2)]
+    }
+    out
+  }
+  
+  
+  if(!is.null(dens) & is.null(red)) out <- densify(out,n=dens)
+  
+  if(!is.null(dens)&!is.null(red)) stop("both 'red' and 'dens' are not NULL. Enter values for only one argument" )
+  
+  if(!is.null(dens)&!is.null(keep)| !is.null(red)&!is.null(keep)) {message("both 'red' and 'keep' or 'dens' and 'keep' are not NULL. Ignoring the former, 'keep' value will be used" )
+    dens <- NULL
+    red <- NULL
+  }
+  
+  
+  
+  if (!is.null(red) & is.null(dens) ){
+    if(!is.numeric(red)) stop("'red' must be numeric and 0-1")
+    if (red<0 | red>1 )
+      stop("'red' must be numeric and 0-1")
+  }
+  
+  if(!is.null(red)) red.n <- round(red*(nrow(out)),0)
+  
+  coo <- Momocs::coo_close(out)
+  if(!is.null(red)) coo <- Momocs::coo_interpolate(coo,n=red.n)
+  if(!is.null(smooth.n)) if( smooth.n>0) coo <- Momocs::coo_smooth(coo,smooth.n)
+  colnames(coo) <- c("x","y")
+  
+  
+  tr <-  Momocs::coo_truss(coo)
+  tip.n <- names(tr[which.max(tr)])
+  
+  tips <-
+    c(as.numeric(gsub("(\\d+)-(\\d+)", "\\1", tip.n)), as.numeric(gsub("(\\d+)-(\\d+)", "\\2", tip.n)))
+  
+  coo <-  Momocs::coo_slide(coo, tips[2])
+  
+  ## skeletonize (sf,concaveman, centerline)
+  
+  
+  coo[,1] <- as.numeric(coo[,1])+1e-3
+  coo[,2] <- as.numeric(coo[,2])+1e-3
+  coo.sf <- sf::st_as_sf(data.frame(coo), coords = c("x","y")) 
+  coo.poly <- concaveman::concaveman(coo.sf)
+ 
+  ml <- centerline::cnt_path_guess(input=coo.poly,keep=keep)$geometry
+  
+  ml <- data.table(x=ml[[1]][,1],
+                   y=ml[[1]][,2])[,n:=1:.N]
+  
+  
+ 
+  #reorder and find sides
+
+  coo.dt <- data.table(coo)[,n:=1:.N]
+  #qplot(d=coo.dt,x,y,col=n)+geom_point(d=ml2,aes(x,y),col="red")
+
+  
+  ml.end1 <- ml[n==1]
+  ml.end2 <- ml[n==max(n)]
+  end1 <- coo.dt[,d:=dist.2d(x,ml.end1$x,y,ml.end1$y),by=n][which.min(d),]
+  end2 <- coo.dt[,d:=dist.2d(x,ml.end2$x,y,ml.end2$y),by=n][which.min(d),]
+  
+  tips2 <- c(end1$n,end2$n)
+  
+  coo.slide <-  Momocs::coo_slide(coo,  min(tips2))
+  
+  coo.slide.dt <-data.table(coo.slide)[,n:=1:.N]
+  #qplot(d=coo.slide.dt,x,y,col=n)+geom_point(d=ml.end1,aes(x,y),col="red")+geom_point(d=ml.end2,aes(x,y),col="red")
+  
+  coo.sl <-  Momocs::coo_slice(coo.slide, ids = tips2-min(tips2))
+  
+  n.pts <- sapply(coo.sl,nrow)
+  
+  coo.sl2 <-
+    lapply(coo.sl, function(x)
+      Momocs::coo_sample(x,n=min(n.pts)))
+  
+  
+  n.pts2 <- sapply(coo.sl2,nrow)
+  
+  coo.sl2 <- lapply(coo.sl2, function(x)
+    smoothr::smooth_spline(x,n =max(n.pts2)))
+  
+  coo.side <- data.table(do.call(rbind,coo.sl2))[,side:=c(rep("a",max(n.pts2)),rep("b",max(n.pts2)))]
+  coo.side[,n:=1:.N,by=side][side=="b",n:=rev(n)]
+  colnames(coo.side)[1:2] <- c("x","y")
+  setkeyv(coo.side,c("side","n"))
+
+  # coo.side %>% 
+  #   ggplot(aes(x,y,col=side))+geom_point()
+  # 
+  return(list(ml=ml[,list(x,y,n)],cont.sm=coo.dt[,list(n,x,y)],cont.sides=coo.side))
+
+}
+
 
